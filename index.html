@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lingua — Playground UI</title>
+<meta name="description" content="Experiment with a programming language designed and interpreted entirely from scratch.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header class="top-nav">
+  <div class="nav-left">
+    <div class="brand">
+      <div class="brand-logo">L</div>
+      <span class="brand-title">Lingua</span>
+    </div>
+    <span class="brand-subtitle">A small language, built from scratch.</span>
+  </div>
+
+  <nav class="nav-links">
+    <a href="#" class="nav-link active">Playground</a>
+    <a href="#" class="nav-link">Examples</a>
+    <a href="#" class="nav-link">Docs</a>
+    <a href="#" class="nav-link">Community</a>
+  </nav>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="theme-btn" aria-label="Toggle theme">
+      <svg class="theme-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <button class="btn-secondary">Log in</button>
+    <button class="btn-primary-blue">Sign up</button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero-section">
+    <div class="hero-text">
+      <div class="badge">LINGUA PLAYGROUND</div>
+      <h1 class="hero-title">Write. Run. Understand.</h1>
+      <p class="hero-desc">Experiment with a programming language designed and interpreted entirely from scratch.</p>
+    </div>
+    
+    <div class="hero-actions">
+      <div class="select-dropdown">
+        <select id="example-select">
+          <option value="hello">Hello, World</option>
+          <option value="fibonacci">Fibonacci Series</option>
+          <option value="factorial">Factorial Function</option>
+        </select>
+        <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      
+      <button class="run-button" id="run-btn">
+        <svg class="run-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <polygon points="5,3 19,12 5,21"></polygon>
+        </svg>
+        <span>Run</span>
+        <kbd class="shortcut-key">Ctrl ↵</kbd>
+      </button>
+    </div>
+  </div>
+
+  <div class="playground-grid">
+    <!-- Left Panel: Source Code Editor -->
+    <div class="card editor-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="icon-box dark-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h2 class="card-title">Source Code</h2>
+            <p class="card-subtitle">Write and edit your Lingua program.</p>
+          </div>
+        </div>
+        <div class="file-tag">main.lingua</div>
+      </div>
+
+      <div class="editor-container">
+        <div class="gutter" aria-hidden="true">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+        </div>
+        <div class="code-area">
+          <div class="line-highlight"></div>
+          <pre class="code-content"><code><span class="c-comment">// Welcome to Lingua!</span>
+<span class="c-comment">// A simple example program</span>
+
+<span class="c-keyword">let</span> <span class="c-var">name</span> = <span class="c-string">"World"</span>;
+<span class="c-keyword">let</span> <span class="c-var">count</span> = <span class="c-number">3</span>;
+
+<span class="c-keyword">fn</span> <span class="c-fn">greet</span>(<span class="c-var">n</span>) {
+  <span class="c-fn">print</span>(<span class="c-string">"Hello, "</span> + <span class="c-var">n</span> + <span class="c-string">"!"</span>);
+}
+
+<span class="c-fn">greet</span>(<span class="c-var">name</span>);
+
+<span class="c-keyword">for</span> (<span class="c-keyword">let</span> <span class="c-var">i</span> = <span class="c-number">0</span>; <span class="c-var">i</span> &lt; <span class="c-var">count</span>; <span class="c-var">i</span> = <span class="c-var">i</span> + <span class="c-number">1</span>) {
+  <span class="c-fn">print</span>(<span class="c-string">"Hello, world! Lingua"</span>);
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="editor-footer">
+        <span>Ln 11, Col 12</span>
+        <div class="footer-right">
+          <span>Tab: 2 spaces</span>
+          <span class="divider">|</span>
+          <span>Ctrl ↵ to run</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Run Program -->
+    <div class="card output-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="icon-box blue-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5,3 19,12 5,21"></polygon>
+            </svg>
+          </div>
+          <div>
+            <h2 class="card-title">Run Program</h2>
+            <p class="card-subtitle">Tokenize, parse and interpret your code.</p>
+          </div>
+        </div>
+        <div class="status-indicator">
+          <span class="status-dot green"></span>
+          <span class="status-text">Ready</span>
+        </div>
+      </div>
+
+      <div class="pipeline-stepper">
+        <div class="step-item completed">
+          <div class="step-circle">1</div>
+          <div class="step-info">
+            <div class="step-name">Tokenize</div>
+            <div class="step-detail">18 tokens</div>
+            <div class="step-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Done</div>
+          </div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step-item completed">
+          <div class="step-circle">2</div>
+          <div class="step-info">
+            <div class="step-name">Parse</div>
+            <div class="step-detail">7 nodes</div>
+            <div class="step-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Done</div>
+          </div>
+        </div>
+        <div class="step-line active"></div>
+        <div class="step-item completed green-step">
+          <div class="step-circle">3</div>
+          <div class="step-info">
+            <div class="step-name">Interpret</div>
+            <div class="step-detail">Success</div>
+            <div class="step-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Done</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="output-toolbar">
+        <div class="output-tabs">
+          <button class="tab-btn active">Output</button>
+          <button class="tab-btn">Tokens <span class="tab-badge">18</span></button>
+          <button class="tab-btn">Tree <span class="tab-badge">7</span></button>
+          <button class="tab-btn">Diagnostics <span class="tab-badge">0</span></button>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-icon-text">Clear</button>
+          <button class="btn-square" title="Copy output">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="console-box">
+        <pre class="console-output">Hello, World!
+Hello, world! Lingua
+Hello, world! Lingua
+Hello, world! Lingua
+3
+&gt; <span class="terminal-cursor"></span></pre>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bottom-bar">
+  <div class="footer-left">
+    <span class="status-dot green"></span>
+    <span class="footer-status">Ready</span>
+    <span class="version-tag">Lingua v0.1.0</span>
+    <span class="curiosity-tag">Built with curiosity.</span>
+  </div>
+  <div class="footer-right-links">
+    <a href="#">About</a>
+    <a href="#">Docs</a>
+    <a href="#">Privacy</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
