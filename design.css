@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+:root { color-scheme:light; --bg:#f7f7f4; --surface:#fff; --line:#e6e5e0; --ink:#26251e; --text:#5a5852; --muted:#807d72; --accent:#f54e00; --code-bg:#fafaf7; --code-text:#26251e; --ui:'Inter',sans-serif; --mono:'JetBrains Mono',monospace; --paper:#26251e; }
+body,.hero-world { background:var(--bg); color:var(--ink); font-family:var(--ui); }
+h1,.hero h1,.docs-page > h1 { font-family:var(--ui); font-weight:400; letter-spacing:-.03em; text-shadow:none; }
+.home-hero h1 { font-size:clamp(46px,6vw,80px); }
+.topbar,.home-header,.footer,.home-footer { background:transparent; color:var(--ink); border-color:var(--line); }
+.brand,.home-brand { color:var(--ink); font-weight:500; }
+.home-brand svg { stroke:var(--ink); }
+.topbar .links a,.home-header nav,.home-footer a,.hero-note { color:var(--text); }
+.topbar .links a[aria-current='page'] { color:var(--ink); border-color:var(--ink); }
+.hero-description,.release-label,.docs-page p,.docs-page li { color:var(--text); }
+.card,.explorer-panel,.docs-page .text-card { background:var(--surface); border-color:var(--line); box-shadow:none; border-radius:12px; }
+.terminal-titlebar { background:var(--bg); border-color:var(--line); }
+.terminal-content,#monaco-editor,.docs-page pre { background:var(--code-bg); border-color:var(--line); color:var(--ink); }
+.terminal-content,.docs-page pre,.docs-page code { font-family:var(--mono); }
+#terminal-screen,.terminal-command,.terminal-command > span:first-child,.docs-page code { color:var(--ink); }
+.select,.save-details input,.save-details select,.save-details button { background:var(--surface); color:var(--ink); border-color:#cfcdc4; }
+.tree-folder-trigger { color:var(--text) !important; }
+.tree-file[aria-current='true'] { background:#efeee8 !important; color:var(--ink); }
+.btn-run,.primary-link { background:var(--accent); color:white; box-shadow:none; border-radius:8px; }
+.guide-link,.header-cta { background:#f7f7f4b8; border-color:#cfcdc4; color:var(--ink); box-shadow:none; }
+.docs-table th { background:#efeee8; color:var(--ink); }
+.docs-table th,.docs-table td { border-color:var(--line); }
+#wave-field { filter:invert(1); opacity:.32; }
+.hero-veil { background:radial-gradient(ellipse at center,#f7f7f4ed,#f7f7f499 48%,transparent 90%); }
+#assistant-panel { background:var(--bg); color:var(--ink); border-color:#cfcdc4; box-shadow:none; width:min(460px,100vw); gap:18px; }
+#assistant-panel header { align-items:flex-start; }
+#assistant-panel h2 { font-size:26px; font-weight:400; letter-spacing:-.025em; margin-top:8px; }
+.assistant-eyebrow { font-size:11px; color:var(--muted); }
+#assistant-panel p { color:var(--text); margin:0; }
+#assistant-panel button,#toggle-assistant { background:white; color:var(--ink); border-color:#cfcdc4; border-radius:8px; }
+#assistant-panel textarea { background:white; color:var(--ink); border-color:#cfcdc4; }
+#assistant-panel #ask-assistant { background:var(--accent); color:white; border-color:var(--accent); min-height:44px; }
+.assistant-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+#assistant-panel .assistant-prompts button { padding:8px 10px; font-size:12px; }
+.groq-setup { border:1px solid #cfcdc4; border-radius:8px; padding:14px; font-size:12px; line-height:1.7; }
+.groq-setup summary { cursor:pointer; font-weight:500; }
+.groq-setup summary span { float:right; color:var(--muted); font-weight:400; }
+.groq-setup ol { padding-left:18px; }
+.groq-setup li { margin:10px 0; }
+.groq-setup a { color:#b83a00; text-decoration:underline; }
+.groq-setup pre { overflow:auto; background:#efeee8; padding:10px; font:11px var(--mono); }
+.assistant-progress { align-self:flex-start; font-size:11px; padding:5px 10px; border-radius:999px; background:#9fbbe04d; }
+#assistant-answer { background:#fff; border:1px solid var(--line); padding:16px; border-radius:8px; min-height:130px; }
+:focus-visible { outline-color:#b83a00; }
+@media(prefers-reduced-motion:no-preference) { #assistant-panel:not([hidden]) { animation:assistant-in 220ms ease-out; } @keyframes assistant-in { from { transform:translateX(30px); opacity:0; } to { transform:none; opacity:1; } } }

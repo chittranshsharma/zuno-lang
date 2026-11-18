@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="workspace.css">
   <link rel="stylesheet" href="interactions.css">
   <link rel="stylesheet" href="premium.css">
-<link rel="stylesheet" href="/assets/editor.css"></head>
+<link rel="stylesheet" href="/assets/editor.css"><link rel="stylesheet" href="/design.css"></head>
 <body>
   <header class="topbar">
     <a class="brand" href="/">Lingua</a>
@@ -99,5 +99,7 @@ print(name);</textarea></div>
   <script src="programs.js?v=3"></script>
   <script src="workspace.js"></script>
   <script src="interactions.js"></script>
-<aside id="assistant-panel" hidden aria-label="Code assistant"><header><h2>Code assistant</h2><button id="close-assistant" aria-label="Close assistant">Close</button></header><p>Powered by Groq. Submitting sends your current code and question to Groq. Suggestions never change files automatically.</p><div id="assistant-answer" role="status" aria-live="polite">Ask for an explanation or help finding a bug.</div><form id="assistant-form"><label for="assistant-question">Your question</label><textarea id="assistant-question" maxlength="2000" required placeholder="Explain this program step by step"></textarea><button id="ask-assistant" type="submit">Ask about my code</button></form></aside><script type="module" src="/assets/editor.js"></script></body>
+<aside id="assistant-panel" hidden aria-label="Code assistant"><header><div><span class="assistant-eyebrow">Lingua / AI</span><h2>A second perspective.</h2></div><button id="close-assistant" aria-label="Close assistant">Close</button></header><p>Powered by Groq. Submitting sends your current code and question to Groq. Suggestions never change files automatically.</p><div class="assistant-prompts"><button type="button" data-question="Explain this program step by step">Explain code</button><button type="button" data-question="Find potential bugs in this program">Find a bug</button><button type="button" data-question="Suggest a simpler approach using supported Lingua syntax">Simplify</button></div>
+<details class="groq-setup"><summary>Connect Groq <span>Setup guide</span></summary><ol><li><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Create a Groq API key ↗</a></li><li>In the Lingua project folder, create a file named <code>.env</code> alongside <code>server.js</code> and <code>package.json</code>.</li><li>Add this line, replacing the placeholder:<pre>GROQ_API_KEY=your_key_here</pre></li><li>Restart the server with <code>npm start</code>, then ask your question.</li></ol><p>For hosted sites, add GROQ_API_KEY in your hosting provider’s environment variables. This is server-owner setup; visitors cannot configure a shared server here. Keep the key out of chat, browser code, and Git.</p></details>
+<span id="assistant-progress" class="assistant-progress">Ready when you are</span><div id="assistant-answer" role="status" aria-live="polite">Ask for an explanation or help finding a bug.</div><form id="assistant-form"><label for="assistant-question">Your question</label><textarea id="assistant-question" maxlength="2000" required placeholder="Explain this program step by step"></textarea><button id="ask-assistant" type="submit">Ask about my code</button></form></aside><script type="module" src="/assets/editor.js"></script></body>
 </html>

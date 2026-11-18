@@ -6,6 +6,7 @@ try { process.loadEnvFile(); } catch {}
 const Program = mongoose.model('Program', new mongoose.Schema({ title: { type: String, required: true }, code: { type: String, required: true }, folder: { type: String, default: 'General' } }, { timestamps: true }));
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lingua';
 app.use(express.json());
+app.get('/design.css', (request, response) => response.sendFile(path.join(__dirname, 'design.css')));
 app.get('/premium.css', (request, response) => response.sendFile(path.join(__dirname, 'premium.css')));
 app.get(['/interactions.css', '/interactions.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
 app.get(['/workspace.css', '/workspace.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
