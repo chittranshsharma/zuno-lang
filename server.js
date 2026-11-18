@@ -8,7 +8,7 @@ const Program = mongoose.model('Program', new mongoose.Schema({ title: { type: S
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lingua';
 app.use(express.json());
 app.get('/favicon.ico', (request, response) => response.status(204).end());
-app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/feedback.js', '/files.js', '/programs.js'], (request, response) => {
+app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/engine.js', '/feedback.js', '/files.js', '/programs.js'], (request, response) => {
   response.sendFile(path.join(__dirname, request.path));
 });
 app.get('/', (request, response) => response.redirect('/playground.html'));

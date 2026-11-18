@@ -27,7 +27,7 @@ Lingua currently uses two statements: `let` stores a value and `print` displays 
 
 | Part | What it does |
 | --- | --- |
-| Playground | Run Lingua code, try three examples, and see output or a line-specific error. |
+| Playground | Run Lingua code, try four examples, and see output or a line-specific error. |
 | Explorer | Save, open, update, and delete programs; group them using folder paths such as `College/Maths`. |
 | File tools | Export code to a `.lingua` file and import `.lingua` or `.txt` files later. |
 | Editor details | Show line and character counts, the selected file, and unsaved code changes. |
@@ -78,6 +78,10 @@ Express provides `GET /api/programs`, `POST /api/programs`, `PUT /api/programs/:
 
 ## Current scope
 
-Lingua is deliberately small. Conditions, loops, and functions are not implemented. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
+Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions are not implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
 
 Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js, Express, and MongoDB**.
+
+## Development
+
+Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.

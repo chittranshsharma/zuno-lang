@@ -57,6 +57,7 @@
               <option value="hello">Hello World</option>
               <option value="math">Simple Maths</option>
               <option value="power">Power and Brackets</option>
+              <option value="control">Loops and Conditions</option>
             </select>
             <label class="field-label" for="code">Code</label>
             <textarea id="code" class="code-editor" spellcheck="false">let name = "World";
@@ -68,7 +69,7 @@ print(name);</textarea>
           <section class="card">
             <header class="card-head"><div><h2>Output</h2><p>Results appear here after you run the code.</p></div></header>
             <pre id="output" class="console" aria-live="polite">Ready to run.</pre>
-            <p class="help">Supports let, print, numbers, strings, + - * / ** %, and brackets.</p>
+            <p class="help">Supports variables, maths, text, booleans, conditions, and loops.</p>
           </section>
         </div>
         <section class="card programs-card">
@@ -85,7 +86,8 @@ print(name);</textarea>
     </div>
   </main>
   <footer class="footer"><span>Lingua · Web Programming project</span><a href="docs.html">Learn the syntax</a></footer>
-  <script src="playground.js?v=4"></script>
+  <script src="engine.js"></script>
+  <script src="playground.js?v=5"></script>
   <script src="files.js?v=2"></script>
   <script src="programs.js?v=3"></script>
 </body>
