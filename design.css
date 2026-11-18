@@ -44,3 +44,4 @@ h1,.hero h1,.docs-page > h1 { font-family:var(--ui); font-weight:400; letter-spa
 #assistant-answer { background:#fff; border:1px solid var(--line); padding:16px; border-radius:8px; min-height:130px; }
 :focus-visible { outline-color:#b83a00; }
 @media(prefers-reduced-motion:no-preference) { #assistant-panel:not([hidden]) { animation:assistant-in 220ms ease-out; } @keyframes assistant-in { from { transform:translateX(30px); opacity:0; } to { transform:none; opacity:1; } } }
+.explorer-panel,.explorer-panel h2,.explorer-panel button,.save-details summary { color:var(--ink); } .explorer-help { color:var(--text); } .explorer-head,.save-details { border-color:var(--line); } .brand::before { color:var(--ink); }
