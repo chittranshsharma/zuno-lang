@@ -1,1 +1,13 @@
-{"name":"lingua","version":"0.3.0","private":true,"scripts":{"start":"node server.js"},"dependencies":{"express":"^4.21.2","mongoose":"^8.19.0"}}
+{
+  "name": "lingua",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.19.0"
+  }
+}
