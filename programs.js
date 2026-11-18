@@ -7,6 +7,35 @@ const updateButton = document.querySelector('#update-program');
 const deleteButton = document.querySelector('#delete-program');
 let programs = [];
 
+document.querySelector('#refresh-programs').addEventListener('click', loadPrograms);
+document.querySelector('#new-program').addEventListener('click', () => {
+  programList.value = '';
+  titleInput.value = '';
+  code.value = '';
+  code.dispatchEvent(new Event('input'));
+  updateButton.disabled = true;
+  deleteButton.disabled = true;
+  programStatus.textContent = 'New program ready. Add a title and click Save new.';
+  titleInput.focus();
+});
+document.querySelector('#new-folder').addEventListener('click', () => {
+  const folder = prompt('Folder name or path, such as College/Maths:');
+  if (folder === null) return;
+  if (!/^[\w -]+(?:\/[\w -]+)*$/.test(folder.trim())) return programStatus.textContent = 'Use simple folder names separated by /.';
+  folderInput.value = folder.trim();
+  programStatus.textContent = 'Folder selected. Save a program to show it in the Explorer.';
+});
+document.querySelector('#copy-shared').addEventListener('click', () => {
+  programList.value = '';
+  titleInput.value = 'My copy';
+  folderInput.value = 'General';
+  updateButton.disabled = true;
+  deleteButton.disabled = true;
+  document.querySelector('#shared-notice').hidden = true;
+  programStatus.textContent = 'Your copy is ready. Change the title and click Save new.';
+  titleInput.focus();
+});
+
 function selectProgram(id) {
   const selected = programs.find(program => program._id === id);
   programList.value = id;
@@ -42,11 +71,11 @@ function drawFolders(parent, folder) {
 }
 
 function showTree() {
-  const tree = {};
+  const tree = Object.create(null);
   programs.forEach(program => {
     let folder = tree;
     (program.folder || 'General').split('/').forEach(name => {
-      folder[name] ||= {};
+      folder[name] ||= Object.create(null);
       folder = folder[name];
     });
     folder[program._id] = { program };

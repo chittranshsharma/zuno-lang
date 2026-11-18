@@ -6,8 +6,8 @@ Lingua is our Web Programming course project. It is a small programming language
 
 - Four linked pages: Playground, Docs, About, and Feedback.
 - A beginner Docs tutorial with small steps, expected output, a syntax table, and common mistakes.
-- A code box with a Run button, Ctrl + Enter shortcut, and two examples.
-- A simple JavaScript runner for `let`, `print`, numbers, strings, and `+`, `-`, `*`, `/` expressions.
+- A code box with a Run button, Ctrl + Enter shortcut, and three working examples.
+- A simple JavaScript runner for `let`, `print`, numbers, strings, `+ - * / ** %`, and brackets.
 - Error messages that show the line number.
 - A feedback form with name, email, and message validation.
 - An Express route that saves valid feedback in `data/feedback.json`.
@@ -15,9 +15,12 @@ Lingua is our Web Programming course project. It is a small programming language
 - Program saving, loading, updating, and deleting through Express and MongoDB.
 - A live line and character count below the editor.
 - A folder explorer for saved programs. Enter a folder like `College/Maths` when saving, then click the file in the explorer to load it.
+- The Explorer now sits beside the editor, with expandable folders and clickable program files.
+- New file clears the editor. New folder sets a folder path; it appears after you save a program there.
+- Shared code opens with a Make my copy button so a friend can prepare a separate saved version.
 - Exporting, importing, and sharing code through the playground.
 
-The language runner is intentionally small. It reads one statement per line. It does not support loops, conditions, or functions yet. Maths is calculated from left to right, so it does not use normal operator precedence yet.
+The language runner is intentionally small. It reads one statement per line. It does not support loops, conditions, or functions yet. Maths follows the usual order: brackets and powers, then multiplication/division/remainder, then addition/subtraction.
 
 ## How to run it
 
@@ -43,6 +46,10 @@ The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your
 `programs.js` sends requests from the saved programs section and builds the folder explorer from saved folder names. A folder is stored as a simple path on each program, so there is no separate folder collection. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title, code, and folder. Mongoose also adds creation and update times.
 
 `files.js` downloads code as a `.lingua` file, imports `.lingua` and `.txt` files under 10 KB, and makes share links for code up to 2000 characters. The code is inside the link, so anyone with the link can read it.
+
+The example menu and Docs use the same working syntax as the playground: `let`, `print`, numbers, double-quoted text, `+ - * / ** %`, and brackets. The Power and Brackets example prints 25 and 1. Conditions, loops and functions are future ideas, not current commands.
+
+Collaboration is simple: send a share link, let a friend edit the code, then click Make my copy and Save new. This is an independent copy, not live simultaneous editing. Saved programs are in one shared MongoDB collection for the course demo; there are no user accounts or private folders.
 
 Feedback uses a local JSON file because that is part of the second evaluation. `POST /api/feedback` saves a form submission, and `GET /api/feedback` fetches the saved submissions. The playground does not show submitted feedback because it contains names and email addresses.
 

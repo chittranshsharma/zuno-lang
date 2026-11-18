@@ -10,7 +10,8 @@ code.addEventListener('input', updateCount);
 updateCount();
 const examples = {
   hello: 'let name = "World";\nprint(name);',
-  math: 'let a = 5;\nlet b = 3;\nprint(a + b);\nprint(a * b);'
+  math: 'let a = 5;\nlet b = 3;\nprint(a + b);\nprint(a * b);',
+  power: 'let answer = (2 + 3) ** 2;\nprint(answer);\nprint(10 % 3);'
 };
 
 document.querySelector('#example').addEventListener('change', event => {

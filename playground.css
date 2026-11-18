@@ -682,15 +682,31 @@ h1 {
 .programs-card label { font-weight: 600; }
 .program-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .program-actions button { padding: 10px 15px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; }
-.saved-layout { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; gap: 24px; }
+.editor-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 18px; margin-top: 22px; }
+.editor-main { min-width: 0; }
+.editor-main .workspace { margin-top: 0; }
+.explorer-panel { min-height: 520px; padding: 14px 10px; border: 1px solid #2f3547; border-radius: 8px; background: #1e2230; color: #e8ebf7; font: 0.82rem/1.5 var(--ui); }
+.explorer-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 8px 12px; border-bottom: 1px solid #383e51; }
+.explorer-head h2 { margin: 0; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.explorer-head button { padding: 4px 7px; border: 1px solid #5b6380; border-radius: 4px; background: transparent; color: inherit; cursor: pointer; }
+.explorer-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+.explorer-actions button { font-size: .7rem; }
+.explorer-panel .folder-tree { margin: 10px 0; padding: 0; border: 0; }
+.explorer-panel .folder-tree details { margin: 3px 0 3px 12px; }
+.explorer-panel .folder-tree summary { padding: 4px; color: #c9c2ff; cursor: pointer; }
+.explorer-panel .folder-tree button { display: block; width: 100%; padding: 5px 8px 5px 18px; border: 0; border-radius: 4px; background: transparent; color: #e8ebf7; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.explorer-panel .folder-tree button:hover, .explorer-panel .folder-tree button:focus-visible { background: #363d55; }
+.explorer-help { padding: 8px; color: #a5acc4; font-size: .75rem; }
+.shared-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 12px 16px; border: 1px solid #bdd8f7; border-radius: 8px; background: #eef6ff; }
+.shared-notice[hidden] { display: none; }
+.shared-notice button { flex: none; padding: 8px 12px; border: 0; border-radius: 5px; background: var(--accent); color: #fff; cursor: pointer; }
+@media (max-width: 1000px) { .editor-layout { grid-template-columns: 190px minmax(0, 1fr); } }
+@media (max-width: 800px) { .editor-layout { grid-template-columns: 1fr; } .explorer-panel { min-height: 0; } }
+@media (max-width: 699px) { .shared-notice { align-items: flex-start; flex-direction: column; } }
 .saved-form { display: flex; flex-direction: column; gap: 10px; }
 .saved-form input, .saved-form select { padding: 10px; border: 1px solid var(--line); border-radius: 6px; }
 .folder-tree { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; }
 .folder-tree details { margin-left: 12px; }
 .folder-tree button { display: block; width: 100%; padding: 6px; border: 0; background: none; text-align: left; cursor: pointer; }
-@media (max-width: 699px) { .saved-layout { grid-template-columns: 1fr; } }
 .program-actions button:disabled { opacity: .5; cursor: default; }
 @media (max-width: 699px) { .topbar { height: auto; min-height: 70px; gap: 12px; } .links { display: flex; margin: 0; gap: 12px; } .workspace { grid-template-columns: 1fr; } }
-.programs-card { margin-top: 24px; padding: 24px; gap: 12px; }
-.program-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.program-actions button { padding: 10px 15px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; }

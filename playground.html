@@ -1,6 +1,99 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lingua Playground</title><link rel="stylesheet" href="playground.css"></head><body>
-<header class="topbar"><a class="brand" href="playground.html">Lingua</a><nav class="links" aria-label="Main navigation"><a href="playground.html">Playground</a><a href="docs.html">Docs</a><a href="about.html">About</a><a href="feedback.html">Feedback</a></nav></header>
-<main class="page"><section class="hero"><div><p class="eyebrow">Lingua playground</p><h1>Write. Run. Understand.</h1><p class="lede">Try a small language made for our Web Programming project.</p></div></section>
-<div class="workspace"><section class="card"><header class="card-head"><div><h2>Source Code</h2><p>Write code or choose an example.</p></div></header><label class="field-label" for="example">Example</label><select id="example" class="select"><option value="hello">Hello World</option><option value="math">Simple Maths</option></select><label class="field-label" for="code">Code</label><textarea id="code" class="code-editor" spellcheck="false">let name = "World";
-print(name);</textarea><p id="code-count" class="help" aria-live="polite">2 lines · 31 characters</p><div class="editor-actions"><button id="run" class="btn-run" type="button">Run</button><span>Ctrl + Enter</span></div></section>
-<section class="card"><header class="card-head"><div><h2>Output</h2><p>Results appear here after you run the code.</p></div></header><pre id="output" class="console" aria-live="polite">Ready to run.</pre><p class="help">Supported now: let, print, numbers, strings, and + - * / ** %.</p></section></div><section class="card programs-card"><h2>Take your code with you</h2><p>Download a Lingua file, open one later, or copy a link to share the code.</p><div class="program-actions"><button id="export-code" type="button">Export file</button><button id="import-code" type="button">Import file</button><button id="share-code" type="button">Copy share link</button></div><input id="import-file" type="file" accept=".lingua,.txt,text/plain" hidden><p id="file-status" role="status" aria-live="polite"></p></section><section class="card programs-card"><h2>Saved programs</h2><p>Give your code a title and folder, then save it.</p><div class="saved-layout"><div><h3>Explorer</h3><div id="folder-tree" class="folder-tree">Connect MongoDB to see saved files.</div></div><div class="saved-form"><label for="program-title">Title</label><input id="program-title" maxlength="80" placeholder="My first program"><label for="program-folder">Folder</label><input id="program-folder" maxlength="100" value="General" placeholder="College/Maths"><p class="help">Use / for subfolders, like College/Maths.</p><div class="program-actions"><button id="save-program" type="button">Save new</button><button id="update-program" type="button" disabled>Update selected</button><button id="delete-program" type="button" disabled>Delete selected</button></div><label for="saved-programs">My programs</label><select id="saved-programs"><option value="">Select a program</option></select><p id="program-status" role="status" aria-live="polite"></p></div></div></section></main><footer class="footer"><span>Lingua · Web Programming project</span><a href="about.html">How it works</a></footer><script src="playground.js?v=3"></script><script src="files.js?v=1"></script><script src="programs.js?v=2"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lingua Playground</title>
+  <link rel="stylesheet" href="playground.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="playground.html">Lingua</a>
+    <nav class="links" aria-label="Main navigation">
+      <a href="playground.html" aria-current="page">Playground</a>
+      <a href="docs.html">Docs</a>
+      <a href="about.html">About</a>
+      <a href="feedback.html">Feedback</a>
+    </nav>
+  </header>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Lingua playground</p>
+        <h1>Write. Run. Share.</h1>
+        <p class="lede">Try the examples, make your own program, or open a friend's link.</p>
+      </div>
+    </section>
+    <div class="editor-layout">
+      <aside class="explorer-panel" aria-label="Program explorer">
+        <div class="explorer-head">
+          <h2>Explorer</h2>
+          <div class="explorer-actions"><button id="new-program" type="button" title="New program">+ File</button><button id="new-folder" type="button" title="New folder">+ Folder</button><button id="refresh-programs" type="button" title="Refresh saved programs">↻</button></div>
+        </div>
+        <div id="folder-tree" class="folder-tree">Loading saved programs...</div>
+        <p class="explorer-help">Saved files appear here when MongoDB is connected.</p>
+      </aside>
+      <div class="editor-main">
+        <div id="shared-notice" class="shared-notice" hidden>
+          <span>You're viewing shared code. Edit it, then save your own copy or share it again.</span>
+          <button id="copy-shared" type="button">Make my copy</button>
+        </div>
+        <div class="workspace">
+          <section class="card">
+            <header class="card-head"><div><h2>Source Code</h2><p>Write code or choose an example.</p></div></header>
+            <label class="field-label" for="example">Example</label>
+            <select id="example" class="select">
+              <option value="hello">Hello World</option>
+              <option value="math">Simple Maths</option>
+              <option value="power">Power and Brackets</option>
+            </select>
+            <label class="field-label" for="code">Code</label>
+            <textarea id="code" class="code-editor" spellcheck="false">let name = "World";
+print(name);</textarea>
+            <p id="code-count" class="help" aria-live="polite"></p>
+            <div class="editor-actions"><button id="run" class="btn-run" type="button">Run</button><span>Ctrl + Enter</span></div>
+          </section>
+          <section class="card">
+            <header class="card-head"><div><h2>Output</h2><p>Results appear here after you run the code.</p></div></header>
+            <pre id="output" class="console" aria-live="polite">Ready to run.</pre>
+            <p class="help">Supports let, print, numbers, strings, + - * / ** %, and brackets.</p>
+          </section>
+        </div>
+        <section class="card programs-card">
+          <h2>Take your code with you</h2>
+          <p>Download a file, open one later, or send someone a link.</p>
+          <div class="program-actions">
+            <button id="export-code" type="button">Export file</button>
+            <button id="import-code" type="button">Import file</button>
+            <button id="share-code" type="button">Copy share link</button>
+          </div>
+          <input id="import-file" type="file" accept=".lingua,.txt,text/plain" hidden>
+          <p id="file-status" role="status" aria-live="polite"></p>
+        </section>
+        <section class="card programs-card">
+          <h2>Save a program</h2>
+          <p>Choose a title and folder. Use / for subfolders, like College/Maths.</p>
+          <div class="saved-form">
+            <label for="program-title">Title</label>
+            <input id="program-title" maxlength="80" placeholder="My first program">
+            <label for="program-folder">Folder</label>
+            <input id="program-folder" maxlength="100" value="General" placeholder="College/Maths">
+            <div class="program-actions">
+              <button id="save-program" type="button">Save new</button>
+              <button id="update-program" type="button" disabled>Update selected</button>
+              <button id="delete-program" type="button" disabled>Delete selected</button>
+            </div>
+            <label for="saved-programs">Selected program</label>
+            <select id="saved-programs"><option value="">Select a program</option></select>
+            <p id="program-status" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="footer"><span>Lingua · Web Programming project</span><a href="docs.html">Learn the syntax</a></footer>
+  <script src="playground.js?v=4"></script>
+  <script src="files.js?v=2"></script>
+  <script src="programs.js?v=3"></script>
+</body>
+</html>

@@ -50,6 +50,7 @@ if (location.hash.startsWith('#code=')) {
       code.dispatchEvent(new Event('input'));
       output.textContent = 'Shared code loaded. Press Run to see the output.';
       fileStatus.textContent = 'You opened a shared program.';
+      document.querySelector('#shared-notice').hidden = false;
     }
   } catch (error) { fileStatus.textContent = 'This share link could not be opened.'; }
 }
