@@ -84,6 +84,8 @@ Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js
 
 ## Development
 
+The Explorer now uses folder/file icons, nesting guides, folder-first sorting, collapse/expand controls, and animated folder opening. The code and output panels use matching terminal windows. Code highlights keywords, strings, and numbers; loading a file or example animates the tokens. Each run types the real result into the terminal, and repeated runs restart the animation. The extra example panel has been removed. Reduced-motion settings show content immediately. See [UI-CREDITS.md](UI-CREDITS.md) for component references.
+
 The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Cloud accounts, project ownership, live collaboration, and a Monaco editor are still pending.
 
 Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.

@@ -17,6 +17,7 @@ const examples = {
 };
 
 document.querySelector('#example').addEventListener('change', event => {
+  document.querySelector('#editor-filename').textContent = event.target.selectedOptions[0].textContent + '.lingua';
   code.value = examples[event.target.value];
   code.dispatchEvent(new Event('input'));
   output.textContent = 'Ready to run.';

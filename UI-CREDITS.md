@@ -1,7 +1,9 @@
-# UI references
+# Interface references
 
-The example navigation is a vanilla JavaScript adaptation of the branching interaction shown by [React Bits Branched Menu](https://reactbits.dev/c/micro/branched-menu), by David Haz. It uses native buttons and disclosure groups, with animated SVG branch strokes. No React dependency is required.
+The current file explorer and terminal adapt the behavior of the Magic UI File Tree and Terminal documentation supplied by the user, authored by dillionverma. These are native JavaScript implementations for Lingua's existing HTML interface, rather than installations of the React/Radix components.
 
-The animated terminal is an original implementation inspired by the publicly described token-transition behavior of [React Bits Pro Code Morph](https://pro.reactbits.dev/docs/components/code-morph). It does not contain the licensed Pro component source. Matching output tokens move to their new positions with the Web Animations API; new tokens fade in. Reduced-motion preferences disable these animations.
+The file explorer has folder and file icons, folder-first sorting, persistent expansion during refresh and selection, nesting indicators, selection styling, collapse/expand controls, and animated folder contents.
 
-The branch menu selects Lingua examples. Open selected example asks before replacing existing code. Terminal animation reacts to real runtime output, including errors and clearing.
+Both editor and runtime output use a terminal window shell. The editor has a syntax-highlighted overlay and staggered token entrance when a file or example loads. Manual typing stays immediate. Output types on each run, including repeated runs with identical results, and restarts safely if another result arrives before typing finishes. Reduced motion displays complete content immediately. A separate live region exposes the full result to assistive technology.
+
+Earlier iterations used React Bits Branched Menu and Code Morph as interaction references. The additional example panel and earlier token-morph output have been replaced by the current interface.

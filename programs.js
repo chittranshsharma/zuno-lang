@@ -9,6 +9,11 @@ const saveDetails = document.querySelector('.save-details');
 const editorState = document.querySelector('#editor-state');
 let programs = [];
 let savedCode = null;
+const folderStates = new Map();
+const treeIcons = {
+  file: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
+  folder: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/></svg>'
+};
 
 function updateEditorState() {
   editorState.textContent = code.value === savedCode ? 'Saved' : code.value ? 'Unsaved changes' : 'New file';
@@ -36,6 +41,7 @@ document.querySelector('#new-program').addEventListener('click', () => {
   saveDetails.open = true;
   programList.value = '';
   titleInput.value = '';
+  document.querySelector('#editor-filename').textContent = 'untitled.lingua';
   code.value = '';
   code.dispatchEvent(new Event('input'));
   savedCode = null;
@@ -60,6 +66,7 @@ function selectProgram(id) {
   updateButton.disabled = !selected;
   deleteButton.disabled = !selected;
   if (!selected) return;
+  document.querySelector('#editor-filename').textContent = selected.title + '.lingua';
   saveDetails.open = true;
   titleInput.value = selected.title;
   folderInput.value = selected.folder || 'General';
@@ -70,27 +77,63 @@ function selectProgram(id) {
   programStatus.textContent = 'Program loaded.';
 }
 
-function drawFolders(parent, folder) {
-  Object.keys(folder).sort().forEach(name => {
+function drawFolders(parent, folder, path = '') {
+  Object.keys(folder).sort((a, b) => Number(Boolean(folder[a].program)) - Number(Boolean(folder[b].program)) || (folder[a].program?.title || a).localeCompare(folder[b].program?.title || b, undefined, { numeric: true })).forEach(name => {
     const item = folder[name];
     if (item.program) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.textContent = item.program.title + '.lingua';
+      button.className = 'tree-file';
+      button.innerHTML = treeIcons.file;
+      const label = document.createElement('span');
+      label.textContent = item.program.title + '.lingua';
+      button.append(label);
       if (item.program._id === programList.value) button.setAttribute('aria-current', 'true');
-      button.addEventListener('click', () => selectProgram(item.program._id));
+      button.addEventListener('click', () => {
+        selectProgram(item.program._id);
+        folderTree.querySelector('[aria-current="true"]')?.focus();
+      });
       parent.append(button);
     } else {
-      const details = document.createElement('details');
-      details.open = true;
-      const summary = document.createElement('summary');
-      summary.textContent = name;
-      details.append(summary);
-      drawFolders(details, item);
-      parent.append(details);
+      const key = path + '/' + name;
+      const section = document.createElement('div');
+      section.className = 'tree-folder';
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'tree-folder-trigger';
+      trigger.innerHTML = '<span class="tree-chevron" aria-hidden="true">›</span>' + treeIcons.folder;
+      const label = document.createElement('span');
+      label.textContent = name;
+      trigger.append(label);
+      const body = document.createElement('div');
+      body.className = 'tree-children';
+      body.id = 'folder-' + encodeURIComponent(key);
+      trigger.setAttribute('aria-controls', body.id);
+      function setOpen(open) {
+        folderStates.set(key, open);
+        trigger.setAttribute('aria-expanded', String(open));
+        body.hidden = !open;
+        if (open && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          body.getAnimations().forEach(animation => animation.cancel());
+          body.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(.22,1,.36,1)' });
+        }
+      }
+      drawFolders(body, item, key);
+      trigger.setAttribute('aria-expanded', String(folderStates.get(key) !== false));
+      body.hidden = folderStates.get(key) === false;
+      trigger.addEventListener('click', () => setOpen(body.hidden));
+      section.append(trigger, body);
+      parent.append(section);
     }
   });
 }
+document.querySelector('#collapse-folders').addEventListener('click', () => {
+  const expanded = folderTree.querySelector('[aria-expanded="true"]');
+  for (const trigger of folderTree.querySelectorAll('.tree-folder-trigger')) {
+    if (trigger.getAttribute('aria-expanded') === String(Boolean(expanded))) trigger.click();
+  }
+  document.querySelector('#collapse-folders').textContent = expanded ? 'Expand all' : 'Collapse all';
+});
 
 function showTree() {
   const tree = Object.create(null);
