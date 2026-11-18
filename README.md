@@ -95,6 +95,6 @@ Run `npm test` for the engine tests. The next product version is being built on 
 ## Editor and optional AI
 The playground uses Monaco with Lingua highlighting, completion snippets, line numbers, bracket matching, find, and undo. Ctrl+Enter runs the program. Ctrl+Alt+B opens the Groq code assistant. It explains code and suggests changes; it does not execute code or edit files.
 
-Set GROQ_API_KEY in a local .env file or server environment and restart npm start. GROQ_MODEL optionally overrides llama-3.3-70b-versatile. Never commit credentials. Only submitted questions and the current editor contents are sent to Groq. Without a key the editor still works and the assistant shows a setup message. Requests have size limits, a timeout, and a per-IP rate limit; public hosting still needs authentication and per-user quotas.
+Each visitor can add their own Groq key in the assistant sidebar. Get one at https://console.groq.com/keys, paste it into Your Groq key, and choose Use key. No .env setup is required. Keys stay in page memory, are cleared on refresh/disconnect, and pass through the server only to authorize the Groq request. Lingua does not persist keys. Host over HTTPS. GROQ_MODEL optionally overrides llama-3.3-70b-versatile on the server. Requests have size limits, a timeout and a per-IP rate limit.
 
 The Feedback page and its API routes have been removed. Existing stored submissions are left untouched.
