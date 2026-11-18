@@ -5,7 +5,7 @@ const app = express();
 const dataFile = path.join(__dirname, 'data', 'feedback.json');
 app.use(express.json());
 app.get('/favicon.ico', (request, response) => response.status(204).end());
-app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/feedback.js'], (request, response) => {
+app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/feedback.js', '/files.js'], (request, response) => {
   response.sendFile(path.join(__dirname, request.path));
 });
 app.get('/', (request, response) => response.redirect('/playground.html'));
