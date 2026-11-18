@@ -45,7 +45,7 @@ The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your
 
 `programs.js` sends requests from the saved programs section and builds the folder explorer from saved folder names. A folder is stored as a simple path on each program, so there is no separate folder collection. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title, code, and folder. Mongoose also adds creation and update times.
 
-`files.js` downloads code as a `.lingua` file and imports `.lingua` and `.txt` files under 10 KB and 5000 characters. The 5000-character limit matches the MongoDB program API. Friends can exchange exported files.
+`files.js` downloads code as a `.lingua` file and imports `.lingua` and `.txt` files under 20 KB and 5000 characters. Export and MongoDB saving use the same 5000-character limit, so an exported program can be imported again. Friends can exchange exported files.
 
 The example menu and Docs use the same working syntax as the playground: `let`, `print`, numbers, double-quoted text, `+ - * / ** %`, and brackets. The Power and Brackets example prints 25 and 1. Conditions, loops and functions are future ideas, not current commands.
 

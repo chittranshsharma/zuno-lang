@@ -3,6 +3,7 @@ const fileInput = document.querySelector('#import-file');
 
 document.querySelector('#export-code').addEventListener('click', () => {
   if (!code.value.trim()) return fileStatus.textContent = 'Write some code first.';
+  if (code.value.length > 5000) return fileStatus.textContent = 'Keep code under 5000 characters to export it.';
   const file = new Blob([code.value], { type: 'text/plain' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(file);
@@ -16,8 +17,8 @@ document.querySelector('#import-code').addEventListener('click', () => fileInput
 fileInput.addEventListener('change', async () => {
   const file = fileInput.files[0];
   if (!file) return;
-  if (!/\.(lingua|txt)$/i.test(file.name) || file.size > 10000) {
-    fileStatus.textContent = 'Choose a .lingua or .txt file under 10 KB.';
+  if (!/\.(lingua|txt)$/i.test(file.name) || file.size > 20000) {
+    fileStatus.textContent = 'Choose a .lingua or .txt file under 20 KB.';
     fileInput.value = '';
     return;
   }
