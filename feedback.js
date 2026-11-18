@@ -15,6 +15,6 @@ form.addEventListener('submit', async event => {
     if (!response.ok) throw new Error(result.error);
     form.reset();
     showStatus('Thank you! Your feedback was saved.');
-  } catch (error) { showStatus(error.message || 'Could not send feedback. Please try again.'); }
+  } catch (error) { showStatus(error instanceof TypeError ? 'Cannot reach the server. Run npm start and open localhost:3000.' : error.message || 'Could not send feedback. Please try again.'); }
 });
 function showStatus(message) { statusText.textContent = message; }

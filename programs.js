@@ -5,10 +5,27 @@ const folderTree = document.querySelector('#folder-tree');
 const programStatus = document.querySelector('#program-status');
 const updateButton = document.querySelector('#update-program');
 const deleteButton = document.querySelector('#delete-program');
+const saveDetails = document.querySelector('.save-details');
 let programs = [];
+
+async function readResult(response) {
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    throw new Error('Open Lingua through npm start to use saved programs.');
+  }
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error);
+  return result;
+}
+
+function showError(error) {
+  const message = error instanceof TypeError ? 'Cannot reach the server. Run npm start and open localhost:3000.' : error.message;
+  programStatus.textContent = message;
+  return message;
+}
 
 document.querySelector('#refresh-programs').addEventListener('click', loadPrograms);
 document.querySelector('#new-program').addEventListener('click', () => {
+  saveDetails.open = true;
   programList.value = '';
   titleInput.value = '';
   code.value = '';
@@ -19,6 +36,7 @@ document.querySelector('#new-program').addEventListener('click', () => {
   titleInput.focus();
 });
 document.querySelector('#new-folder').addEventListener('click', () => {
+  saveDetails.open = true;
   const folder = prompt('Folder name or path, such as College/Maths:');
   if (folder === null) return;
   if (!/^[\w -]+(?:\/[\w -]+)*$/.test(folder.trim())) return programStatus.textContent = 'Use simple folder names separated by /.';
@@ -26,6 +44,7 @@ document.querySelector('#new-folder').addEventListener('click', () => {
   programStatus.textContent = 'Folder selected. Save a program to show it in the Explorer.';
 });
 document.querySelector('#copy-shared').addEventListener('click', () => {
+  saveDetails.open = true;
   programList.value = '';
   titleInput.value = 'My copy';
   folderInput.value = 'General';
@@ -42,6 +61,7 @@ function selectProgram(id) {
   updateButton.disabled = !selected;
   deleteButton.disabled = !selected;
   if (!selected) return;
+  saveDetails.open = true;
   titleInput.value = selected.title;
   folderInput.value = selected.folder || 'General';
   code.value = selected.code;
@@ -88,13 +108,12 @@ function showTree() {
 async function loadPrograms() {
   try {
     const response = await fetch('/api/programs');
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error);
+    const result = await readResult(response);
     programs = result;
     programList.replaceChildren(new Option('Select a program', ''));
     programs.forEach(program => programList.add(new Option(program.title, program._id)));
     showTree();
-  } catch (error) { programStatus.textContent = error.message; folderTree.textContent = error.message; }
+  } catch (error) { folderTree.textContent = showError(error); }
 }
 
 async function saveProgram(method, id) {
@@ -109,12 +128,11 @@ async function saveProgram(method, id) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, code: source, folder })
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error);
+    const result = await readResult(response);
     await loadPrograms();
     selectProgram(result._id);
     programStatus.textContent = id ? 'Program updated.' : 'Program saved.';
-  } catch (error) { programStatus.textContent = error.message; }
+  } catch (error) { showError(error); saveDetails.open = true; }
 }
 
 document.querySelector('#save-program').addEventListener('click', () => saveProgram('POST'));
@@ -124,14 +142,13 @@ deleteButton.addEventListener('click', async () => {
   if (!programList.value || !confirm('Delete this program?')) return;
   try {
     const response = await fetch('/api/programs/' + programList.value, { method: 'DELETE' });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error);
+    const result = await readResult(response);
     await loadPrograms();
     titleInput.value = '';
     folderInput.value = 'General';
     updateButton.disabled = true;
     deleteButton.disabled = true;
     programStatus.textContent = 'Program deleted.';
-  } catch (error) { programStatus.textContent = error.message; }
+  } catch (error) { showError(error); saveDetails.open = true; }
 });
 loadPrograms();

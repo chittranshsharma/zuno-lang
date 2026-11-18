@@ -14,7 +14,7 @@ Lingua is our Web Programming course project. It is a small programming language
 - A feedback fetch route at `GET /api/feedback`.
 - Program saving, loading, updating, and deleting through Express and MongoDB.
 - A live line and character count below the editor.
-- A folder explorer for saved programs. Enter a folder like `College/Maths` when saving, then click the file in the explorer to load it.
+- A folder explorer for saved programs. Open **Save or edit program** in the sidebar, enter a folder like `College/Maths`, save, then click the file to load it.
 - The Explorer now sits beside the editor, with expandable folders and clickable program files.
 - New file clears the editor. New folder sets a folder path; it appears after you save a program there.
 - Shared code opens with a Make my copy button so a friend can prepare a separate saved version.
@@ -33,7 +33,7 @@ npm start
 
 Open `http://localhost:3000` in a browser. Use the server URL for the feedback form, because a page opened directly from a file cannot submit to the API.
 
-The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your database uses another address, set the `MONGODB_URI` environment variable before starting the server. The playground runner and feedback form still work when MongoDB is unavailable, but the saved programs section will show a database error.
+The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your database uses another address, set the `MONGODB_URI` environment variable before starting the server. The playground runner and feedback form still work when MongoDB is unavailable, but saving programs needs MongoDB. If the page is opened as a file or on static hosting, the save and feedback APIs will not work; use the Node server for the final demo.
 
 ## How the parts work
 
@@ -61,4 +61,4 @@ Feedback uses a local JSON file because that is part of the second evaluation. `
 | Phase 2 | JavaScript, DOM, forms, local JSON | Linked pages, working interactions, validation, form submission, and JSON saving. |
 | Final phase | Full-stack app and MongoDB | Express APIs for local JSON feedback and MongoDB CRUD for saved programs. |
 
-For the final demo, run a short program, show a helpful error, submit feedback, then save, load, update, and delete a program while MongoDB is running. No external API is used because the course parameter says "if required" and Lingua does not need outside data for its core purpose.
+For the final demo, start MongoDB and the Node server. Run a short program, show a helpful error, submit feedback, then save, load, update, and delete a program from the Explorer. Export and import a file, and open a share link in another browser tab. No external API is used because the course parameter says "if required" and Lingua does not need outside data for its core purpose.

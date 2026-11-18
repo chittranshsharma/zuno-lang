@@ -697,6 +697,13 @@ h1 {
 .explorer-panel .folder-tree button { display: block; width: 100%; padding: 5px 8px 5px 18px; border: 0; border-radius: 4px; background: transparent; color: #e8ebf7; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
 .explorer-panel .folder-tree button:hover, .explorer-panel .folder-tree button:focus-visible { background: #363d55; }
 .explorer-help { padding: 8px; color: #a5acc4; font-size: .75rem; }
+.save-details { margin: 16px 6px 0; padding-top: 12px; border-top: 1px solid #383e51; }
+.save-details summary { cursor: pointer; color: #c9c2ff; font-weight: 600; }
+.save-details .saved-form { margin-top: 12px; gap: 7px; }
+.save-details input, .save-details select { width: 100%; padding: 8px; border: 1px solid #5b6380; border-radius: 4px; background: #292f42; color: #fff; font: inherit; }
+.save-details button { padding: 8px; border: 1px solid #5b6380; border-radius: 4px; background: #292f42; color: #fff; text-align: left; cursor: pointer; }
+.save-details button:disabled { opacity: .45; cursor: default; }
+.save-details #program-status { overflow-wrap: anywhere; color: #d6dbed; }
 .shared-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 12px 16px; border: 1px solid #bdd8f7; border-radius: 8px; background: #eef6ff; }
 .shared-notice[hidden] { display: none; }
 .shared-notice button { flex: none; padding: 8px 12px; border: 0; border-radius: 5px; background: var(--accent); color: #fff; cursor: pointer; }

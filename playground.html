@@ -32,6 +32,21 @@
         </div>
         <div id="folder-tree" class="folder-tree">Loading saved programs...</div>
         <p class="explorer-help">Saved files appear here when MongoDB is connected.</p>
+        <details class="save-details">
+          <summary>Save or edit program</summary>
+          <div class="saved-form">
+            <label for="program-title">Title</label>
+            <input id="program-title" maxlength="80" placeholder="Program name">
+            <label for="program-folder">Folder</label>
+            <input id="program-folder" maxlength="100" value="General" placeholder="College/Maths">
+            <button id="save-program" type="button">Save new</button>
+            <button id="update-program" type="button" disabled>Update selected</button>
+            <button id="delete-program" type="button" disabled>Delete selected</button>
+            <label for="saved-programs">Selected file</label>
+            <select id="saved-programs"><option value="">Select a program</option></select>
+            <p id="program-status" role="status" aria-live="polite"></p>
+          </div>
+        </details>
       </aside>
       <div class="editor-main">
         <div id="shared-notice" class="shared-notice" hidden>
@@ -69,24 +84,6 @@ print(name);</textarea>
           </div>
           <input id="import-file" type="file" accept=".lingua,.txt,text/plain" hidden>
           <p id="file-status" role="status" aria-live="polite"></p>
-        </section>
-        <section class="card programs-card">
-          <h2>Save a program</h2>
-          <p>Choose a title and folder. Use / for subfolders, like College/Maths.</p>
-          <div class="saved-form">
-            <label for="program-title">Title</label>
-            <input id="program-title" maxlength="80" placeholder="My first program">
-            <label for="program-folder">Folder</label>
-            <input id="program-folder" maxlength="100" value="General" placeholder="College/Maths">
-            <div class="program-actions">
-              <button id="save-program" type="button">Save new</button>
-              <button id="update-program" type="button" disabled>Update selected</button>
-              <button id="delete-program" type="button" disabled>Delete selected</button>
-            </div>
-            <label for="saved-programs">Selected program</label>
-            <select id="saved-programs"><option value="">Select a program</option></select>
-            <p id="program-status" role="status" aria-live="polite"></p>
-          </div>
         </section>
       </div>
     </div>
