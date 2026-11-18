@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root { --bg:#101214; --surface:#191c1f; --line:#353b40; --ink:#f1f3f2; --text:#dee3e1; --muted:#a5b0ad; --accent:#c2e4d5; --code-bg:#111517; --code-text:#e0e7e4; --ui:'Manrope',sans-serif; --mono:'IBM Plex Mono',monospace; --radius-card:3px; }
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap');
+:root { --bg:#101214; --surface:#191c1f; --line:#353b40; --ink:#f1f3f2; --text:#dee3e1; --muted:#a5b0ad; --accent:#c2e4d5; --code-bg:#111517; --code-text:#e0e7e4; --ui:'Geist',sans-serif; --mono:'IBM Plex Mono',monospace; --radius-card:3px; }
 body { background:var(--bg); }
 .topbar { background:#101214; padding:0 40px; height:88px; }
 .brand { font-size:22px; font-weight:800; letter-spacing:-1px; }
@@ -35,3 +35,46 @@ button:active:not(:disabled) { transform:translateY(1px); }
 @keyframes premium-enter { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 @media(max-width:800px) { .topbar { padding:20px; height:auto; } .page { padding:0 16px 32px; } .hero { min-height:280px; padding:44px 0; } .hero::after { right:-160px; opacity:.4; } .hero h1 { font-size:48px; } }
 @media(prefers-reduced-motion:reduce) { .premium-ready * { animation:none !important; } button:hover:not(:disabled),button:active:not(:disabled) { transform:none; } }
+
+:root { --bg:#000; --surface:#0c0c0c; --line:#292929; --ink:#f5f5f5; --text:#dedede; --muted:#999; --accent:#eee; --code-bg:#080808; --code-text:#e8e8e8; --radius-card:10px; }
+.topbar { background:#000e; border-bottom:1px solid #242424; }
+.brand { font-weight:600; }
+.brand::before { color:#eee; border-color:#666; }
+.topbar .links a[aria-current='page'] { color:#fff; border-color:#fff; }
+.hero { min-height:220px; padding:44px 0 32px; }
+.hero::after { display:none; }
+.hero h1 { font-size:clamp(36px,4vw,60px); }
+.hero .lede { margin-top:16px; }
+.explorer-panel,.card { border-radius:10px; background:#0c0c0c; border-color:#292929; box-shadow:0 12px 40px #0003; }
+.terminal-titlebar { background:#141414; border-bottom:1px solid #292929; padding:20px; }
+.terminal-editor,.terminal-content,.terminal-editor #code { background:#080808; border-color:#252525; border-radius:6px; }
+.terminal-editor.syntax-ready #code { background:transparent; }
+.terminal-editor:focus-within { border-color:#777; box-shadow:0 0 0 3px #ffffff08; }
+.terminal-editor #code { caret-color:#fff; }
+.terminal-editor #code::selection { background:#ffffff30; }
+#code-highlight { color:#e5e5e5; }
+.syntax-keyword { color:#c5bcf0; }
+.syntax-string { color:#c3d6bb; }
+.syntax-number { color:#e2c59d; }
+.syntax-call { color:#b9d6e6; }
+.terminal-command,.terminal-command > span:first-child,#terminal-screen { color:#e0e0e0; }
+.terminal-command-file { color:#888; }
+.tree-children { border-color:#303030; }
+.tree-folder-trigger { color:#ccc !important; }
+.tree-file[aria-current='true'] { background:#262626 !important; }
+.select,.save-details input,.save-details select,.save-details button { background:#141414; border-color:#333; color:#ddd; border-radius:6px; }
+.btn-run { background:#eee; color:#111; border-radius:6px; }
+.footer { background:#000; border-color:#252525; color:#999; }
+.docs-page { max-width:1000px; padding-top:64px; }
+.docs-page > h1 { max-width:800px; font-size:clamp(38px,5vw,68px); font-weight:500; line-height:1.08; letter-spacing:-.055em; }
+.docs-page > .lede { max-width:720px; margin:24px 0 48px; line-height:1.8; color:#aaa; }
+.docs-page .text-card { padding:32px; margin:24px 0; }
+.docs-page h2 { font-size:23px; letter-spacing:-.035em; font-weight:500; }
+.docs-page p,.docs-page li { line-height:1.85; color:#bdbdbd; }
+.docs-page pre { background:#060606; border:1px solid #292929; border-radius:6px; padding:22px; font:13px/1.85 var(--mono); color:#ddd; overflow:auto; }
+.docs-page code { font-family:var(--mono); color:#e0e0e0; }
+.docs-table { width:100%; border-collapse:collapse; }
+.docs-table th,.docs-table td { border-color:#303030; padding:14px; text-align:left; }
+.docs-table th { background:#151515; color:#eee; }
+:focus-visible { outline:2px solid #ddd; outline-offset:4px; }
+@media(max-width:600px) { .docs-page { padding-top:32px; } .docs-page .text-card { padding:20px; } .topbar .links { gap:16px; } .hero { min-height:200px; } }
