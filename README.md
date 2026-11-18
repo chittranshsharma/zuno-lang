@@ -1,64 +1,40 @@
 # Lingua
 
-Lingua is our Web Programming course project. It is a small programming language with a web playground where someone can write code and see the output. We are building it step by step so we can explain every part during our end-semester viva.
+Lingua is our Web Programming project. It is a small programming language that runs in the browser. You can write a few lines of code, press **Run**, and see the output beside the editor.
 
-## What works now
+We kept the language small so it is easy to use and explain. It understands `let` for storing a value and `print` for showing one. It also supports numbers, text in double quotes, maths, powers, and brackets. Write one statement per line and end it with a semicolon.
 
-- Four linked pages: Playground, Docs, About, and Feedback.
-- A beginner Docs tutorial with small steps, expected output, a syntax table, and common mistakes.
-- A code box with a Run button, Ctrl + Enter shortcut, and three working examples.
-- A simple JavaScript runner for `let`, `print`, numbers, strings, `+ - * / ** %`, and brackets.
-- Error messages that show the line number.
-- A feedback form with name, email, and message validation.
-- An Express route that saves valid feedback in `data/feedback.json`.
-- A feedback count route at `GET /api/feedback`, without exposing submitted names, emails, or messages.
-- Program saving, loading, updating, and deleting through Express and MongoDB.
-- A live line and character count below the editor.
-- A folder explorer for saved programs. Open **Save or edit program** in the sidebar, enter a folder like `College/Maths`, save, then click the file to load it.
-- The Explorer now sits beside the editor, with expandable folders and clickable program files.
-- New file clears the editor. New folder sets a folder path; it appears after you save a program there.
-- The Explorer highlights the selected file, and the editor shows when code has unsaved changes.
-- Exporting and importing code through the playground.
+```text
+let name = "World";
+print(name);
+```
 
-The language runner is intentionally small. It reads one statement per line. It does not support loops, conditions, or functions yet. Maths follows the usual order: brackets and powers, then multiplication/division/remainder, then addition/subtraction.
+This prints `World`. The playground has three examples, and the Docs page explains the syntax step by step.
 
-## How to run it
+## What you can do
 
-Install Node.js and MongoDB, then run these commands in the project folder:
+- Run code and see a line number when there is an error.
+- Save, open, update, and delete programs using MongoDB.
+- Organise saved programs in folders in the Explorer.
+- See when code has unsaved changes.
+- Export a program as a `.lingua` file and import it later.
+- Send feedback through a form. The server saves it in `data/feedback.json`.
+
+The site has linked Playground, Docs, About, and Feedback pages. Everyone using the same server can see and edit saved programs, so it is a course demo rather than private code storage.
+
+## Run it
+
+Install Node.js and MongoDB. Start MongoDB, then run these commands in the project folder:
 
 ```text
 npm install
 npm start
 ```
 
-Open `http://localhost:3000` in a browser. Use the server URL for the feedback form, because a page opened directly from a file cannot submit to the API.
+Open `http://localhost:3000`. The app uses `mongodb://127.0.0.1:27017/lingua` by default. If your MongoDB address is different, set `MONGODB_URI` before starting the server. The code runner works without MongoDB, but saving programs needs it.
 
-The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your database uses another address, set the `MONGODB_URI` environment variable before starting the server. The playground runner and feedback form still work when MongoDB is unavailable, but saving programs needs MongoDB. If the page is opened as a file or on static hosting, the save and feedback APIs will not work; use the Node server for the final demo.
+## How it works
 
-## How the parts work
+The pages use HTML and CSS. `playground.js` reads Lingua code one line at a time and shows the result. `programs.js` handles the Explorer and sends save requests to the Express server. `files.js` handles file import and export. `server.js` stores programs in MongoDB. It also checks feedback and saves it to the local JSON file. The feedback API only returns the number of submissions, not names or email addresses.
 
-`playground.html` holds the code box and output area. `playground.js` listens for the Run button, reads the code line by line, stores values in a JavaScript object, and shows printed results in the page.
-
-`feedback.html` has the form. `feedback.js` checks the fields and sends JSON with `fetch`. `server.js` checks the data again and writes it to `data/feedback.json`. We validate on both sides so the page gives quick feedback and the server does not accept bad input.
-
-`docs.html` teaches the current syntax. `about.html` explains the project to visitors. `playground.css` styles all four pages.
-
-`programs.js` sends requests from the saved programs section and builds the folder explorer from saved folder names. A folder is stored as a simple path on each program, so there is no separate folder collection. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title, code, and folder. Mongoose also adds creation and update times.
-
-`files.js` downloads code as a `.lingua` file and imports `.lingua` and `.txt` files under 20 KB and 5000 characters. Export and MongoDB saving use the same 5000-character limit, so an exported program can be imported again. Friends can exchange exported files.
-
-The example menu and Docs use the same working syntax as the playground: `let`, `print`, numbers, double-quoted text, `+ - * / ** %`, and brackets. The Power and Brackets example prints 25 and 1. Conditions, loops and functions are future ideas, not current commands.
-
-Saved programs are in one shared MongoDB collection for the course demo; there are no user accounts or private folders.
-
-Feedback uses a local JSON file because that is part of the second evaluation. `POST /api/feedback` saves a form submission, and `GET /api/feedback` reads that file and returns only the total number of submissions. Names, email addresses, and messages are not sent back through the API.
-
-## Course roadmap
-
-| Evaluation | Course focus | Project work |
-| --- | --- | --- |
-| Phase 1 | HTML and CSS | Responsive playground design. |
-| Phase 2 | JavaScript, DOM, forms, local JSON | Linked pages, working interactions, validation, form submission, and JSON saving. |
-| Final phase | Full-stack app and MongoDB | Express APIs for local JSON feedback and MongoDB CRUD for saved programs. |
-
-For the final demo, start MongoDB and the Node server. Run a short program, show a helpful error, submit feedback, then save, load, update, and delete a program from the Explorer. Export and import a file. No external API is used because the course parameter says "if required" and Lingua does not need outside data for its core purpose.
+For a quick demo, run an example, save it in a folder, edit and update it, then export and import the file. You can also submit the feedback form. Conditions, loops, and functions are not part of Lingua yet.
