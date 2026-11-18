@@ -3,11 +3,22 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
+    "build": "esbuild landing.jsx --bundle --minify --jsx=automatic --outfile=public/landing.js --legal-comments=linked",
+    "prestart": "npm run build",
     "start": "node server.js",
     "test": "node --test"
   },
   "dependencies": {
     "express": "^4.21.2",
-    "mongoose": "^8.19.0"
+    "mongoose": "^8.19.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "vgpu": "^0.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  },
+  "overrides": {
+    "@modelcontextprotocol/server": "^2.4.0"
   }
 }

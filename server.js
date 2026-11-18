@@ -14,7 +14,9 @@ app.get('/favicon.ico', (request, response) => response.status(204).end());
 app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/engine.js', '/feedback.js', '/files.js', '/programs.js'], (request, response) => {
   response.sendFile(path.join(__dirname, request.path));
 });
-app.get('/', (request, response) => response.redirect('/playground.html'));
+app.use('/assets', express.static(path.join(__dirname, 'public')));
+app.get(['/','/index.html'], (request, response) => response.sendFile(path.join(__dirname, 'index.html')));
+app.get('/landing.css', (request, response) => response.sendFile(path.join(__dirname, 'landing.css')));
 app.get('/api/feedback', async (request, response) => {
   try { response.json({ count: JSON.parse(await fs.readFile(dataFile, 'utf8')).length }); }
   catch (error) { response.status(500).json({ error: 'Could not load feedback.' }); }
