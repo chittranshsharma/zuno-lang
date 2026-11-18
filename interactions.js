@@ -62,3 +62,13 @@ motionPreference.addEventListener('change', () => {
 highlightCode(true);
 document.querySelector('.terminal-editor').classList.add('syntax-ready');
 animateOutput();
+const heroTitle = document.querySelector('.hero h1');
+heroTitle.replaceChildren(...heroTitle.textContent.split(' ').flatMap((word, index) => {
+  const span = document.createElement('span');
+  span.className = 'premium-word';
+  span.textContent = word;
+  span.style.setProperty('--word-index', index);
+  return [span, document.createTextNode(' ')];
+}));
+document.querySelectorAll('.workspace > *, .programs-card').forEach((element, index) => element.style.setProperty('--entrance-delay', 250 + index * 90 + 'ms'));
+document.body.classList.add('premium-ready');
