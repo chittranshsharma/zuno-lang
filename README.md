@@ -13,6 +13,8 @@ Lingua is our Web Programming course project. It is a small programming language
 - An Express route that saves valid feedback in `data/feedback.json`.
 - A feedback fetch route at `GET /api/feedback`.
 - Program saving, loading, updating, and deleting through Express and MongoDB.
+- A live line and character count below the editor.
+- A folder explorer for saved programs. Enter a folder like `College/Maths` when saving, then click the file in the explorer to load it.
 - Exporting, importing, and sharing code through the playground.
 
 The language runner is intentionally small. It reads one statement per line. It does not support loops, conditions, or functions yet. Maths is calculated from left to right, so it does not use normal operator precedence yet.
@@ -38,7 +40,7 @@ The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your
 
 `docs.html` teaches the current syntax. `about.html` explains the project to visitors. `playground.css` styles all four pages.
 
-`programs.js` sends requests from the saved programs section. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title and code. Mongoose also adds creation and update times.
+`programs.js` sends requests from the saved programs section and builds the folder explorer from saved folder names. A folder is stored as a simple path on each program, so there is no separate folder collection. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title, code, and folder. Mongoose also adds creation and update times.
 
 `files.js` downloads code as a `.lingua` file, imports `.lingua` and `.txt` files under 10 KB, and makes share links for code up to 2000 characters. The code is inside the link, so anyone with the link can read it.
 

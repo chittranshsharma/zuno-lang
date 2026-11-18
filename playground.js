@@ -1,5 +1,13 @@
 const code = document.querySelector('#code');
 const output = document.querySelector('#output');
+const codeCount = document.querySelector('#code-count');
+function updateCount() {
+  const characters = code.value.length;
+  const lines = characters ? code.value.split('\n').length : 0;
+  codeCount.textContent = lines + ' lines · ' + characters + ' characters';
+}
+code.addEventListener('input', updateCount);
+updateCount();
 const examples = {
   hello: 'let name = "World";\nprint(name);',
   math: 'let a = 5;\nlet b = 3;\nprint(a + b);\nprint(a * b);'
@@ -7,6 +15,7 @@ const examples = {
 
 document.querySelector('#example').addEventListener('change', event => {
   code.value = examples[event.target.value];
+  code.dispatchEvent(new Event('input'));
   output.textContent = 'Ready to run.';
 });
 

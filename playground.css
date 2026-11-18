@@ -682,6 +682,13 @@ h1 {
 .programs-card label { font-weight: 600; }
 .program-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .program-actions button { padding: 10px 15px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; }
+.saved-layout { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; gap: 24px; }
+.saved-form { display: flex; flex-direction: column; gap: 10px; }
+.saved-form input, .saved-form select { padding: 10px; border: 1px solid var(--line); border-radius: 6px; }
+.folder-tree { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; }
+.folder-tree details { margin-left: 12px; }
+.folder-tree button { display: block; width: 100%; padding: 6px; border: 0; background: none; text-align: left; cursor: pointer; }
+@media (max-width: 699px) { .saved-layout { grid-template-columns: 1fr; } }
 .program-actions button:disabled { opacity: .5; cursor: default; }
 @media (max-width: 699px) { .topbar { height: auto; min-height: 70px; gap: 12px; } .links { display: flex; margin: 0; gap: 12px; } .workspace { grid-template-columns: 1fr; } }
 .programs-card { margin-top: 24px; padding: 24px; gap: 12px; }

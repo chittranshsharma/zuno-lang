@@ -22,6 +22,7 @@ fileInput.addEventListener('change', async () => {
     return;
   }
   code.value = await file.text();
+  code.dispatchEvent(new Event('input'));
   output.textContent = 'File loaded. Press Run to see the output.';
   fileStatus.textContent = file.name + ' imported.';
   fileInput.value = '';
@@ -46,6 +47,7 @@ if (location.hash.startsWith('#code=')) {
     const sharedCode = decodeURIComponent(location.hash.slice(6));
     if (sharedCode.length <= 2000) {
       code.value = sharedCode;
+      code.dispatchEvent(new Event('input'));
       output.textContent = 'Shared code loaded. Press Run to see the output.';
       fileStatus.textContent = 'You opened a shared program.';
     }
