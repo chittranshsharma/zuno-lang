@@ -56,24 +56,11 @@ function CanvasFallback({ paused, shapes }) {
 
 function Background() {
   const [fallback, setFallback] = useState(!navigator.gpu);
-  const [paused, setPaused] = useState(false);
-  const [shapes, setShapes] = useState('mixed');
+  const paused = false;
+  const shapes = 'mixed';
   useEffect(() => {
-    const pause = document.querySelector('#pause-waves');
-    const choices = document.querySelectorAll('[data-shapes]');
-    const toggle = () => setPaused(value => !value);
-    const choose = event => setShapes(event.currentTarget.dataset.shapes);
-    pause.addEventListener('click', toggle);
-    choices.forEach(button => button.addEventListener('click', choose));
-    return () => { pause.removeEventListener('click', toggle); choices.forEach(button => button.removeEventListener('click', choose)); };
-  }, []);
-  useEffect(() => {
-    const button = document.querySelector('#pause-waves');
-    button.textContent = paused ? 'Resume motion' : 'Pause motion';
-    button.setAttribute('aria-pressed', String(paused));
-    document.querySelectorAll('[data-shapes]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.shapes === shapes)));
     document.querySelector('#wave-field').dataset.renderer = fallback ? 'canvas' : 'webgpu';
-  }, [paused, shapes, fallback]);
+  }, [fallback]);
   return fallback ? <CanvasFallback paused={paused} shapes={shapes} /> : <ShapeWaves
     text="</>"
     fontFamily='Geist, "Geist Sans", system-ui, sans-serif'

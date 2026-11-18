@@ -7,13 +7,15 @@
   <title>Lingua — Give your ideas a language</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist:wght@500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="landing.css">
   <link rel="stylesheet" href="assets/landing.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="hero-world">
+    <div id="wave-field" aria-hidden="true"></div>
+    <div class="hero-veil" aria-hidden="true"></div>
     <header class="home-header">
       <a href="/" class="home-brand" aria-label="Lingua home"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5"/><path d="m9 24 7-16 7 16M13 17h6"/></svg><span>lingua</span></a>
       <nav aria-label="Main navigation"><a href="docs.html">Documentation</a><a href="about.html">About Lingua</a></nav>
@@ -28,9 +30,8 @@
           <div class="hero-actions"><a href="playground.html" class="primary-link">Start creating <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a><a href="docs.html" class="guide-link">Meet the language <span aria-hidden="true">↗</span></a></div>
           <p class="hero-note">Runs in your browser. No setup to try it.</p>
         </div>
-        <div id="wave-field" aria-hidden="true"></div>
+
       </section>
-      <div class="hero-baseline"><p>From first line to next idea.</p><div class="wave-controls" aria-label="Background controls"><div class="shape-options" aria-label="Wave shapes"><button type="button" data-shapes="mixed" aria-label="Mixed shapes" aria-pressed="true">◈</button><button type="button" data-shapes="circles" aria-label="Circle shapes" aria-pressed="false">○</button><button type="button" data-shapes="squares" aria-label="Square shapes" aria-pressed="false">□</button><button type="button" data-shapes="triangles" aria-label="Triangle shapes" aria-pressed="false">△</button></div><button id="pause-waves" type="button" aria-pressed="false">Pause motion</button></div></div>
     </main>
     <footer class="home-footer"><span>Made for the joy of figuring it out.</span><a href="https://github.com/chittranshsharma/lingua">Explore the source <span aria-hidden="true">↗</span></a></footer>
   </div>
