@@ -7,7 +7,7 @@
     let offset = 0;
     const fail = (token, message) => { throw new Error(`Line ${token.line}, column ${token.column}: ${message}`); };
     while (offset < source.length) {
-      const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[{}();=+*/%<>!\-])/);
+      const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],{}();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
       if (!/^\s/.test(text)) tokens.push({ text, line, column });
@@ -26,13 +26,23 @@
       if (peek() !== text) fail(tokens[index], 'Expected ' + text);
       return take();
     };
-    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false']);
+    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'return']);
+    function argumentsUntil(end) {
+      const values = [];
+      if (peek() !== end) {
+        do { values.push(expression()); if (peek() !== ',') break; take(); } while (true);
+      }
+      expect(end);
+      return values;
+    }
     const precedence = { '||': 1, '&&': 2, '==': 3, '!=': 3, '<': 4, '>': 4, '<=': 4, '>=': 4, '+': 5, '-': 5, '*': 6, '/': 6, '%': 6, '**': 8 };
     function expression(min = 0) {
       if (++depth > 200) fail(tokens[index], 'Expression is too deeply nested');
       const token = take();
       let node;
-      if (token.text === '(') {
+      if (token.text === '[') {
+        node = { type: 'array', token, items: argumentsUntil(']') };
+      } else if (token.text === '(') {
         node = expression();
         expect(')');
       } else if (['-', '+', '!'].includes(token.text)) {
@@ -47,6 +57,11 @@
       } else if (/^[A-Za-z_]\w*$/.test(token.text) && !reserved.has(token.text)) {
         node = { type: 'variable', token };
       } else fail(token, 'Expected an expression');
+      while (peek() === '(' || peek() === '[') {
+        const suffix = take();
+        if (suffix.text === '(') node = { type: 'call', token: suffix, callee: node, args: argumentsUntil(')') };
+        else { const position = expression(); expect(']'); node = { type: 'index', token: suffix, array: node, position }; }
+      }
       while (Object.hasOwn(precedence, peek()) && precedence[peek()] >= min) {
         const operator = take();
         const right = expression(precedence[operator.text] + (operator.text === '**' ? 0 : 1));
@@ -66,6 +81,27 @@
     }
     function statement() {
       const token = take();
+      if (token.text === 'fn') {
+        const name = take();
+        if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a function name');
+        expect('(');
+        const params = [];
+        if (peek() !== ')') {
+          do {
+            const param = take();
+            if (!/^[A-Za-z_]\w*$/.test(param.text) || reserved.has(param.text) || params.includes(param.text)) fail(param, 'Invalid or duplicate parameter');
+            params.push(param.text);
+            if (peek() !== ',') break;
+            take();
+          } while (true);
+        }
+        expect(')');
+        return { type: 'function', token: name, params, body: block() };
+      }
+      if (token.text === 'return') {
+        const value = expression(); expect(';');
+        return { type: 'return', token, value };
+      }
       if (token.text === 'if' || token.text === 'while') {
         expect('(');
         const condition = expression();
@@ -93,10 +129,33 @@
     while (peek()) program.push(statement());
     const output = [];
     let steps = 0;
+    let calls = 0;
+    const returnSignal = Symbol('return');
     const tick = token => { if (++steps > limit) fail(token, 'Execution limit reached. Check your loops.'); };
     function evaluate(node, scope) {
       tick(node.token);
       const op = node.token.text;
+      if (node.type === 'array') return node.items.map(item => evaluate(item, scope));
+      if (node.type === 'index') {
+        const array = evaluate(node.array, scope);
+        const position = evaluate(node.position, scope);
+        if (!Array.isArray(array) || !Number.isInteger(position) || position < 0 || position >= array.length) fail(node.token, 'Array index is outside its bounds');
+        return array[position];
+      }
+      if (node.type === 'call') {
+        const fn = evaluate(node.callee, scope);
+        if (!fn || fn.kind !== 'function') fail(node.token, 'Expected a function');
+        if (fn.params.length !== node.args.length) fail(node.token, 'Wrong number of arguments');
+        const values = node.args.map(arg => evaluate(arg, scope));
+        if (++calls > 100) fail(node.token, 'Function call limit reached');
+        try {
+          run(fn.body, { values: new Map(fn.params.map((name, i) => [name, values[i]])), parent: fn.scope });
+          return false;
+        } catch (signal) {
+          if (signal && signal.type === returnSignal) return signal.value;
+          throw signal;
+        } finally { calls--; }
+      }
       if (node.type === 'literal') return node.value;
       if (node.type === 'variable') {
         for (let current = scope; current; current = current.parent) if (current.values.has(op)) return current.values.get(op);
@@ -133,7 +192,13 @@
     function run(statements, scope) {
       for (const node of statements) {
         tick(node.token);
-        if (node.type === 'if') {
+        if (node.type === 'function') {
+          if (scope.values.has(node.token.text)) fail(node.token, 'Variable already declared: ' + node.token.text);
+          scope.values.set(node.token.text, { kind: 'function', params: node.params, body: node.body, scope });
+        } else if (node.type === 'return') {
+          if (!calls) fail(node.token, 'Return must be inside a function');
+          throw { type: returnSignal, value: evaluate(node.value, scope) };
+        } else if (node.type === 'if') {
           run(evaluate(node.condition, scope) ? node.body : node.otherwise, { values: new Map(), parent: scope });
         } else if (node.type === 'while') {
           while (evaluate(node.condition, scope)) {

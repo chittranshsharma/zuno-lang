@@ -1,6 +1,13 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { execute } = require('./engine');
+test('functions, recursion, and arrays work together', () => {
+  assert.deepEqual(execute('fn double(x) { return x * 2; } let items = [2, 4, 6]; print(double(items[1]));'), ['8']);
+  assert.deepEqual(execute('fn fact(n) { if (n <= 1) { return 1; } return n * fact(n - 1); } print(fact(5));'), ['120']);
+  assert.throws(() => execute('return 1;'), /inside a function/);
+  assert.throws(() => execute('let a = [1]; print(a[2]);'), /bounds/);
+  assert.throws(() => execute('fn f() { return f(); } print(f());'), /call limit/);
+});
 
 test('existing programs and arithmetic precedence', () => {
   assert.deepEqual(execute('let name = "World"; print(name); print((2 + 3) ** 2); print(10 % 3);'), ['World', '25', '1']);

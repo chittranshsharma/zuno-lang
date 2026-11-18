@@ -9,6 +9,7 @@ function updateCount() {
 code.addEventListener('input', updateCount);
 updateCount();
 const examples = {
+  functions: 'fn double(number) {\n  return number * 2;\n}\nlet numbers = [2, 4, 6];\nprint(double(numbers[1]));',
   control: 'let n = 1;\nwhile (n <= 5) {\n  if (n % 2 == 0) {\n    print(n);\n  }\n  n = n + 1;\n}',
   hello: 'let name = "World";\nprint(name);',
   math: 'let a = 5;\nlet b = 3;\nprint(a + b);\nprint(a * b);',
@@ -27,9 +28,12 @@ code.addEventListener('keydown', event => {
 });
 
 function runCode() {
+  const started = performance.now();
   try {
     output.textContent = Lingua.execute(code.value).join('\n') || 'Program finished with no output.';
+    document.querySelector('#run-status').textContent = 'Finished in ' + (performance.now() - started).toFixed(1) + ' ms';
   } catch (error) {
     output.textContent = error.message;
+    document.querySelector('#run-status').textContent = 'Check the error in Output';
   }
 }

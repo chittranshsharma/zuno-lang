@@ -84,4 +84,6 @@ Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js
 
 ## Development
 
+The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Cloud accounts, project ownership, live collaboration, and a Monaco editor are still pending.
+
 Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.

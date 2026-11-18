@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lingua Playground</title>
   <link rel="stylesheet" href="playground.css">
+  <link rel="stylesheet" href="workspace.css">
 </head>
 <body>
   <header class="topbar">
@@ -20,8 +21,8 @@
     <section class="hero">
       <div>
         <p class="eyebrow">Lingua playground</p>
-        <h1>Write. Run. Share.</h1>
-        <p class="lede">Try the examples, make your own program, or open a friend's link.</p>
+        <h1>A little language. Room for big ideas.</h1>
+        <p class="lede">Explore, build, and run your next idea in Lingua.</p>
       </div>
     </section>
     <div class="editor-layout">
@@ -58,17 +59,19 @@
               <option value="math">Simple Maths</option>
               <option value="power">Power and Brackets</option>
               <option value="control">Loops and Conditions</option>
+              <option value="functions">Functions and Arrays</option>
             </select>
             <label class="field-label" for="code">Code</label>
             <textarea id="code" class="code-editor" spellcheck="false">let name = "World";
 print(name);</textarea>
             <p id="code-count" class="help" aria-live="polite"></p>
             <p id="editor-state" class="help" role="status" aria-live="polite">Unsaved changes</p>
-            <div class="editor-actions"><button id="run" class="btn-run" type="button">Run</button><span>Ctrl + Enter</span></div>
+            <div class="editor-actions"><button id="run" class="btn-run" type="button">Run program</button><span>Ctrl + Enter</span><span id="run-status" role="status">Ready</span></div>
           </section>
           <section class="card">
             <header class="card-head"><div><h2>Output</h2><p>Results appear here after you run the code.</p></div></header>
             <pre id="output" class="console" aria-live="polite">Ready to run.</pre>
+            <div class="program-actions editor-actions"><button id="clear-output" type="button">Clear output</button></div>
             <p class="help">Supports variables, maths, text, booleans, conditions, and loops.</p>
           </section>
         </div>
@@ -85,10 +88,11 @@ print(name);</textarea>
       </div>
     </div>
   </main>
-  <footer class="footer"><span>Lingua · Web Programming project</span><a href="docs.html">Learn the syntax</a></footer>
+  <footer class="footer"><span>Lingua workspace</span><a href="docs.html">Language guide</a></footer>
   <script src="engine.js"></script>
   <script src="playground.js?v=5"></script>
   <script src="files.js?v=2"></script>
   <script src="programs.js?v=3"></script>
+  <script src="workspace.js"></script>
 </body>
 </html>

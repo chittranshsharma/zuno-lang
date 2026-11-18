@@ -1,0 +1,55 @@
+:root {
+  color-scheme: dark;
+  --bg: #10131f;
+  --surface: #191d2d;
+  --line: #343b53;
+  --ink: #f2f3fb;
+  --text: #dde0ee;
+  --muted: #a8b0c9;
+  --accent: #b9a7ff;
+  --code-bg: #141827;
+  --code-text: #e1e5f7;
+  --console-text: #c5e5dc;
+  --radius-card: 12px;
+  --ui: 'Segoe UI', system-ui, sans-serif;
+}
+body { font-size: 14px; }
+.topbar { height: 72px; padding: 0 32px; grid-template-columns: 1fr auto; }
+.brand { font-size: 24px; letter-spacing: -.8px; }
+.brand::before { content: 'λ'; display: grid; place-items: center; width: 36px; height: 36px; background: #b9a7ff; color: #161326; border-radius: 10px; font: 26px Georgia, serif; }
+.links a { padding: 10px 0; }
+.links a[aria-current='page']::after { inset: auto 0 0; }
+.page { padding: 28px 32px 40px; }
+.hero { margin: 0; }
+.hero h1 { font-size: clamp(26px, 3vw, 38px); letter-spacing: -1.3px; }
+.hero .eyebrow { display: none; }
+.hero .lede { color: var(--muted); margin-top: 8px; font-size: 14px; }
+.editor-layout { grid-template-columns: 240px minmax(0, 1fr); margin-top: 28px; gap: 16px; }
+.explorer-panel { background: var(--surface); border-color: var(--line); border-radius: 12px; }
+.explorer-head { flex-wrap: wrap; gap: 12px; }
+.explorer-head h2 { text-transform: none; letter-spacing: 0; font-size: 14px; }
+.explorer-head button { min-height: 36px; }
+.workspace { grid-template-columns: minmax(0, 1.5fr) minmax(250px, 1fr); gap: 16px; }
+.card-head { height: 64px; }
+.card-head h2 { font-size: 14px; }
+.field-label { color: var(--muted); font-size: 12px; }
+.code-editor { min-height: 360px; tab-size: 2; font-size: 14px; line-height: 1.8; }
+.console { min-height: 360px; font-size: 14px; line-height: 1.8; }
+.btn-run { background: var(--accent); color: #17132b; box-shadow: none; justify-content: center; border-radius: 7px; }
+.editor-actions { flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.programs-card { margin-top: 16px; padding: 20px; }
+.programs-card h2 { font-size: 16px; }
+.programs-card p { color: var(--muted); }
+.program-actions button { min-height: 44px; }
+.save-details button { min-height: 40px; }
+.footer { padding: 16px 32px; height: auto; justify-content: space-between; }
+#editor-state { font-size: 12px; color: var(--accent); }
+.select { background-color: var(--code-bg); }
+.text-card, .form-card { line-height: 1.7; }
+.docs-table { display: block; overflow-x: auto; }
+button:hover:not(:disabled) { filter: brightness(1.13); }
+button:active:not(:disabled) { filter: brightness(.92); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 1150px) { .workspace { grid-template-columns: minmax(0, 1fr); } .console { min-height: 180px; } }
+@media (max-width: 800px) { .editor-layout { grid-template-columns: minmax(0, 1fr); } .page { padding: 24px 16px; } .topbar { padding: 16px; height: auto; gap: 16px; } .topbar .links { gap: 16px; flex-wrap: wrap; } .explorer-panel { min-height: 0; } }
+@media (max-width: 500px) { .topbar { grid-template-columns: 1fr; } .links a { min-height: 44px; } .code-editor { min-height: 300px; } .footer { padding: 16px; } }

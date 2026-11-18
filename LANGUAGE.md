@@ -22,6 +22,16 @@ Operators, from lowest to highest priority: `||`, `&&`, `== !=`, `< <= > >=`, `+
 
 The interpreter has no access to network, files, browser objects, or JavaScript evaluation. Each execution has fresh variables. Execution stops after 100000 evaluation steps or 1000 output lines. Source and individual generated strings are capped at 100000 characters, and parser nesting is capped at 200. Playground imports and stored programs still use their existing 5000-character limit.
 
-Functions, arrays, modules, and comments are not supported yet. This reference describes the current engine, not a finished language specification.
+Functions use `fn name(parameter) { return value; }`. They capture the surrounding scope, accept an exact number of arguments, and support recursion up to 100 nested calls. A function without a return produces `false`. Return outside a function is an error.
+
+```text
+fn double(number) {
+  return number * 2;
+}
+let numbers = [2, 4, 6];
+print(double(numbers[1]));
+```
+
+This prints 8. Arrays use zero-based indexing. Out-of-range and non-integer indexes are errors. Array mutation and built-in collection methods are not implemented. Modules and comments are not supported yet.
 
 Run `npm test` to check compatibility, scope, control flow, diagnostics, and execution limits.
