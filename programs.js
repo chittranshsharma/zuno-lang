@@ -6,7 +6,15 @@ const programStatus = document.querySelector('#program-status');
 const updateButton = document.querySelector('#update-program');
 const deleteButton = document.querySelector('#delete-program');
 const saveDetails = document.querySelector('.save-details');
+const editorState = document.querySelector('#editor-state');
 let programs = [];
+let savedCode = null;
+
+function updateEditorState() {
+  editorState.textContent = code.value === savedCode ? 'Saved' : code.value ? 'Unsaved changes' : 'New file';
+}
+code.addEventListener('input', updateEditorState);
+updateEditorState();
 
 async function readResult(response) {
   if (!response.headers.get('content-type')?.includes('application/json')) {
@@ -30,6 +38,9 @@ document.querySelector('#new-program').addEventListener('click', () => {
   titleInput.value = '';
   code.value = '';
   code.dispatchEvent(new Event('input'));
+  savedCode = null;
+  updateEditorState();
+  showTree();
   updateButton.disabled = true;
   deleteButton.disabled = true;
   programStatus.textContent = 'New program ready. Add a title and click Save new.';
@@ -43,18 +54,6 @@ document.querySelector('#new-folder').addEventListener('click', () => {
   folderInput.value = folder.trim();
   programStatus.textContent = 'Folder selected. Save a program to show it in the Explorer.';
 });
-document.querySelector('#copy-shared').addEventListener('click', () => {
-  saveDetails.open = true;
-  programList.value = '';
-  titleInput.value = 'My copy';
-  folderInput.value = 'General';
-  updateButton.disabled = true;
-  deleteButton.disabled = true;
-  document.querySelector('#shared-notice').hidden = true;
-  programStatus.textContent = 'Your copy is ready. Change the title and click Save new.';
-  titleInput.focus();
-});
-
 function selectProgram(id) {
   const selected = programs.find(program => program._id === id);
   programList.value = id;
@@ -65,7 +64,9 @@ function selectProgram(id) {
   titleInput.value = selected.title;
   folderInput.value = selected.folder || 'General';
   code.value = selected.code;
+  savedCode = selected.code;
   code.dispatchEvent(new Event('input'));
+  showTree();
   programStatus.textContent = 'Program loaded.';
 }
 
@@ -76,6 +77,7 @@ function drawFolders(parent, folder) {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = item.program.title + '.lingua';
+      if (item.program._id === programList.value) button.setAttribute('aria-current', 'true');
       button.addEventListener('click', () => selectProgram(item.program._id));
       parent.append(button);
     } else {
@@ -107,11 +109,13 @@ function showTree() {
 
 async function loadPrograms() {
   try {
+    const selectedId = programList.value;
     const response = await fetch('/api/programs');
     const result = await readResult(response);
     programs = result;
     programList.replaceChildren(new Option('Select a program', ''));
     programs.forEach(program => programList.add(new Option(program.title, program._id)));
+    if (programs.some(program => program._id === selectedId)) programList.value = selectedId;
     showTree();
   } catch (error) { folderTree.textContent = showError(error); }
 }
@@ -121,6 +125,7 @@ async function saveProgram(method, id) {
   const source = code.value.trim();
   const folder = folderInput.value.trim() || 'General';
   if (!title || !source) return programStatus.textContent = 'Add a title and code first.';
+  if (source.length > 5000) return programStatus.textContent = 'Keep code under 5000 characters.';
   if (!/^[\w -]+(?:\/[\w -]+)*$/.test(folder)) return programStatus.textContent = 'Use folder names separated by /.';
   try {
     const response = await fetch(id ? '/api/programs/' + id : '/api/programs', {
@@ -146,6 +151,8 @@ deleteButton.addEventListener('click', async () => {
     await loadPrograms();
     titleInput.value = '';
     folderInput.value = 'General';
+    savedCode = null;
+    updateEditorState();
     updateButton.disabled = true;
     deleteButton.disabled = true;
     programStatus.textContent = 'Program deleted.';

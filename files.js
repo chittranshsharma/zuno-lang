@@ -21,36 +21,15 @@ fileInput.addEventListener('change', async () => {
     fileInput.value = '';
     return;
   }
-  code.value = await file.text();
+  const importedCode = await file.text();
+  if (importedCode.length > 5000) {
+    fileStatus.textContent = 'This file is too long. Choose one under 5000 characters.';
+    fileInput.value = '';
+    return;
+  }
+  code.value = importedCode;
   code.dispatchEvent(new Event('input'));
   output.textContent = 'File loaded. Press Run to see the output.';
   fileStatus.textContent = file.name + ' imported.';
   fileInput.value = '';
 });
-
-document.querySelector('#share-code').addEventListener('click', async () => {
-  if (!code.value.trim()) return fileStatus.textContent = 'Write some code first.';
-  if (code.value.length > 2000) return fileStatus.textContent = 'Use Export file for code longer than 2000 characters.';
-  const link = new URL('playground.html', location.href);
-  link.hash = 'code=' + encodeURIComponent(code.value);
-  try {
-    await navigator.clipboard.writeText(link.href);
-    fileStatus.textContent = 'Share link copied. Anyone with the link can view the code.';
-  } catch (error) {
-    prompt('Copy this link:', link.href);
-    fileStatus.textContent = 'Share link ready.';
-  }
-});
-
-if (location.hash.startsWith('#code=')) {
-  try {
-    const sharedCode = decodeURIComponent(location.hash.slice(6));
-    if (sharedCode.length <= 2000) {
-      code.value = sharedCode;
-      code.dispatchEvent(new Event('input'));
-      output.textContent = 'Shared code loaded. Press Run to see the output.';
-      fileStatus.textContent = 'You opened a shared program.';
-      document.querySelector('#shared-notice').hidden = false;
-    }
-  } catch (error) { fileStatus.textContent = 'This share link could not be opened.'; }
-}

@@ -11,14 +11,14 @@ Lingua is our Web Programming course project. It is a small programming language
 - Error messages that show the line number.
 - A feedback form with name, email, and message validation.
 - An Express route that saves valid feedback in `data/feedback.json`.
-- A feedback fetch route at `GET /api/feedback`.
+- A feedback count route at `GET /api/feedback`, without exposing submitted names, emails, or messages.
 - Program saving, loading, updating, and deleting through Express and MongoDB.
 - A live line and character count below the editor.
 - A folder explorer for saved programs. Open **Save or edit program** in the sidebar, enter a folder like `College/Maths`, save, then click the file to load it.
 - The Explorer now sits beside the editor, with expandable folders and clickable program files.
 - New file clears the editor. New folder sets a folder path; it appears after you save a program there.
-- Shared code opens with a Make my copy button so a friend can prepare a separate saved version.
-- Exporting, importing, and sharing code through the playground.
+- The Explorer highlights the selected file, and the editor shows when code has unsaved changes.
+- Exporting and importing code through the playground.
 
 The language runner is intentionally small. It reads one statement per line. It does not support loops, conditions, or functions yet. Maths follows the usual order: brackets and powers, then multiplication/division/remainder, then addition/subtraction.
 
@@ -45,13 +45,13 @@ The app connects to local MongoDB at `mongodb://127.0.0.1:27017/lingua`. If your
 
 `programs.js` sends requests from the saved programs section and builds the folder explorer from saved folder names. A folder is stored as a simple path on each program, so there is no separate folder collection. `server.js` has four MongoDB program routes: `GET /api/programs` lists programs, `POST /api/programs` creates one, `PUT /api/programs/:id` updates one, and `DELETE /api/programs/:id` removes one. The Program model has a title, code, and folder. Mongoose also adds creation and update times.
 
-`files.js` downloads code as a `.lingua` file, imports `.lingua` and `.txt` files under 10 KB, and makes share links for code up to 2000 characters. The code is inside the link, so anyone with the link can read it.
+`files.js` downloads code as a `.lingua` file and imports `.lingua` and `.txt` files under 10 KB and 5000 characters. The 5000-character limit matches the MongoDB program API. Friends can exchange exported files.
 
 The example menu and Docs use the same working syntax as the playground: `let`, `print`, numbers, double-quoted text, `+ - * / ** %`, and brackets. The Power and Brackets example prints 25 and 1. Conditions, loops and functions are future ideas, not current commands.
 
-Collaboration is simple: send a share link, let a friend edit the code, then click Make my copy and Save new. This is an independent copy, not live simultaneous editing. Saved programs are in one shared MongoDB collection for the course demo; there are no user accounts or private folders.
+Saved programs are in one shared MongoDB collection for the course demo; there are no user accounts or private folders.
 
-Feedback uses a local JSON file because that is part of the second evaluation. `POST /api/feedback` saves a form submission, and `GET /api/feedback` fetches the saved submissions. The playground does not show submitted feedback because it contains names and email addresses.
+Feedback uses a local JSON file because that is part of the second evaluation. `POST /api/feedback` saves a form submission, and `GET /api/feedback` reads that file and returns only the total number of submissions. Names, email addresses, and messages are not sent back through the API.
 
 ## Course roadmap
 
@@ -61,4 +61,4 @@ Feedback uses a local JSON file because that is part of the second evaluation. `
 | Phase 2 | JavaScript, DOM, forms, local JSON | Linked pages, working interactions, validation, form submission, and JSON saving. |
 | Final phase | Full-stack app and MongoDB | Express APIs for local JSON feedback and MongoDB CRUD for saved programs. |
 
-For the final demo, start MongoDB and the Node server. Run a short program, show a helpful error, submit feedback, then save, load, update, and delete a program from the Explorer. Export and import a file, and open a share link in another browser tab. No external API is used because the course parameter says "if required" and Lingua does not need outside data for its core purpose.
+For the final demo, start MongoDB and the Node server. Run a short program, show a helpful error, submit feedback, then save, load, update, and delete a program from the Explorer. Export and import a file. No external API is used because the course parameter says "if required" and Lingua does not need outside data for its core purpose.

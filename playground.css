@@ -704,12 +704,9 @@ h1 {
 .save-details button { padding: 8px; border: 1px solid #5b6380; border-radius: 4px; background: #292f42; color: #fff; text-align: left; cursor: pointer; }
 .save-details button:disabled { opacity: .45; cursor: default; }
 .save-details #program-status { overflow-wrap: anywhere; color: #d6dbed; }
-.shared-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 12px 16px; border: 1px solid #bdd8f7; border-radius: 8px; background: #eef6ff; }
-.shared-notice[hidden] { display: none; }
-.shared-notice button { flex: none; padding: 8px 12px; border: 0; border-radius: 5px; background: var(--accent); color: #fff; cursor: pointer; }
+.explorer-panel .folder-tree button[aria-current="true"] { background: #363d55; color: #fff; font-weight: 600; }
 @media (max-width: 1000px) { .editor-layout { grid-template-columns: 190px minmax(0, 1fr); } }
 @media (max-width: 800px) { .editor-layout { grid-template-columns: 1fr; } .explorer-panel { min-height: 0; } }
-@media (max-width: 699px) { .shared-notice { align-items: flex-start; flex-direction: column; } }
 .saved-form { display: flex; flex-direction: column; gap: 10px; }
 .saved-form input, .saved-form select { padding: 10px; border: 1px solid var(--line); border-radius: 6px; }
 .folder-tree { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; }

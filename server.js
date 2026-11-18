@@ -13,7 +13,7 @@ app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/pl
 });
 app.get('/', (request, response) => response.redirect('/playground.html'));
 app.get('/api/feedback', async (request, response) => {
-  try { response.json(JSON.parse(await fs.readFile(dataFile, 'utf8'))); }
+  try { response.json({ count: JSON.parse(await fs.readFile(dataFile, 'utf8')).length }); }
   catch (error) { response.status(500).json({ error: 'Could not load feedback.' }); }
 });
 app.post('/api/feedback', async (request, response) => {

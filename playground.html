@@ -49,10 +49,6 @@
         </details>
       </aside>
       <div class="editor-main">
-        <div id="shared-notice" class="shared-notice" hidden>
-          <span>You're viewing shared code. Edit it, then save your own copy or share it again.</span>
-          <button id="copy-shared" type="button">Make my copy</button>
-        </div>
         <div class="workspace">
           <section class="card">
             <header class="card-head"><div><h2>Source Code</h2><p>Write code or choose an example.</p></div></header>
@@ -66,6 +62,7 @@
             <textarea id="code" class="code-editor" spellcheck="false">let name = "World";
 print(name);</textarea>
             <p id="code-count" class="help" aria-live="polite"></p>
+            <p id="editor-state" class="help" role="status" aria-live="polite">Unsaved changes</p>
             <div class="editor-actions"><button id="run" class="btn-run" type="button">Run</button><span>Ctrl + Enter</span></div>
           </section>
           <section class="card">
@@ -76,11 +73,10 @@ print(name);</textarea>
         </div>
         <section class="card programs-card">
           <h2>Take your code with you</h2>
-          <p>Download a file, open one later, or send someone a link.</p>
+          <p>Download a file or open one later.</p>
           <div class="program-actions">
             <button id="export-code" type="button">Export file</button>
             <button id="import-code" type="button">Import file</button>
-            <button id="share-code" type="button">Copy share link</button>
           </div>
           <input id="import-file" type="file" accept=".lingua,.txt,text/plain" hidden>
           <p id="file-status" role="status" aria-live="polite"></p>
