@@ -7,6 +7,7 @@ const dataFile = path.join(__dirname, 'data', 'feedback.json');
 const Program = mongoose.model('Program', new mongoose.Schema({ title: { type: String, required: true }, code: { type: String, required: true }, folder: { type: String, default: 'General' } }, { timestamps: true }));
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lingua';
 app.use(express.json());
+app.get(['/interactions.css', '/interactions.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
 app.get(['/workspace.css', '/workspace.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
 app.get('/favicon.ico', (request, response) => response.status(204).end());
 app.get(['/playground.html', '/docs.html', '/about.html', '/feedback.html', '/playground.css', '/playground.js', '/engine.js', '/feedback.js', '/files.js', '/programs.js'], (request, response) => {

@@ -6,6 +6,7 @@
   <title>Lingua Playground</title>
   <link rel="stylesheet" href="playground.css">
   <link rel="stylesheet" href="workspace.css">
+  <link rel="stylesheet" href="interactions.css">
 </head>
 <body>
   <header class="topbar">
@@ -24,6 +25,10 @@
         <h1>A little language. Room for big ideas.</h1>
         <p class="lede">Explore, build, and run your next idea in Lingua.</p>
       </div>
+    </section>
+    <section class="example-studio" aria-label="Interactive language examples">
+      <nav class="example-navigation" aria-label="Example branches"><h2>Explore the language</h2><div id="example-branches"></div></nav>
+      <div class="example-description"><h2>Small steps. Real programs.</h2><p>Choose an example from the branches, then open it in your editor.</p><button id="load-preview" type="button">Open selected example</button><span id="morph-title">Hello World</span></div>
     </section>
     <div class="editor-layout">
       <aside class="explorer-panel" aria-label="Program explorer">
@@ -69,7 +74,7 @@ print(name);</textarea>
             <div class="editor-actions"><button id="run" class="btn-run" type="button">Run program</button><span>Ctrl + Enter</span><span id="run-status" role="status">Ready</span></div>
           </section>
           <section class="card">
-            <header class="card-head"><div><h2>Output</h2><p>Results appear here after you run the code.</p></div></header>
+            <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Terminal</h2><p>Lingua runtime</p></div><span class="terminal-session">output</span></header>
             <pre id="output" class="console" aria-live="polite">Ready to run.</pre>
             <div class="program-actions editor-actions"><button id="clear-output" type="button">Clear output</button></div>
             <p class="help">Supports variables, maths, text, booleans, conditions, and loops.</p>
@@ -94,5 +99,6 @@ print(name);</textarea>
   <script src="files.js?v=2"></script>
   <script src="programs.js?v=3"></script>
   <script src="workspace.js"></script>
+  <script src="interactions.js"></script>
 </body>
 </html>
