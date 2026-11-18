@@ -74,11 +74,11 @@ Express provides `GET /api/programs`, `POST /api/programs`, `PUT /api/programs/:
 3. Create a folder path in the Explorer, give the program a title, and save it.
 4. Click the saved file, edit the code, and watch the unsaved indicator change. Update the file.
 5. Export the code, clear the editor, and import the `.lingua` file.
-6. Open Feedback and submit the form.
+6. Open the AI assistant with Ctrl+Alt+B to ask about the program.
 
 ## Current scope
 
-Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions are not implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
+Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions and arrays are implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
 
 Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js, Express, and MongoDB**.
 
@@ -88,6 +88,13 @@ The home page at `/` features the React Bits ShapeWaves animation with a `</>` c
 
 The Explorer now uses folder/file icons, nesting guides, folder-first sorting, collapse/expand controls, and animated folder opening. The code and output panels use matching terminal windows. Code highlights keywords, strings, and numbers; loading a file or example animates the tokens. Each run types the real result into the terminal, and repeated runs restart the animation. The extra example panel has been removed. Reduced-motion settings show content immediately. See [UI-CREDITS.md](UI-CREDITS.md) for component references.
 
-The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Cloud accounts, project ownership, live collaboration, and a Monaco editor are still pending.
+The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Cloud accounts, project ownership, live collaboration, are still pending.
 
 Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.
+
+## Editor and optional AI
+The playground uses Monaco with Lingua highlighting, completion snippets, line numbers, bracket matching, find, and undo. Ctrl+Enter runs the program. Ctrl+Alt+B opens the Groq code assistant. It explains code and suggests changes; it does not execute code or edit files.
+
+Set GROQ_API_KEY in a local .env file or server environment and restart npm start. GROQ_MODEL optionally overrides llama-3.3-70b-versatile. Never commit credentials. Only submitted questions and the current editor contents are sent to Groq. Without a key the editor still works and the assistant shows a setup message. Requests have size limits, a timeout, and a per-IP rate limit; public hosting still needs authentication and per-user quotas.
+
+The Feedback page and its API routes have been removed. Existing stored submissions are left untouched.

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="workspace.css">
   <link rel="stylesheet" href="interactions.css">
   <link rel="stylesheet" href="premium.css">
-</head>
+<link rel="stylesheet" href="/assets/editor.css"></head>
 <body>
   <header class="topbar">
     <a class="brand" href="/">Lingua</a>
@@ -16,7 +16,7 @@
       <a href="playground.html" aria-current="page">Playground</a>
       <a href="docs.html">Docs</a>
       <a href="about.html">About</a>
-      <a href="feedback.html">Feedback</a>
+      
     </nav>
   </header>
   <main class="page">
@@ -65,11 +65,11 @@
               <option value="functions">Functions and Arrays</option>
             </select>
             <label class="field-label" for="code">Code</label>
-            <div class="terminal-editor"><pre id="code-highlight" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">let name = "World";
+            <div id="monaco-editor" aria-label="Lingua code editor"></div><div class="terminal-editor"><pre id="code-highlight" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">let name = "World";
 print(name);</textarea></div>
             <p id="code-count" class="help" aria-live="polite"></p>
             <p id="editor-state" class="help" role="status" aria-live="polite">Unsaved changes</p>
-            <div class="editor-actions"><button id="run" class="btn-run" type="button">Run program</button><span>Ctrl + Enter</span><span id="run-status" role="status">Ready</span></div>
+            <div class="editor-actions"><button id="run" class="btn-run" type="button">Run program</button><span>Ctrl + Enter</span><button id="toggle-assistant" type="button" aria-expanded="false" aria-controls="assistant-panel">Ask AI <kbd>Ctrl+Alt+B</kbd></button><span id="run-status" role="status">Ready</span></div>
           </section>
           <section class="card">
             <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Terminal</h2><p>Lingua runtime</p></div><span class="terminal-session">output</span></header>
@@ -99,5 +99,5 @@ print(name);</textarea></div>
   <script src="programs.js?v=3"></script>
   <script src="workspace.js"></script>
   <script src="interactions.js"></script>
-</body>
+<aside id="assistant-panel" hidden aria-label="Code assistant"><header><h2>Code assistant</h2><button id="close-assistant" aria-label="Close assistant">Close</button></header><p>Powered by Groq. Submitting sends your current code and question to Groq. Suggestions never change files automatically.</p><div id="assistant-answer" role="status" aria-live="polite">Ask for an explanation or help finding a bug.</div><form id="assistant-form"><label for="assistant-question">Your question</label><textarea id="assistant-question" maxlength="2000" required placeholder="Explain this program step by step"></textarea><button id="ask-assistant" type="submit">Ask about my code</button></form></aside><script type="module" src="/assets/editor.js"></script></body>
 </html>
