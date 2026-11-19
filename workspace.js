@@ -1,17 +1,5 @@
 const draftKey = 'zuno.workspace.draft';
 const runStatus = document.querySelector('#run-status');
-try {
-  const draft = localStorage.getItem(draftKey);
-  if (draft !== null) {
-    code.value = draft;
-    code.dispatchEvent(new Event('input'));
-    runStatus.textContent = 'Local draft restored';
-  }
-} catch {}
-code.addEventListener('input', () => {
-  try { localStorage.setItem(draftKey, code.value); }
-  catch { runStatus.textContent = 'Draft storage unavailable. Export your code to keep a copy.'; }
-});
 code.addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;
   event.preventDefault();

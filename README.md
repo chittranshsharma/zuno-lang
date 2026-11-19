@@ -53,3 +53,11 @@ The project is maintained in its existing Git repository. [UI credits](UI-CREDIT
 Use bet/nah for branches, grind for while loops, each for iteration, and and/or/not for logic. Conditions can omit parentheses. Existing aliases and conventional keywords still work.
 
 The sandboxed browser App preview supports a ui module with labels, inputs, buttons and named Zuno callbacks. Try Clicker app, Converter app, or Quiz app and press Run. Run again resets state; Hide unloads the app. This enables small interactive tools, not arbitrary full-stack applications. Network access, persistence, custom HTML/CSS and native APIs are not supported. The CLI does not expose ui.
+
+## Tabs and workspace recovery
+
+The tab-bar + creates a new file. Each tab has a close button and an unsaved-change dot. Dirty tabs ask before closing; use Reopen closed file or Ctrl+Shift+T to restore one of the last ten closed files from this session. Ctrl+Alt+N creates a file; command search includes New, Close, and Reopen.
+
+Up to 40 open files and their contents restore from local browser storage after refresh. Guest and account workspaces have separate recovery records. Sign-out restores the guest workspace and removes account models from memory. Local recovery is browser-local, not cloud synchronization or encrypted storage; on shared computers, clear site data to remove local drafts. Browser storage failure is reported so you can save/export instead. Closing the last tab opens an empty file.
+
+Examples and imports open as separate tabs. Saving a draft attaches that tab to its server record without duplicating it. Deleting a saved record leaves the open copy as a local draft. Cursor state and undo history survive tab switching; undo history is not persisted across refresh.

@@ -1,3 +1,4 @@
+import { setupTabs } from './workspace-tabs.js';
 export function setupStudio(monaco, editor, source, openAssistant) {
   document.body.classList.add('studio');
   const workspace = document.querySelector('.workspace');
@@ -48,50 +49,8 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   tabs.className = 'editor-tabs';
   tabs.setAttribute('aria-label', 'Open files');
   sourceCard.prepend(tabs);
-  const models = new Map();
-  let active = '';
-  let switching = false;
-  const filename = document.querySelector('#editor-filename');
-  const identity = () => document.querySelector('#saved-programs').value || filename.textContent;
-  function drawTabs() {
-    tabs.replaceChildren();
-    for (const [id, entry] of models) {
-      const button = document.createElement('button');
-      button.textContent = entry.name;
-      button.setAttribute('aria-pressed', String(id === active));
-      button.onclick = () => {
-        active = id;
-        switching = true;
-        editor.setModel(entry.model);
-        filename.textContent = entry.name;
-        document.querySelector('#saved-programs').value = entry.savedId;
-        document.querySelector('#program-title').value = entry.title;
-        document.querySelector('#program-folder').value = entry.folder;
-        document.querySelector('#update-program').disabled = !entry.savedId;
-        document.querySelector('#delete-program').disabled = !entry.savedId;
-        source.value = entry.model.getValue(); source.dispatchEvent(new Event('input'));
-        switching = false;
-        document.dispatchEvent(new CustomEvent('studio-file-selected',{detail:{savedCode:entry.savedCode}}));
-        drawTabs(); editor.focus();
-      };
-      tabs.append(button);
-    }
-  }
-  function capture() {
-    if (switching) return;
-    const id = identity();
-    if (active === id) return;
-    if (!models.size) models.set(id, { model: editor.getModel() });
-    else if (!models.has(id)) models.set(id, { model: monaco.editor.createModel(source.value, 'zuno') });
-    const entry = models.get(id);
-    Object.assign(entry, { name: filename.textContent, savedId: document.querySelector('#saved-programs').value, title: document.querySelector('#program-title').value, folder: document.querySelector('#program-folder').value, savedCode: document.querySelector('#saved-programs').value ? source.value : null });
-    active = id;
-    editor.setModel(entry.model);
-    source.value = entry.model.getValue();
-    drawTabs();
-  }
-  capture();
-  source.addEventListener('input', capture, true);
+  const tabWorkspace=setupTabs(monaco,editor,source,tabs);
+  globalThis.ZunoWorkspace=tabWorkspace;
   const runtimeErrors=document.createElement('div');
   terminal.append(runtimeErrors);
   new MutationObserver(()=>{
@@ -167,7 +126,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   document.body.append(palette);
   const search = palette.querySelector('input');
   function commands() {
-    const items = [ ['Run program',()=>document.querySelector('#run').click()],['Toggle AI assistant',()=>openAssistant()],['New file',()=>document.querySelector('#new-program').click()],['Export file',()=>document.querySelector('#export-code').click()],['Toggle minimap',()=>editor.updateOptions({minimap:{enabled:!editor.getOption(monaco.editor.EditorOption.minimap).enabled}})],['Toggle word wrap',()=>editor.updateOptions({wordWrap:editor.getOption(monaco.editor.EditorOption.wordWrap)==='off'?'on':'off'})] ];
+    const items = [ ['Run program',()=>document.querySelector('#run').click()],['Toggle AI assistant',()=>openAssistant()],['New file',()=>tabWorkspace.newFile()],['Close current file',()=>tabWorkspace.closeCurrent()],['Reopen closed file',()=>tabWorkspace.reopen()],['Export file',()=>document.querySelector('#export-code').click()],['Toggle minimap',()=>editor.updateOptions({minimap:{enabled:!editor.getOption(monaco.editor.EditorOption.minimap).enabled}})],['Toggle word wrap',()=>editor.updateOptions({wordWrap:editor.getOption(monaco.editor.EditorOption.wordWrap)==='off'?'on':'off'})] ];
     for (const option of document.querySelector('#example').options) items.push(['Example: '+option.textContent,()=>{ document.querySelector('#example').value=option.value; document.querySelector('#example').dispatchEvent(new Event('change')); }]);
     for (const button of document.querySelectorAll('.tree-file')) items.push(['File: '+button.textContent,()=>button.click()]);
     const list=palette.querySelector('.command-results'); list.replaceChildren();
@@ -185,11 +144,12 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   document.querySelector('.explorer-panel').append(account);
   let loggedIn=false;
   async function accountState(){
-    const response=await fetch('/api/auth/me');const data=await response.json();
+    const response=await fetch('/api/auth/me');if(!response.ok)throw new Error('Account service unavailable');const data=await response.json();
     loggedIn=Boolean(data.user);
     account.querySelector('#account-state').textContent=data.user?.email||'Private projects · Sign in';
     account.querySelector('form').hidden=loggedIn;account.querySelector('#sign-out').hidden=!loggedIn;
-    document.querySelector('#refresh-programs').click();
+    await globalThis.loadPrograms();
+    tabWorkspace.setScope(data.user?.email || 'guest');
   }
   account.querySelector('form').onsubmit=async event=>{
     event.preventDefault();const form=new FormData(event.target);
@@ -202,11 +162,11 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   account.querySelector('#sign-out').onclick=async()=>{
     clearTimeout(saveTimer);
     loggedIn=false;
-    await fetch('/api/auth/logout',{method:'POST'});
-    models.forEach(entry=>{if(entry.model!==editor.getModel())entry.model.dispose();});models.clear();active='';
-    document.querySelector('#new-program').click();await accountState();
+    const response=await fetch('/api/auth/logout',{method:'POST'});
+    if(!response.ok){account.querySelector('#account-message').textContent='Could not sign out. Please retry.';loggedIn=true;return;}
+    await accountState();
   };
-  accountState().catch(()=>{account.querySelector('#account-message').textContent='Account service unavailable.';});
+  accountState().catch(()=>{tabWorkspace.setScope('guest');account.querySelector('#account-message').textContent='Account service unavailable. Using your local guest workspace.';});
   const autosave=document.createElement('label');autosave.className='autosave-toggle';autosave.innerHTML='<input type="checkbox"> Autosave saved files';
   account.append(autosave);
   let saveTimer;
@@ -215,9 +175,11 @@ export function setupStudio(monaco, editor, source, openAssistant) {
     if(!loggedIn||!autosave.querySelector('input').checked)return;
     const id=document.querySelector('#saved-programs').value;
     if(!id)return;
+    const tabId=tabWorkspace.activeId;
     const snapshot={title:document.querySelector('#program-title').value,folder:document.querySelector('#program-folder').value,code:editor.getValue()};
     saveTimer=setTimeout(async()=>{
-      try{const response=await fetch('/api/programs/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)});const data=await response.json();if(!response.ok)throw new Error(data.error);document.querySelector('#editor-state').textContent=editor.getValue()===snapshot.code?'Autosaved':'Unsaved changes';}
+      try{const response=await fetch('/api/programs/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)});const data=await response.json();if(!response.ok)throw new Error(data.error);document.querySelector('#editor-state').textContent=editor.getValue()===snapshot.code?'Autosaved':'Unsaved changes';
+        tabWorkspace.markSaved(tabId,data);}
       catch(error){document.querySelector('#editor-state').textContent=error.message;}
     },1200);
   });

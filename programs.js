@@ -40,6 +40,7 @@ function showError(error) {
 
 document.querySelector('#refresh-programs').addEventListener('click', loadPrograms);
 document.querySelector('#new-program').addEventListener('click', () => {
+  if(globalThis.ZunoWorkspace){globalThis.ZunoWorkspace.newFile();return;}
   saveDetails.open = true;
   programList.value = '';
   titleInput.value = '';
@@ -68,6 +69,7 @@ function selectProgram(id) {
   updateButton.disabled = !selected;
   deleteButton.disabled = !selected;
   if (!selected) return;
+  if(globalThis.ZunoWorkspace){globalThis.ZunoWorkspace.open({name:selected.title+'.zuno',code:selected.code,savedCode:selected.code,savedId:selected._id,title:selected.title,folder:selected.folder});return;}
   document.querySelector('#editor-filename').textContent = selected.title + '.zuno';
   saveDetails.open = true;
   titleInput.value = selected.title;
@@ -179,6 +181,7 @@ async function saveProgram(method, id) {
   if (source.length > 5000) return programStatus.textContent = 'Keep code under 5000 characters.';
   if (!/^[\w -]+(?:\/[\w -]+)*$/.test(folder)) return programStatus.textContent = 'Use folder names separated by /.';
   try {
+    const tabId=globalThis.ZunoWorkspace?.activeId;
     const response = await fetch(id ? '/api/programs/' + id : '/api/programs', {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -186,7 +189,8 @@ async function saveProgram(method, id) {
     });
     const result = await readResult(response);
     await loadPrograms();
-    selectProgram(result._id);
+    if(globalThis.ZunoWorkspace)globalThis.ZunoWorkspace.markSaved(tabId,result);
+    else selectProgram(result._id);
     programStatus.textContent = id ? 'Program updated.' : 'Program saved.';
   } catch (error) { showError(error); saveDetails.open = true; }
 }
@@ -197,7 +201,8 @@ programList.addEventListener('change', () => selectProgram(programList.value));
 deleteButton.addEventListener('click', async () => {
   if (!programList.value || !confirm('Delete this program?')) return;
   try {
-    const response = await fetch('/api/programs/' + programList.value, { method: 'DELETE' });
+    const deletedId=programList.value;
+    const response = await fetch('/api/programs/' + deletedId, { method: 'DELETE' });
     const result = await readResult(response);
     await loadPrograms();
     titleInput.value = '';
@@ -206,7 +211,8 @@ deleteButton.addEventListener('click', async () => {
     updateEditorState();
     updateButton.disabled = true;
     deleteButton.disabled = true;
-    programStatus.textContent = 'Program deleted.';
+    globalThis.ZunoWorkspace?.detachSaved(deletedId);
+    programStatus.textContent = 'Program deleted. The open copy is now a local draft.';
   } catch (error) { showError(error); saveDetails.open = true; }
 });
 loadPrograms();

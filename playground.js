@@ -24,6 +24,10 @@ const examples = {
 };
 
 document.querySelector('#example').addEventListener('change', event => {
+  if(globalThis.ZunoWorkspace){
+    globalThis.ZunoWorkspace.open({id:'example:'+event.target.value,name:event.target.selectedOptions[0].textContent+'.zuno',code:examples[event.target.value],savedCode:null,title:''});
+    output.textContent='Ready to run.';return;
+  }
   document.querySelector('#editor-filename').textContent = event.target.selectedOptions[0].textContent + '.zuno';
   code.value = examples[event.target.value];
   code.dispatchEvent(new Event('input'));

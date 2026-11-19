@@ -7,7 +7,7 @@ document.querySelector('#export-code').addEventListener('click', () => {
   const file = new Blob([code.value], { type: 'text/plain' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(file);
-  link.download = 'program.zuno';
+  link.download = document.querySelector('#editor-filename').textContent.replace(/[^a-zA-Z0-9_. -]/g,'_') || 'program.zuno';
   link.click();
   URL.revokeObjectURL(link.href);
   fileStatus.textContent = 'File downloaded.';
@@ -28,7 +28,8 @@ fileInput.addEventListener('change', async () => {
     fileInput.value = '';
     return;
   }
-  code.value = importedCode;
+  if(globalThis.ZunoWorkspace)globalThis.ZunoWorkspace.open({name:file.name.replace(/\.txt$/i,'.zuno'),code:importedCode,savedCode:null,title:''});
+  else code.value = importedCode;
   code.dispatchEvent(new Event('input'));
   output.textContent = 'File loaded. Press Run to see the output.';
   fileStatus.textContent = file.name + ' imported.';
