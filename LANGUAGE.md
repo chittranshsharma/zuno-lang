@@ -35,3 +35,9 @@ print(double(numbers[1]));
 This prints 8. Arrays use zero-based indexing. Out-of-range and non-integer indexes are errors. Array mutation and built-in collection methods are not implemented. Modules and comments are not supported yet.
 
 Run `npm test` to check compatibility, scope, control flow, diagnostics, and execution limits.
+
+## Modern dialect
+vibe = let; lock = const; cook = func = fn; yap = say = print; yeet = return; fr = true; cap = false.
+Constants reject reassignment. for name in expression { statements } iterates arrays or strings.
+range(end) or range(start, end) creates up to 10,000 integers, excluding end. len reads array/text length; upper/lower transform text; abs/round handle numbers; join(array, separator) returns text.
+Line comments start with //. The parser is available as Lingua.parse(source) and never executes code, enabling editor diagnostics. New dialect keywords are reserved.

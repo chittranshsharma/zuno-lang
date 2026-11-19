@@ -35,7 +35,7 @@
         </div>
         <div class="tree-toolbar"><span>Workspace files</span><button id="collapse-folders" type="button">Collapse all</button></div>
         <div id="folder-tree" class="folder-tree" aria-label="Saved files">Loading saved programs...</div>
-        <p class="explorer-help">Saved files appear here when MongoDB is connected.</p>
+        <p class="explorer-help">Sign in to organize your private files.</p>
         <details class="save-details">
           <summary>Save or edit program</summary>
           <div class="saved-form">
@@ -62,7 +62,7 @@
               <option value="math">Simple Maths</option>
               <option value="power">Power and Brackets</option>
               <option value="control">Loops and Conditions</option>
-              <option value="functions">Functions and Arrays</option>
+              <option value="functions">Functions and Arrays</option><option value="modern">Modern dialect</option>
             </select>
             <label class="field-label" for="code">Code</label>
             <div id="monaco-editor" aria-label="Lingua code editor"></div><div class="terminal-editor"><pre id="code-highlight" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">let name = "World";
@@ -76,7 +76,7 @@ print(name);</textarea></div>
             <pre id="output" class="sr-only" aria-live="polite">Ready to run.</pre>
             <div class="terminal-content"><div class="terminal-command" aria-hidden="true"><span>❯</span> lingua run <span class="terminal-command-file">workspace</span></div><pre id="terminal-screen" aria-hidden="true"></pre><span class="terminal-caret" aria-hidden="true"></span><span id="terminal-animation-status" class="terminal-animation-status">Ready</span></div>
             <div class="program-actions editor-actions"><button id="clear-output" type="button">Clear output</button></div>
-            <p class="help">Supports variables, maths, text, booleans, conditions, and loops.</p>
+            <p class="help">Functions, arrays, loops, constants, and the modern dialect.</p>
           </section>
         </div>
         <section class="card programs-card">

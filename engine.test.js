@@ -37,3 +37,11 @@ test('variable names do not access object prototypes', () => {
   assert.deepEqual(execute('let __proto__ = 7; print(__proto__);'), ['7']);
   assert.throws(() => execute('print(constructor);'), /Unknown variable/);
 });
+
+test('modern and playful syntax with bounded helpers', () => {
+  assert.deepEqual(execute('lock items = range(3); cook twice(x) { yeet x * 2; } for item in items { yap(twice(item)); }'), ['0','2','4']);
+  assert.deepEqual(execute('vibe ok = fr; yap(ok && !cap); say(upper("hello")); say(len([1,2]));'), ['true','HELLO','2']);
+  assert.throws(() => execute('lock x = 1; x = 2;'), /constant/);
+  assert.throws(() => execute('say(range(10001));'), /10000/);
+  assert.equal(require('./engine').parse('while (fr) {}').length, 1);
+});

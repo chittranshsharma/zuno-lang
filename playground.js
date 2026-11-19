@@ -9,6 +9,7 @@ function updateCount() {
 code.addEventListener('input', updateCount);
 updateCount();
 const examples = {
+  modern: 'lock scores = range(1, 5);\ncook double(score) {\n  yeet score * 2;\n}\nfor score in scores {\n  yap(double(score));\n}',
   functions: 'fn double(number) {\n  return number * 2;\n}\nlet numbers = [2, 4, 6];\nprint(double(numbers[1]));',
   control: 'let n = 1;\nwhile (n <= 5) {\n  if (n % 2 == 0) {\n    print(n);\n  }\n  n = n + 1;\n}',
   hello: 'let name = "World";\nprint(name);',

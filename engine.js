@@ -1,5 +1,5 @@
 (function (root) {
-  function execute(source, limit = 100000) {
+  function execute(source, limit = 100000, parseOnly = false) {
     if (source.length > 100000) throw new Error('Program exceeds 100000 characters');
     const tokens = [];
     let line = 1;
@@ -7,10 +7,15 @@
     let offset = 0;
     const fail = (token, message) => { throw new Error(`Line ${token.line}, column ${token.column}: ${message}`); };
     while (offset < source.length) {
+      if (source.slice(offset, offset + 2) === '//') {
+        const end = source.indexOf('\n', offset);
+        const count = (end < 0 ? source.length : end) - offset;
+        offset += count; column += count; continue;
+      }
       const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],{}();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
-      if (!/^\s/.test(text)) tokens.push({ text, line, column });
+      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false' })[text] || text, line, column });
       for (const character of text) {
         if (character === '\n') { line++; column = 1; }
         else column++;
@@ -26,7 +31,7 @@
       if (peek() !== text) fail(tokens[index], 'Expected ' + text);
       return take();
     };
-    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'return']);
+    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'func', 'const', 'say', 'for', 'in', 'return']);
     function argumentsUntil(end) {
       const values = [];
       if (peek() !== end) {
@@ -81,7 +86,7 @@
     }
     function statement() {
       const token = take();
-      if (token.text === 'fn') {
+      if (['fn', 'func'].includes(token.text)) {
         const name = take();
         if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a function name');
         expect('(');
@@ -98,6 +103,13 @@
         expect(')');
         return { type: 'function', token: name, params, body: block() };
       }
+      if (token.text === 'for') {
+        const name = take();
+        if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a loop variable');
+        expect('in');
+        const iterable = expression();
+        return { type: 'for', token: name, iterable, body: block() };
+      }
       if (token.text === 'return') {
         const value = expression(); expect(';');
         return { type: 'return', token, value };
@@ -111,22 +123,24 @@
         if (token.text === 'if' && peek() === 'else') { take(); otherwise = block(); }
         return { type: token.text, token, condition, body, otherwise };
       }
-      if (token.text === 'print') {
+      if (['print', 'say'].includes(token.text)) {
         expect('(');
         const value = expression();
         expect(')');
         expect(';');
         return { type: 'print', token, value };
       }
-      const name = token.text === 'let' ? take() : token;
+      const name = ['let', 'const'].includes(token.text) ? take() : token;
       if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a variable name');
       expect('=');
       const value = expression();
       expect(';');
-      return { type: token.text === 'let' ? 'declare' : 'assign', token: name, value };
+      return { type: ['let', 'const'].includes(token.text) ? 'declare' : 'assign', constant: token.text === 'const', token: name, value };
     }
     const program = [];
     while (peek()) program.push(statement());
+    if (parseOnly) return program;
+    const constants = new WeakMap();
     const output = [];
     let steps = 0;
     let calls = 0;
@@ -139,11 +153,15 @@
       if (node.type === 'index') {
         const array = evaluate(node.array, scope);
         const position = evaluate(node.position, scope);
-        if (!Array.isArray(array) || !Number.isInteger(position) || position < 0 || position >= array.length) fail(node.token, 'Array index is outside its bounds');
+        if ((!Array.isArray(array) && typeof array !== 'string') || !Number.isInteger(position) || position < 0 || position >= array.length) fail(node.token, 'Array index is outside its bounds');
         return array[position];
       }
       if (node.type === 'call') {
         const fn = evaluate(node.callee, scope);
+        if (fn && fn.kind === 'builtin') {
+          const args = node.args.map(arg => evaluate(arg, scope));
+          try { return fn.call(...args); } catch (error) { fail(node.token, error.message); }
+        }
         if (!fn || fn.kind !== 'function') fail(node.token, 'Expected a function');
         if (fn.params.length !== node.args.length) fail(node.token, 'Wrong number of arguments');
         const values = node.args.map(arg => evaluate(arg, scope));
@@ -200,6 +218,10 @@
           throw { type: returnSignal, value: evaluate(node.value, scope) };
         } else if (node.type === 'if') {
           run(evaluate(node.condition, scope) ? node.body : node.otherwise, { values: new Map(), parent: scope });
+        } else if (node.type === 'for') {
+          const items = evaluate(node.iterable, scope);
+          if (!Array.isArray(items) && typeof items !== 'string') fail(node.token, 'For needs an array or text');
+          for (const item of items) { tick(node.token); run(node.body, { values: new Map([[node.token.text, item]]), parent: scope }); }
         } else if (node.type === 'while') {
           while (evaluate(node.condition, scope)) {
             tick(node.token);
@@ -214,18 +236,30 @@
           } else if (node.type === 'declare') {
             if (scope.values.has(name)) fail(node.token, 'Variable already declared: ' + name);
             scope.values.set(name, value);
+            if (node.constant) { if (!constants.has(scope)) constants.set(scope, new Set()); constants.get(scope).add(name); }
           } else {
             let target = scope;
             while (target && !target.values.has(name)) target = target.parent;
             if (!target) fail(node.token, 'Unknown variable: ' + name);
+            if (constants.get(target)?.has(name)) fail(node.token, 'Cannot reassign constant: ' + name);
             target.values.set(name, value);
           }
         }
       }
     }
-    run(program, { values: new Map(), parent: null });
+    const builtins = {
+      len: value => { if (!Array.isArray(value) && typeof value !== 'string') throw new Error('len needs an array or text'); return value.length; },
+      range: (start, end) => { if (end === undefined) { end = start; start = 0; } if (!Number.isInteger(start) || !Number.isInteger(end) || end - start > 10000 || end < start) throw new Error('range needs ordered integers, up to 10000 items'); return Array.from({ length: end - start }, (_, i) => start + i); },
+      upper: value => { if (typeof value !== 'string') throw new Error('upper needs text'); return value.toUpperCase(); },
+      lower: value => { if (typeof value !== 'string') throw new Error('lower needs text'); return value.toLowerCase(); },
+      abs: value => { if (typeof value !== 'number') throw new Error('abs needs a number'); return Math.abs(value); },
+      round: value => { if (typeof value !== 'number') throw new Error('round needs a number'); return Math.round(value); },
+      join: (values, separator = ',') => { if (!Array.isArray(values) || typeof separator !== 'string') throw new Error('join needs an array and text'); const result = values.join(separator); if (result.length > 100000) throw new Error('Text exceeds 100000 characters'); return result; }
+    };
+    const builtinScope = { values: new Map(Object.entries(builtins).map(([name, call]) => [name, { kind: 'builtin', call }])), parent: null };
+    run(program, { values: new Map(), parent: builtinScope });
     return output;
   }
-  if (typeof module !== 'undefined' && module.exports) module.exports = { execute };
-  else root.Lingua = { execute };
+  if (typeof module !== 'undefined' && module.exports) module.exports = { execute, parse: source => execute(source, 0, true) };
+  else root.Lingua = { execute, parse: source => execute(source, 0, true) };
 })(globalThis);

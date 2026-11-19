@@ -78,7 +78,7 @@ Express provides `GET /api/programs`, `POST /api/programs`, `PUT /api/programs/:
 
 ## Current scope
 
-Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions and arrays are implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
+Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions and arrays are implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; accounts now isolate saved programs.
 
 Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js, Express, and MongoDB**.
 
@@ -88,9 +88,9 @@ The home page at `/` features the React Bits ShapeWaves animation with a `</>` c
 
 The Explorer now uses folder/file icons, nesting guides, folder-first sorting, collapse/expand controls, and animated folder opening. The code and output panels use matching terminal windows. Code highlights keywords, strings, and numbers; loading a file or example animates the tokens. Each run types the real result into the terminal, and repeated runs restart the animation. The extra example panel has been removed. Reduced-motion settings show content immediately. See [UI-CREDITS.md](UI-CREDITS.md) for component references.
 
-The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Cloud accounts, project ownership, live collaboration, are still pending.
+The next workspace includes a dark responsive interface, recoverable local drafts, run timing, and a clear-output action. The engine now supports `fn` functions, `return`, lexical closures, recursion, and array literals with checked indexing. See [LANGUAGE.md](LANGUAGE.md) for exact syntax and current limits. Live collaboration and production hosting are still pending.
 
-Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.
+Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; live collaboration and production hosting are not implemented yet.
 
 ## Editor and optional AI
 The playground uses Monaco with Lingua highlighting, completion snippets, line numbers, bracket matching, find, and undo. Ctrl+Enter runs the program. Ctrl+Alt+B opens the Groq code assistant. It explains code and suggests changes; it does not execute code or edit files.
@@ -98,3 +98,12 @@ The playground uses Monaco with Lingua highlighting, completion snippets, line n
 Each visitor can add their own Groq key in the assistant sidebar. Get one at https://console.groq.com/keys, paste it into Your Groq key, and choose Use key. No .env setup is required. Keys stay in page memory, are cleared on refresh/disconnect, and pass through the server only to authorize the Groq request. Lingua does not persist keys. Host over HTTPS. GROQ_MODEL optionally overrides llama-3.3-70b-versatile on the server. Requests have size limits, a timeout and a per-IP rate limit.
 
 The Feedback page and its API routes have been removed. Existing stored submissions are left untouched.
+
+## Studio upgrade
+The workspace now has per-file Monaco models and tabs, keyboard-operable panel size sliders, a terminal below the editor, syntax diagnostics, runtime-error navigation, symbol suggestions, and Ctrl+Shift+P commands. Ctrl+Alt+B opens streaming Markdown chat with history, stop, selected-code context, and suggested edits reviewed in a Monaco diff. Accepted edits support undo and reject stale file contents.
+
+Private accounts use salted scrypt password hashes and expiring HttpOnly sessions. Program queries require the account owner. Existing shared records are retained without an owner and are not exposed to new accounts; they need an explicit owner migration if you want them imported. Saved files have optional autosave. Local drafts and unsaved tabs are browser-local, not cloud records.
+
+Hosting is deferred at the owner's request. Deploy the Express server with HTTPS, NODE_ENV=production, and MONGODB_URI pointing at a hosted database. Use the same deployment from another device to access your account. Account recovery and email verification are not implemented yet.
+
+New syntax: vibe/let, lock/const, cook/func/fn, yap/say/print, yeet/return, fr/true, cap/false, and for item in iterable blocks. Helpers include len, range, upper, lower, abs, round, and join. Existing grammar remains supported except that the new keywords are now reserved. This is still a bounded small-language runtime, not a general-purpose platform with modules or a package ecosystem.

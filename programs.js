@@ -9,6 +9,8 @@ const saveDetails = document.querySelector('.save-details');
 const editorState = document.querySelector('#editor-state');
 let programs = [];
 let savedCode = null;
+let untitledNumber = 0;
+document.addEventListener('studio-file-selected', event => { savedCode = event.detail.savedCode; updateEditorState(); showTree(); });
 const folderStates = new Map();
 const treeIcons = {
   file: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>',
@@ -41,7 +43,7 @@ document.querySelector('#new-program').addEventListener('click', () => {
   saveDetails.open = true;
   programList.value = '';
   titleInput.value = '';
-  document.querySelector('#editor-filename').textContent = 'untitled.lingua';
+  document.querySelector('#editor-filename').textContent = 'untitled-' + (++untitledNumber) + '.lingua';
   code.value = '';
   code.dispatchEvent(new Event('input'));
   savedCode = null;
@@ -160,7 +162,13 @@ async function loadPrograms() {
     programs.forEach(program => programList.add(new Option(program.title, program._id)));
     if (programs.some(program => program._id === selectedId)) programList.value = selectedId;
     showTree();
-  } catch (error) { folderTree.textContent = showError(error); }
+  } catch (error) {
+    programs = [];
+    programList.replaceChildren(new Option('Select a program', ''));
+    updateButton.disabled = true;
+    deleteButton.disabled = true;
+    folderTree.textContent = showError(error);
+  }
 }
 
 async function saveProgram(method, id) {
