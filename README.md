@@ -47,3 +47,9 @@ npm run build checks CSS and builds the browser bundles. npm test covers interpr
 ## Source and credits
 
 The project is maintained in its existing Git repository. [UI credits](UI-CREDITS.md) list third-party components and licenses.
+
+## Interactive apps and the dialect
+
+Use bet/nah for branches, grind for while loops, each for iteration, and and/or/not for logic. Conditions can omit parentheses. Existing aliases and conventional keywords still work.
+
+The sandboxed browser App preview supports a ui module with labels, inputs, buttons and named Zuno callbacks. Try Clicker app, Converter app, or Quiz app and press Run. Run again resets state; Hide unloads the app. This enables small interactive tools, not arbitrary full-stack applications. Network access, persistence, custom HTML/CSS and native APIs are not supported. The CLI does not expose ui.

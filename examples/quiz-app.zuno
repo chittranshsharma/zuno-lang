@@ -1,0 +1,33 @@
+import ui as app;
+lock questions = ["What does fr mean?", "Which keyword returns a value?", "Which keyword declares a constant?"];
+lock answers = ["true", "yeet", "lock"];
+vibe current = 0;
+vibe score = 0;
+app.title("Zuno vibe check");
+app.label("question", questions[0]);
+app.input("answer", "Your answer");
+app.label("progress", "Question 1 of 3");
+app.label("feedback", "Type an answer and check it.");
+cook check() {
+  bet current >= len(questions) {
+    app.set("feedback", "Quiz complete. Score: " + text(score));
+    yeet cap;
+  }
+  lock answer = lower(trim(app.value("answer")));
+  bet answer == answers[current] {
+    score = score + 1;
+    app.set("feedback", "No cap. Correct.");
+  } nah {
+    app.set("feedback", "Answer: " + answers[current]);
+  }
+  current = current + 1;
+  bet current < len(questions) {
+    app.set("question", questions[current]);
+    app.set("answer", "");
+    app.set("progress", "Question " + text(current + 1) + " of 3");
+  } nah {
+    app.set("question", "You finished. Score: " + text(score) + " of 3");
+    app.set("progress", "Done");
+  }
+}
+app.button("Check answer", check);

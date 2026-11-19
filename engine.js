@@ -1,5 +1,5 @@
 (function (root) {
-  function execute(source, limit = 100000, parseOnly = false) {
+  function execute(source, limit = 100000, parseOnly = false, host = {}) {
     if (source.length > 100000) throw new Error('Program exceeds 100000 characters');
     const tokens = [];
     let line = 1;
@@ -15,7 +15,7 @@
       const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],.{}:();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
-      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false' })[text] || text, line, column });
+      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false', bet:'if', nah:'else', grind:'while', each:'for', and:'&&', or:'||', not:'!' })[text] || text, line, column });
       for (const character of text) {
         if (character === '\n') { line++; column = 1; }
         else column++;
@@ -25,8 +25,8 @@
     tokens.push({ text: '', line, column });
     let index = 0;
     let depth = 0;
-    const peek = () => tokens[index].text;
-    const take = () => tokens[index++];
+    const peek = () => tokens[Math.min(index,tokens.length-1)].text;
+    const take = () => { if(index>=tokens.length)fail(tokens[tokens.length-1],'Unexpected end of program'); return tokens[index++]; };
     const expect = text => {
       if (peek() !== text) fail(tokens[index], 'Expected ' + text);
       return take();
@@ -136,12 +136,13 @@
         return { type: 'return', token, value };
       }
       if (token.text === 'if' || token.text === 'while') {
-        expect('(');
+        const wrapped=peek()==='(';
+        if(wrapped)take();
         const condition = expression();
-        expect(')');
+        if(wrapped)expect(')');
         const body = block();
         let otherwise = [];
-        if (token.text === 'if' && peek() === 'else') { take(); otherwise = block(); }
+        if (token.text === 'if' && peek() === 'else') { take(); otherwise = peek()==='if' ? [statement()] : block(); }
         return { type: token.text, token, condition, body, otherwise };
       }
       if (['print', 'say'].includes(token.text)) {
@@ -354,6 +355,28 @@
     const builtinScope = { values: new Map(Object.entries(builtins).map(([name, call]) => [name, { kind: 'builtin', call }])), parent: null };
     for(const [name,names] of Object.entries({math:['abs','round','floor','ceil','sqrt','sum','min','max'],strings:['upper','lower','trim','split','join','contains','replace','text','number'],arrays:['len','range','push','pop','slice','reverse','sort'],dict:['keys','values','has','remove'],testing:['assert']})) {
       modules.set(name,dict(names.map(key=>[key,builtinScope.values.get(key)])));
+    }
+    if(host.ui){
+      const methods=new Map();
+      for(const name of ['title','label','input','value','set','button','clear']){
+        methods.set(name,{kind:'builtin',call:(...args)=>{
+          const method=host.ui[name];
+          if(typeof method!=='function')throw new Error('UI method unavailable: '+name);
+          if(name==='button'){
+            const callback=args[1];
+            if(callback?.kind!=='function'||callback.params.length)throw new Error('button needs a zero-argument function');
+            args[1]=()=>{
+              steps=0;
+              try{
+                evaluate({type:'call',token:{text:'event',line:1,column:1},callee:{type:'literal',token:{text:'callback',line:1,column:1},value:callback},args:[]},builtinScope);
+                host.onOutput?.(output.slice());
+              }catch(error){host.onError?.(error);}
+            };
+          }
+          return method(...args);
+        }});
+      }
+      modules.set('ui',dict(methods));
     }
     run(program, { values: new Map(), parent: builtinScope });
     return output;

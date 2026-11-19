@@ -11,7 +11,7 @@ app.get('/premium.css', (request, response) => response.sendFile(path.join(__dir
 app.get(['/interactions.css', '/interactions.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
 app.get(['/workspace.css', '/workspace.js'], (request, response) => response.sendFile(path.join(__dirname, request.path)));
 app.get('/favicon.ico', (request, response) => response.status(204).end());
-app.get(['/playground.html', '/docs.html', '/about.html', '/playground.css', '/playground.js', '/engine.js', '/files.js', '/programs.js'], (request, response) => {
+app.get(['/playground.html', '/docs.html', '/about.html', '/playground.css', '/playground.js', '/engine.js', '/files.js', '/programs.js', '/app-preview.html', '/app-preview.js'], (request, response) => {
   response.sendFile(path.join(__dirname, request.path));
 });
 app.use('/assets', express.static(path.join(__dirname, 'public')));

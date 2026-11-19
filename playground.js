@@ -9,6 +9,9 @@ function updateCount() {
 code.addEventListener('input', updateCount);
 updateCount();
 const examples = {
+  quiz: "import ui as app;\nlock questions = [\"What does fr mean?\", \"Which keyword returns a value?\", \"Which keyword declares a constant?\"];\nlock answers = [\"true\", \"yeet\", \"lock\"];\nvibe current = 0;\nvibe score = 0;\napp.title(\"Zuno vibe check\");\napp.label(\"question\", questions[0]);\napp.input(\"answer\", \"Your answer\");\napp.label(\"progress\", \"Question 1 of 3\");\napp.label(\"feedback\", \"Type an answer and check it.\");\ncook check() {\n  bet current >= len(questions) {\n    app.set(\"feedback\", \"Quiz complete. Score: \" + text(score));\n    yeet cap;\n  }\n  lock answer = lower(trim(app.value(\"answer\")));\n  bet answer == answers[current] {\n    score = score + 1;\n    app.set(\"feedback\", \"No cap. Correct.\");\n  } nah {\n    app.set(\"feedback\", \"Answer: \" + answers[current]);\n  }\n  current = current + 1;\n  bet current < len(questions) {\n    app.set(\"question\", questions[current]);\n    app.set(\"answer\", \"\");\n    app.set(\"progress\", \"Question \" + text(current + 1) + \" of 3\");\n  } nah {\n    app.set(\"question\", \"You finished. Score: \" + text(score) + \" of 3\");\n    app.set(\"progress\", \"Done\");\n  }\n}\napp.button(\"Check answer\", check);\n",
+  clicker: "import ui as app;\nvibe clicks = 0;\napp.title(\"Click check\");\napp.label(\"score\", \"Clicks: 0\");\ncook click() {\n  clicks = clicks + 1;\n  bet clicks >= 10 {\n    app.set(\"score\", \"Double digits. You cooked: \" + text(clicks));\n  } nah {\n    app.set(\"score\", \"Clicks: \" + text(clicks));\n  }\n}\ncook reset() {\n  clicks = 0;\n  app.set(\"score\", \"Clicks: 0\");\n}\napp.button(\"+1\", click);\napp.button(\"Reset\", reset);\n",
+  converter: "import ui as app;\napp.title(\"Temperature check\");\napp.input(\"degrees\", \"Celsius\");\napp.label(\"result\", \"Enter a number, then convert.\");\ncook convert() {\n  lock value = number(app.value(\"degrees\"));\n  lock fahrenheit = value * 9 / 5 + 32;\n  app.set(\"result\", text(round(fahrenheit)) + \" F\");\n}\napp.button(\"Convert\", convert);\n",
   counter: "import math as m;\nimport dict as d;\nmodule scoring {\n  cook double(value) { yeet value * 2; }\n}\nimport scoring as scores;\nclass Counter {\n  cook init(start) { this.count = start; }\n  cook next() {\n    this.count = this.count + 1;\n    yeet this.count;\n  }\n}\nvibe counter = Counter(4);\nvibe profile = {\"name\": \"Avi\", \"score\": scores.double(21)};\nprofile.score = profile.score + counter.next();\nyap(profile.name);\nyap(profile.score);\nyap(join(d.keys(profile), \", \"));\nyap(m.sqrt(81));\n",
   scoreboard: "vibe scores = [82, 94, 71, 88];\npush(scores, 95);\nlock average = sum(scores) / len(scores);\nyap(\"Average: \" + text(round(average)));\nyap(\"Highest: \" + text(max(scores)));\nyap(\"Sorted: \" + join(sort(scores), \", \"));\nassert(len(scores) == 5);\n",
   words: "lock words = split(trim(\"code creates possibilities\"), \" \");\nyap(\"Words: \" + text(len(words)));\nfor word in words {\n  yap(upper(word));\n}\n",
@@ -34,6 +37,11 @@ code.addEventListener('keydown', event => {
 
 function runCode() {
   const started = performance.now();
+  if (/\bimport\s+ui\s+as\b/.test(code.value)) {
+    output.textContent = 'App running in preview. Use the controls below the workspace.';
+    document.querySelector('#preview-app')?.click();
+    return;
+  }
   try {
     output.textContent = Zuno.execute(code.value).join('\n') || 'Program finished with no output.';
     document.querySelector('#run-status').textContent = 'Finished in ' + (performance.now() - started).toFixed(1) + ' ms';

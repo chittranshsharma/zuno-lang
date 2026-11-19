@@ -1,4 +1,34 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zuno — Language guide</title><link rel="stylesheet" href="playground.css"><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="design.css"></head><body><header class="topbar"><a class="brand" href="/">Zuno</a><nav class="links" aria-label="Main navigation"><a href="playground.html">Playground</a><a href="docs.html" aria-current="page">Docs</a><a href="about.html">About</a></nav></header><main class="page narrow docs-page"><h1>Small syntax.<br>More room to build.</h1><p class="lede">A complete guide to the language you can run today. Start with a line, build a function, and turn collections into something useful.</p><nav class="docs-nav" aria-label="On this page"><a href="#structures">Modules, dictionaries, classes</a><a href="#start">Start with an idea</a><a href="#variables">Variables and constants</a><a href="#dialect">Choose your voice</a><a href="#math">Expressions and maths</a><a href="#flow">Conditions and repetition</a><a href="#functions">Functions, closures, recursion</a><a href="#arrays">Arrays that do useful work</a><a href="#text">Text processing</a><a href="#convert">Conversions and assertions</a><a href="#cli">Run outside the browser</a><a href="#workspace">Your workspace</a><a href="#ai">AI with review built in</a><a href="#limits">Know the boundaries</a></nav><section id="start" class="card text-card"><h2>Start with an idea</h2><p>Use yap to show a value. Statements end with semicolons; braces group blocks. Numbers, double-quoted text, booleans, arrays, and functions are supported.</p><pre><code>vibe name = &quot;world&quot;;
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zuno — Language guide</title><link rel="stylesheet" href="playground.css"><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="design.css"></head><body><header class="topbar"><a class="brand" href="/">Zuno</a><nav class="links" aria-label="Main navigation"><a href="playground.html">Playground</a><a href="docs.html" aria-current="page">Docs</a><a href="about.html">About</a></nav></header><main class="page narrow docs-page"><h1>Small syntax.<br>More room to build.</h1><p class="lede">A complete guide to the language you can run today. Start with a line, build a function, and turn collections into something useful.</p><nav class="docs-nav" aria-label="On this page"><a href="#voice">The dialect</a><a href="#apps">Build apps</a><a href="#structures">Modules, dictionaries, classes</a><a href="#start">Start with an idea</a><a href="#variables">Variables and constants</a><a href="#dialect">Choose your voice</a><a href="#math">Expressions and maths</a><a href="#flow">Conditions and repetition</a><a href="#functions">Functions, closures, recursion</a><a href="#arrays">Arrays that do useful work</a><a href="#text">Text processing</a><a href="#convert">Conversions and assertions</a><a href="#cli">Run outside the browser</a><a href="#workspace">Your workspace</a><a href="#ai">AI with review built in</a><a href="#limits">Know the boundaries</a></nav><section id="voice" class="card text-card"><h2>A dialect you can remember</h2><p>vibe declares something you can change; lock keeps the binding fixed; cook defines a function; yeet returns a result; yap prints; fr means true; cap means false. Now bet starts a condition, nah handles the alternative, grind repeats while a condition holds, and each walks a collection. Use and, or, and not for readable logic. Conventional keywords still work. The dialect words are reserved; use quoted dictionary keys when a field shares a keyword.</p><pre><code>vibe energy = 3;
+grind energy &gt; 0 {
+  bet energy == 1 {
+    yap("Last round");
+  } nah {
+    yap("Still cooking");
+  }
+  energy = energy - 1;
+}
+each item in ["build", "try", "repeat"] {
+  yap(item);
+}
+bet fr and not cap { yap("Ready"); }</code></pre><p>Parentheses around if/bet and while/grind conditions are optional. Semicolons still end simple statements. No slang memorization is required: if, else, while, for, let, const, fn, return, and print remain available.</p></section><section id="apps" class="card text-card"><h2>Build an interactive app</h2><p>Select Clicker app, Converter app, or Quiz app in the studio and press Run program, or choose Preview app. Your app appears beneath the workspace. Zuno functions become event handlers; their captured variables keep state between clicks. Run again to reset the app. Hide unloads the preview.</p><pre><code>import ui as app;
+vibe clicks = 0;
+app.title(&quot;Click check&quot;);
+app.label(&quot;score&quot;, &quot;Clicks: 0&quot;);
+cook click() {
+  clicks = clicks + 1;
+  bet clicks &gt;= 10 {
+    app.set(&quot;score&quot;, &quot;Double digits. You cooked: &quot; + text(clicks));
+  } nah {
+    app.set(&quot;score&quot;, &quot;Clicks: &quot; + text(clicks));
+  }
+}
+cook reset() {
+  clicks = 0;
+  app.set(&quot;score&quot;, &quot;Clicks: 0&quot;);
+}
+app.button(&quot;+1&quot;, click);
+app.button(&quot;Reset&quot;, reset);
+</code></pre><h3>The ui module</h3><p>import ui as app; is available in the browser preview. app.title(text) adds a heading. app.label(id, text) adds a text label. app.input(id, caption) adds a labeled text input; app.value(id) reads it. app.set(id, text) updates a label or input. app.button(caption, callback) connects a zero-argument Zuno function. app.clear() removes widgets, but preserves language variables. Widget IDs must be unique. Values and captions must be text.</p><p>Build counters, calculators, converters, quizzes, trackers, and small input-driven tools. Apps cannot use HTML, CSS, arbitrary JavaScript, network requests, device APIs, or persistent storage yet. The sandbox blocks network access. Each event receives a fresh 100,000-step budget. The preview allows up to 200 top-level widgets and 10,000 characters per UI text value. Console output is separate from UI labels; use app.set for visible app results. ui is unavailable in the CLI.</p></section><section id="start" class="card text-card"><h2>Start with an idea</h2><p>Use yap to show a value. Statements end with semicolons; braces group blocks. Numbers, double-quoted text, booleans, arrays, and functions are supported.</p><pre><code>vibe name = &quot;world&quot;;
 yap(&quot;Hello, &quot; + name);</code></pre></section><section id="variables" class="card text-card"><h2>Variables and constants</h2><p>vibe creates a mutable binding. lock prevents reassignment of the binding; an array held by lock can still be mutated. Nested blocks have their own scope. Names are case-sensitive.</p><pre><code>vibe score = 10;
 score = score + 5;
 lock target = 20;

@@ -78,3 +78,30 @@ test('module names and class bodies remain isolated from host objects',()=>{
   assert.throws(()=>execute('class C { cook init() {} } vibe c = C(); yap(c.constructor);'),/Unknown member/);
   assert.throws(()=>execute('module m {} import m as a; a = 2;'),/constant/);
 });
+
+test('readable dialect supports unwrapped conditions and else-if',()=>{
+  assert.deepEqual(execute('vibe n = 0; grind n < 3 { n = n + 1; } bet n == 2 { yap(cap); } nah bet n == 3 and not cap { yap(fr); } nah { yap(cap); } each x in [1,2] { yap(x); }'),['true','1','2']);
+  assert.throws(()=>execute('bet'),/Line 1/);
+  assert.throws(()=>execute('yap('),/Line 1/);
+});
+test('UI callbacks preserve state and bound each event',()=>{
+  const fs=require('node:fs');const labels=new Map();const buttons=new Map();const errors=[];
+  const ui={title:()=>true,label:(id,text)=>labels.set(id,text),set:(id,text)=>labels.set(id,text),button:(name,callback)=>buttons.set(name,callback)};
+  execute(fs.readFileSync('examples/clicker-app.zuno','utf8'),100000,false,{ui,onError:error=>errors.push(error.message)});
+  for(let i=0;i<10;i++)buttons.get('+1')();
+  assert.equal(labels.get('score'),'Double digits. You cooked: 10');
+  buttons.get('Reset')();assert.equal(labels.get('score'),'Clicks: 0');assert.deepEqual(errors,[]);
+  execute('import ui as app; cook forever() { grind fr {} } app.button("Loop", forever);',100,false,{ui,onError:error=>errors.push(error.message)});
+  buttons.get('Loop')();assert.match(errors[0],/Execution limit/);
+  assert.throws(()=>execute('import ui as app; app.button("Bad", 1);',100,false,{ui}),/zero-argument/);
+  assert.throws(()=>execute('import ui as app;'),/Unknown module/);
+});
+
+test('quiz app can be completed through real Zuno handlers',()=>{
+  const fs=require('node:fs');const labels=new Map();const input=new Map();let click;
+  const ui={title:()=>true,label:(id,value)=>labels.set(id,value),input:id=>input.set(id,''),value:id=>input.get(id),set:(id,value)=>(input.has(id)?input:labels).set(id,value),button:(caption,fn)=>{click=fn;}};
+  execute(fs.readFileSync('examples/quiz-app.zuno','utf8'),100000,false,{ui,onError:error=>{throw error;}});
+  for(const answer of ['true','yeet','lock']){input.set('answer',answer);click();}
+  assert.equal(labels.get('question'),'You finished. Score: 3 of 3');
+  click();assert.match(labels.get('feedback'),/Quiz complete/);
+});

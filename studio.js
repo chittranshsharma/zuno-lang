@@ -1,6 +1,27 @@
 export function setupStudio(monaco, editor, source, openAssistant) {
   document.body.classList.add('studio');
   const workspace = document.querySelector('.workspace');
+  const previewCard=document.createElement('section');
+  previewCard.className='card app-preview-card';
+  const previewHead=document.createElement('header');previewHead.className='terminal-titlebar';
+  const previewTitle=document.createElement('h2');previewTitle.textContent='App preview';
+  const previewButton=document.createElement('button');previewButton.id='preview-app';previewButton.textContent='Preview app';
+  const previewStatus=document.createElement('span');previewStatus.setAttribute('role','status');previewStatus.textContent='Sandboxed · no network access';
+  const frame=document.createElement('iframe');frame.title='Zuno app preview';frame.sandbox='allow-scripts';frame.src='/app-preview.html';
+  let ready=false;let pending=null;
+  frame.onload=()=>{ready=true;if(pending!==null){frame.contentWindow.postMessage({type:'zuno-preview',code:pending},'*');pending=null;}};
+  previewButton.onclick=()=>{
+    previewCard.hidden=false;const program=editor.getValue();
+    if(ready)frame.contentWindow.postMessage({type:'zuno-preview',code:program},'*');else pending=program;
+    document.querySelector('#run-status').textContent='App preview updated';
+    previewStatus.textContent='Sandboxed · rerun to reset state';
+    previewCard.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  };
+  const hidePreview=document.createElement('button');hidePreview.textContent='Hide';hidePreview.onclick=()=>{previewCard.hidden=true;frame.src='/app-preview.html';ready=false;};
+  previewHead.append(previewTitle,previewButton,hidePreview);previewCard.append(previewHead,previewStatus,frame);previewCard.hidden=true;
+  document.querySelector('.editor-main').append(previewCard);
+  document.querySelector('.editor-actions').append(previewButton);
+  source.addEventListener('input',()=>{if(!previewCard.hidden)previewStatus.textContent='Source changed · press Preview app to apply';});
   const sourceCard = workspace.firstElementChild;
   const terminal = workspace.lastElementChild;
   sourceCard.classList.add('source-pane');
@@ -109,7 +130,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
     const word = model.getWordUntilPosition(position);
     const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
-    const names = new Set(['len','range','upper','lower','abs','round','join','push','pop','slice','reverse','sort','sum','min','max','split','trim','contains','replace','text','number','floor','ceil','sqrt','assert','vibe','lock','cook','yap','yeet','fr','cap']);
+    const names = new Set(['len','range','upper','lower','abs','round','join','push','pop','slice','reverse','sort','sum','min','max','split','trim','contains','replace','text','number','floor','ceil','sqrt','assert','vibe','lock','cook','yap','yeet','fr','cap','bet','nah','grind','each','and','or','not']);
     for (const match of model.getValue().matchAll(/\b(?:let|const|vibe|lock|fn|func|cook|class)\s+(\w+)|\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) {
       if (match[1]) names.add(match[1]);
       if (match[2]) match[2].split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>names.add(n));

@@ -169,3 +169,9 @@ yap(profile.score);
 yap(join(d.keys(profile), ", "));
 yap(m.sqrt(81));
 ~~~
+
+## Readable dialect and browser apps
+
+bet = if, nah = else, grind = while, each = for, and = &&, or = ||, not = !. Conditions may omit parentheses. Semicolons remain required on simple statements. All aliases are reserved.
+
+The browser preview exposes import ui as app;. Methods: title(text), label(id,text), input(id,caption), value(id), set(id,text), button(caption,zeroArgumentFunction), clear(). UI text must be strings under 10,000 characters, IDs must be unique, and at most 200 top-level widgets are allowed. Callback functions retain lexical state and each event gets a fresh step budget. Rerun resets the program. Hide unloads it. Network and direct DOM access are unavailable; ui is unavailable in CLI runs. See examples/clicker-app.zuno and examples/converter-app.zuno.

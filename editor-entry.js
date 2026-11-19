@@ -6,16 +6,28 @@ globalThis.MonacoEnvironment = { getWorker: () => new Worker('/assets/editor.wor
 const source = document.querySelector('#code');
 monaco.languages.register({ id: 'zuno' });
 monaco.languages.setMonarchTokensProvider('zuno', { tokenizer: { root: [
-  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|class|module|import|as|this|true|false|fr|cap)\b/, 'keyword'],
+  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|bet|nah|grind|each|and|or|not|class|module|import|as|this|true|false|fr|cap)\b/, 'keyword'],
   [/\b(print|say|yap)\b/, 'type'], [/"(?:\\.|[^"\\])*"/, 'string'], [/\d+(?:\.\d+)?/, 'number'], [/[a-zA-Z_]\w*/, 'identifier']
 ] } });
 monaco.languages.setLanguageConfiguration('zuno', { brackets: [['{','}'],['[',']'],['(',')']], autoClosingPairs: [{open:'{',close:'}'},{open:'[',close:']'},{open:'(',close:')'},{open:'"',close:'"'}] });
 monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
   const word = model.getWordUntilPosition(position);
   const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
-  const snippets = {"cook":"cook ${1:name}(${2:arg}) {\n  yeet ${3:arg};\n}","class":"class ${1:Name} {\n  cook init(${2:value}) {\n    this.value = value;\n  }\n}","import":"import ${1:math} as ${2:m};","dictionary":"vibe ${1:item} = {\"name\": ${2:\"Zuno\"}};", let:'let ${1:name} = ${2:0};', print:'print(${1:value});', fn:'fn ${1:name}(${2:argument}) {\n  return ${3:argument};\n}', if:'if (${1:condition}) {\n  $0\n}', while:'while (${1:condition}) {\n  $0\n}' };
+  const snippets = {"bet":"bet ${1:condition} {\n  $0\n} nah {\n}","grind":"grind ${1:condition} {\n  $0\n}","each":"each ${1:item} in ${2:items} {\n  $0\n}","cook":"cook ${1:name}(${2:arg}) {\n  yeet ${3:arg};\n}","class":"class ${1:Name} {\n  cook init(${2:value}) {\n    this.value = value;\n  }\n}","import":"import ${1:math} as ${2:m};","dictionary":"vibe ${1:item} = {\"name\": ${2:\"Zuno\"}};", let:'let ${1:name} = ${2:0};', print:'print(${1:value});', fn:'fn ${1:name}(${2:argument}) {\n  return ${3:argument};\n}', if:'if (${1:condition}) {\n  $0\n}', while:'while (${1:condition}) {\n  $0\n}' };
   return { suggestions:Object.entries(snippets).map(([label,insertText]) => ({ label,insertText,range,kind:monaco.languages.CompletionItemKind.Snippet,insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet })) };
 } });
+monaco.languages.registerCompletionItemProvider('zuno', {
+  triggerCharacters:['.'],
+  provideCompletionItems(model,position){
+    const prefix=model.getLineContent(position.lineNumber).slice(0,position.column-1);
+    const match=prefix.match(/(\w+)\.(\w*)$/);
+    if(!match)return {suggestions:[]};
+    const imported=[...model.getValue().matchAll(/import\s+ui\s+as\s+(\w+)/g)].some(item=>item[1]===match[1]);
+    if(!imported)return {suggestions:[]};
+    const range={startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:position.column-match[2].length,endColumn:position.column};
+    return {suggestions:['title','label','input','value','set','button','clear'].map(label=>({label,insertText:label,range,kind:monaco.languages.CompletionItemKind.Function}))};
+  }
+});
 monaco.editor.defineTheme('zuno-premium', { base:'vs-dark',inherit:true,rules:[{token:'keyword',foreground:'C792EA'},{token:'string',foreground:'BDD3AC'},{token:'number',foreground:'DDBB91'}], colors:{'editor.background':'#0C0B10','editor.foreground':'#E5E5E5','editorLineNumber.foreground':'#707075','editor.lineHighlightBackground':'#16121F','editorCursor.foreground':'#FFFFFF','editor.selectionBackground':'#FFFFFF25','editorWidget.background':'#1B1B1E','editorWidget.border':'#39393D'} });
 const editor = monaco.editor.create(document.querySelector('#monaco-editor'), { value:source.value,language:'zuno',theme:'zuno-premium',automaticLayout:true,fontFamily:'JetBrains Mono, monospace',fontSize:14,lineHeight:25,minimap:{enabled:false},padding:{top:20},scrollBeyondLastLine:false,tabSize:2,ariaLabel:'Zuno code editor' });
 document.querySelector('.terminal-editor').hidden = true;
