@@ -1,42 +1,42 @@
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Learn Lingua</title><link rel="stylesheet" href="playground.css"><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="/design.css"></head>
-<body>
-<header class="topbar"><a class="brand" href="/">Lingua</a><nav class="links" aria-label="Main navigation"><a href="playground.html">Playground</a><a href="docs.html" aria-current="page">Docs</a><a href="about.html">About</a></nav></header>
-<main class="page narrow docs-page">
-  <p class="eyebrow">Beginner guide</p><h1>Learn Lingua, one step at a time</h1><p class="lede">You only need two commands to get started: <code>let</code> stores a value and <code>print</code> shows it. Try each example in the <a href="playground.html">playground</a>.</p>
-  <section class="card text-card"><h2>Meet the new dialect</h2><p>The original syntax still works. The new dialect gives the same language a different voice: <code>vibe</code> creates a variable, <code>lock</code> creates a constant, <code>cook</code> defines a function, <code>yeet</code> returns a value, and <code>yap</code> prints. <code>fr</code> and <code>cap</code> mean true and false.</p><pre>lock scores = range(1, 5);
-cook double(score) {
-  yeet score * 2;
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lingua — Language guide</title><link rel="stylesheet" href="playground.css"><link rel="stylesheet" href="premium.css"><link rel="stylesheet" href="design.css"></head><body><header class="topbar"><a class="brand" href="/">Lingua</a><nav class="links" aria-label="Main navigation"><a href="playground.html">Playground</a><a href="docs.html" aria-current="page">Docs</a><a href="about.html">About</a></nav></header><main class="page narrow docs-page"><h1>Small syntax.<br>More room to build.</h1><p class="lede">A complete guide to the language you can run today. Start with a line, build a function, and turn collections into something useful.</p><nav class="docs-nav" aria-label="On this page"><a href="#start">Start with an idea</a><a href="#variables">Variables and constants</a><a href="#dialect">Choose your voice</a><a href="#math">Expressions and maths</a><a href="#flow">Conditions and repetition</a><a href="#functions">Functions, closures, recursion</a><a href="#arrays">Arrays that do useful work</a><a href="#text">Text processing</a><a href="#convert">Conversions and assertions</a><a href="#cli">Run outside the browser</a><a href="#workspace">Your workspace</a><a href="#ai">AI with review built in</a><a href="#limits">Know the boundaries</a></nav><section id="start" class="card text-card"><h2>Start with an idea</h2><p>Use yap to show a value. Statements end with semicolons; braces group blocks. Numbers, double-quoted text, booleans, arrays, and functions are supported.</p><pre><code>vibe name = &quot;world&quot;;
+yap(&quot;Hello, &quot; + name);</code></pre></section><section id="variables" class="card text-card"><h2>Variables and constants</h2><p>vibe creates a mutable binding. lock prevents reassignment of the binding; an array held by lock can still be mutated. Nested blocks have their own scope. Names are case-sensitive.</p><pre><code>vibe score = 10;
+score = score + 5;
+lock target = 20;
+yap(score &gt;= target);</code></pre></section><section id="dialect" class="card text-card"><h2>Choose your voice</h2><p>Playful and conventional keywords share one runtime. vibe = let; lock = const; cook = func = fn; yap = say = print; yeet = return; fr = true; cap = false. These words are reserved. Line comments start with //.</p><pre><code>lock ready = fr;
+if (ready &amp;&amp; !cap) {
+  yap(&quot;Let us cook&quot;);
+}</code></pre></section><section id="math" class="card text-card"><h2>Expressions and maths</h2><p>Arithmetic: +, -, *, /, %, **. Comparison: ==, !=, &lt;, &lt;=, &gt;, &gt;=. Logic: &amp;&amp;, ||, !. Powers bind before unary minus; multiplication binds before addition. Logical expressions short-circuit. Division by zero and non-finite results are errors.</p><pre><code>yap((2 + 3) ** 2);
+yap(sqrt(81));
+yap(round(8.6));
+yap(floor(8.6));
+yap(ceil(8.1));
+yap(abs(-12));</code></pre></section><section id="flow" class="card text-card"><h2>Conditions and repetition</h2><p>if/else chooses a block. while repeats while its condition is truthy. for item in values iterates an array or text. range excludes its end and supports at most 10,000 items.</p><pre><code>vibe total = 0;
+for n in range(1, 6) {
+  total = total + n;
 }
-for score in scores {
-  yap(double(score));
-}</pre><p>This prints 2, 4, 6, and 8. <code>range(start, end)</code> excludes the end. Semicolons end declarations, assignments, output, and return statements. Blocks use braces. The conventional aliases <code>const</code>, <code>func</code>, and <code>say</code> also work.</p><p>Helpers: <code>len</code>, <code>range</code>, <code>upper</code>, <code>lower</code>, <code>abs</code>, <code>round</code>, and <code>join</code>. Arrays and text support indexed reads. Constants cannot be reassigned. Line comments begin with <code>//</code>.</p></section>
-  <section class="card text-card"><h2>Your studio</h2><p>Open files and examples in editor tabs. Resize the Explorer and editor with their sliders, using arrow keys for precise adjustments. Ctrl+Shift+P opens commands, files, examples, minimap, and word-wrap settings. Syntax errors appear as editor markers and clickable Problems entries without running the program.</p><p>Ctrl+Alt+B opens AI chat. Ask selection attaches highlighted text. Suggest edit asks for a complete replacement and opens a diff for review. Accept is undoable with Ctrl+Z; stale suggestions cannot overwrite newer edits. Stop cancels generation. Conversations and API keys remain in page memory.</p><p>Register with an email and a password of at least 12 characters to use private saved files. Enable Autosave saved files for existing records; create a named file first. Folders are paths such as Work/Maths. Across-device access requires the same hosted server and database. Hosting is not included in this local preview.</p></section>
-  <section class="card text-card"><h2>Playground examples</h2><p>The example menu includes six programs, covering greetings, maths, conditions, loops, functions, and arrays. <strong>Hello World</strong> prints <code>World</code>. <strong>Simple Maths</strong> prints <code>8</code> and <code>15</code>. <strong>Power and Brackets</strong> prints <code>25</code> and <code>1</code>. Choose one, press Run, then change a value and run it again.</p></section>
-  <section class="card text-card"><h2>Step 1: Print something</h2><p>Type this in the code box and click <strong>Run</strong>.</p><pre class="example-code">print("Hello!");</pre><p><strong>Output:</strong></p><pre class="example-output">Hello!</pre><p>Text goes inside double quotes. The semicolon tells Lingua where the statement ends.</p></section>
-  <section class="card text-card"><h2>Step 2: Store a value</h2><p>A variable is a name for a value. Here, <code>name</code> stores the text <code>"Avi"</code>. Spaces around <code>=</code> are optional, so <code>let name="Avi";</code> works too.</p><pre class="example-code">let name = "Avi";
-print(name);</pre><p><strong>Output:</strong></p><pre class="example-output">Avi</pre><p>When you write <code>print(name);</code>, Lingua looks up the value stored in <code>name</code>. <code>print("name");</code> prints the word name because quotes mean plain text.</p></section>
-  <section class="card text-card"><h2>Step 3: Work with numbers</h2><p>Numbers do not need quotes. You can store them and use them in calculations.</p><pre class="example-code">let marks = 40;
-print(marks + 10);</pre><p><strong>Output:</strong></p><pre class="example-output">50</pre><p>You can use <code>+</code> to add, <code>-</code> to subtract, <code>*</code> to multiply, <code>/</code> to divide, <code>**</code> for powers, and <code>%</code> for the remainder.</p></section>
-  <section class="card text-card"><h2>Step 4: Use two variables</h2><p>Variables can be used together in a calculation.</p><pre class="example-code">let price = 20;
-let quantity = 3;
-print(price * quantity);</pre><p><strong>Output:</strong></p><pre class="example-output">60</pre><p>Try changing either number and running the program again.</p></section>
-  <section class="card text-card"><h2>Quick syntax guide</h2><table class="docs-table"><thead><tr><th>What you want</th><th>Write this</th></tr></thead><tbody><tr><td>Show text</td><td><code>print("Hi");</code></td></tr><tr><td>Save a number</td><td><code>let score = 10;</code></td></tr><tr><td>Save text</td><td><code>let city = "Delhi";</code></td></tr><tr><td>Show a variable</td><td><code>print(score);</code></td></tr><tr><td>Do maths</td><td><code>print(score + 5);</code></td></tr></tbody></table><p>End each statement with a semicolon. Empty lines are fine. A variable name can contain letters, numbers, and underscores, but it must start with a letter or underscore.</p></section>
-  <section class="card text-card"><h2>Common mistakes</h2><ul><li><strong>Missing semicolon:</strong> <code>print("Hi")</code> needs <code>;</code> at the end.</li><li><strong>Missing quotes:</strong> <code>print(Hello);</code> looks for a variable named Hello. Use <code>print("Hello");</code> for text.</li><li><strong>Unknown variable:</strong> create it with <code>let</code> before printing it.</li></ul><p>The output box will show a line number when something goes wrong, so you know where to look.</p></section>
-  <section class="card text-card"><h2>Step 5: Powers and brackets</h2><p>Choose <strong>Power and Brackets</strong> from the example menu, or paste this program:</p><pre class="example-code">let answer = (2 + 3) ** 2;
-print(answer);
-print(10 % 3);</pre><p><strong>Output:</strong></p><pre class="example-output">25
-1</pre><p>Brackets run first. Then powers, multiplication, division and remainder run before addition and subtraction.</p></section>
-  <section class="card text-card"><h2>What else can I do?</h2><p>The playground can export your code as a <code>.lingua</code> file and import it again later. You can give that file to a friend so they can open it in their playground.</p><p>When MongoDB is running, open <strong>Save or edit program</strong> in the Explorer. Give your program a title and a folder such as <code>College/Maths</code>, then click Save new. Click a file in the Explorer to load it; use Update selected or Delete selected for changes. The highlighted file is the one you selected, and the editor tells you when its code has unsaved changes. Saved programs are private to the signed-in account.</p><p>Conditions and loops are supported. Functions and arrays are also supported. The language currently supports <code>let</code>, <code>print</code>, numbers, double-quoted text, maths and brackets.</p></section>
-  <section class="card text-card"><h2>Conditions and loops</h2><p>Use if and else to choose a block. Use while to repeat a block. Braces group the statements. Change a variable with assignment to make progress toward ending a loop.</p><pre class="example-code">let n = 1;
-while (n &lt;= 5) {
-  if (n % 2 == 0) {
-    print(n);
+if (total == 15) {
+  yap(&quot;Correct&quot;);
+} else {
+  yap(&quot;Try again&quot;);
+}</code></pre></section><section id="functions" class="card text-card"><h2>Functions, closures, recursion</h2><p>Functions capture their surrounding scope. Pass exactly the declared number of arguments. A function can return another function. A missing return produces false. Calls may also stand alone as statements.</p><pre><code>cook multiplier(factor) {
+  cook apply(value) {
+    yeet value * factor;
   }
-  n = n + 1;
-}</pre><p>This prints 2 and 4. Infinite loops stop with an execution-limit error.</p></section>
-  <a class="btn-run inline-button" href="playground.html">Open the playground</a>
-</main>
-<footer class="footer"><span>Lingua · Web Programming project</span></footer>
-</body></html>
+  yeet apply;
+}
+lock triple = multiplier(3);
+yap(triple(14));</code></pre></section><section id="arrays" class="card text-card"><h2>Arrays that do useful work</h2><p>Indexing starts at zero. Out-of-bounds reads are errors. push and pop mutate arrays; sort, reverse, and slice return copies. sort accepts numeric arrays. push currently accepts primitive values and caps arrays at 10,000 items. Nested array literals are supported, but indexed assignment is not yet supported.</p><pre><code>vibe scores = [82, 94, 71, 88];
+push(scores, 95);
+lock average = sum(scores) / len(scores);
+yap(&quot;Average: &quot; + text(round(average)));
+yap(&quot;Highest: &quot; + text(max(scores)));
+yap(&quot;Sorted: &quot; + join(sort(scores), &quot;, &quot;));
+assert(len(scores) == 5);</code></pre></section><section id="text" class="card text-card"><h2>Text processing</h2><p>Use trim, split, join, upper, lower, contains, replace, and slice. replace changes every literal occurrence. Text indexes refer to UTF-16 code units; for iteration follows Unicode code points. Text produced by replace and join is limited to 100,000 characters.</p><pre><code>lock words = split(trim(&quot;code creates possibilities&quot;), &quot; &quot;);
+yap(&quot;Words: &quot; + text(len(words)));
+for word in words {
+  yap(upper(word));
+}</code></pre></section><section id="convert" class="card text-card"><h2>Conversions and assertions</h2><p>number converts numeric text and rejects non-finite results. text converts primitive values. assert stops the program with a useful error when its condition is false.</p><pre><code>lock price = number(&quot;19.5&quot;);
+lock quantity = 3;
+lock total = price * quantity;
+assert(total &gt; 0, &quot;Total must be positive&quot;);
+yap(&quot;Total: &quot; + text(total));</code></pre></section><section id="cli" class="card text-card"><h2>Run outside the browser</h2><p>Install project dependencies, then run node cli.js examples/scoreboard.lingua. Use node cli.js --check examples/scoreboard.lingua to parse without executing. The CLI uses the same engine as the playground.</p></section><section id="workspace" class="card text-card"><h2>Your workspace</h2><p>Open examples and saved files in tabs. Ctrl+Enter runs code. Ctrl+Shift+P opens commands. Resize the editor and Explorer with drag handles or keyboard-accessible sliders. Syntax markers never execute your code. Runtime errors appear after Run. Private saved files require an account; optional autosave updates existing saved records. Hosting is deferred, so cross-device access requires your own deployed server.</p></section><section id="ai" class="card text-card"><h2>AI with review built in</h2><p>Ctrl+Alt+B opens the Groq assistant. Paste your own key, then choose Use key. Ask selection attaches highlighted code. Chat streams Markdown, supports follow-ups, and can be stopped. Suggest edit opens a diff; Accept is undoable, Reject leaves the source untouched, and stale suggestions cannot overwrite newer edits. Keys and conversation history live only in page memory.</p></section><section id="limits" class="card text-card"><h2>Know the boundaries</h2><p>This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No modules, dictionaries, classes, package manager, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.</p></section><section class="card text-card"><h2>Standard helpers</h2><h3>Collections</h3><p><code>len(value), range(end), range(start, end), push(array, primitive), pop(array), slice(value, start, end), reverse(array), sort(numbers), sum(numbers), min(numbers), max(numbers)</code></p><h3>Text</h3><p><code>upper(text), lower(text), trim(text), split(text, separator), join(array, separator), contains(text, part), replace(text, from, to)</code></p><h3>Numbers and checks</h3><p><code>abs(number), round(number), floor(number), ceil(number), sqrt(number), number(value), text(primitive), assert(condition, message)</code></p></section><a class="btn-run inline-button" href="playground.html">Open the studio</a></main><footer class="footer">Lingua · Made to explore</footer></body></html>

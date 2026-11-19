@@ -9,6 +9,8 @@ function updateCount() {
 code.addEventListener('input', updateCount);
 updateCount();
 const examples = {
+  scoreboard: "vibe scores = [82, 94, 71, 88];\npush(scores, 95);\nlock average = sum(scores) / len(scores);\nyap(\"Average: \" + text(round(average)));\nyap(\"Highest: \" + text(max(scores)));\nyap(\"Sorted: \" + join(sort(scores), \", \"));\nassert(len(scores) == 5);\n",
+  words: "lock words = split(trim(\"code creates possibilities\"), \" \");\nyap(\"Words: \" + text(len(words)));\nfor word in words {\n  yap(upper(word));\n}\n",
   modern: 'lock scores = range(1, 5);\ncook double(score) {\n  yeet score * 2;\n}\nfor score in scores {\n  yap(double(score));\n}',
   functions: 'fn double(number) {\n  return number * 2;\n}\nlet numbers = [2, 4, 6];\nprint(double(numbers[1]));',
   control: 'let n = 1;\nwhile (n <= 5) {\n  if (n % 2 == 0) {\n    print(n);\n  }\n  n = n + 1;\n}',

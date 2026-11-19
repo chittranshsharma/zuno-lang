@@ -69,8 +69,8 @@ function Background() {
     shapes={shapes}
     cellSize={10}
     dotSize={0.75}
-    color="#929292"
-    hoverColor="#ffffff"
+    color="#9c86b3"
+    hoverColor="#e6c8ff"
     backgroundColor="#000000"
     speed={1}
     scale={1}

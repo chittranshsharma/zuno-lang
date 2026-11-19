@@ -107,3 +107,8 @@ Private accounts use salted scrypt password hashes and expiring HttpOnly session
 Hosting is deferred at the owner's request. Deploy the Express server with HTTPS, NODE_ENV=production, and MONGODB_URI pointing at a hosted database. Use the same deployment from another device to access your account. Account recovery and email verification are not implemented yet.
 
 New syntax: vibe/let, lock/const, cook/func/fn, yap/say/print, yeet/return, fr/true, cap/false, and for item in iterable blocks. Helpers include len, range, upper, lower, abs, round, and join. Existing grammar remains supported except that the new keywords are now reserved. This is still a bounded small-language runtime, not a general-purpose platform with modules or a package ecosystem.
+
+## Language utilities and CLI
+The expanded helper library covers arrays, numeric summaries, text processing, conversions, and assertions. Run node cli.js examples/scoreboard.lingua or node cli.js --check examples/word-counter.lingua. All executable examples in the language guide are tested. See LANGUAGE.md for the complete supported syntax and limits.
+
+The home page, studio, documentation, About page, and AI panel share a purple theme. The shared stylesheet was repaired and is checked during the build.

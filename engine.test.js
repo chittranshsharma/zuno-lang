@@ -45,3 +45,17 @@ test('modern and playful syntax with bounded helpers', () => {
   assert.throws(() => execute('say(range(10001));'), /10000/);
   assert.equal(require('./engine').parse('while (fr) {}').length, 1);
 });
+
+test('collections, text utilities and standalone calls', () => {
+  assert.deepEqual(execute('vibe xs = [3, 1]; push(xs, 2); yap(join(sort(xs), ",")); yap(sum(xs)); yap(pop(xs)); assert(len(xs) == 2);'), ['1,2,3','6','2']);
+  assert.deepEqual(execute('vibe words = split(trim(" hi there "), " "); yap(upper(words[0])); yap(replace("hello", "l", "x")); yap(slice("hello", 1, 4));'), ['HI','hexxo','ell']);
+  assert.deepEqual(execute('yap(sqrt(81)); yap(number("42") + 1); yap(max([1,5,2]));'), ['9','43','5']);
+  assert.throws(()=>execute('assert(cap, "Nope");'), /Nope/);
+  assert.throws(()=>execute('vibe xs = []; push(xs, xs);'), /primitive/);
+  assert.throws(()=>execute('yap(sqrt(-1));'), /nonnegative/);
+  assert.throws(()=>execute('yap(number("abc"));'), /finite/);
+});
+
+test('every published guide example runs', () => {
+  for (const example of require('./examples/catalog.json')) assert.doesNotThrow(()=>execute(example.code),example.name);
+});

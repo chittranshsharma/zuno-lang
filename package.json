@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "build": "esbuild landing.jsx --bundle --minify --jsx=automatic --outfile=public/landing.js --legal-comments=linked && esbuild editor-entry.js --bundle --minify --format=esm --outfile=public/editor.js --loader:.ttf=file && esbuild node_modules/monaco-editor/esm/vs/editor/editor.worker.js --bundle --minify --format=esm --outfile=public/editor.worker.js",
+    "build": "node check-styles.js && esbuild landing.jsx --bundle --minify --jsx=automatic --outfile=public/landing.js --legal-comments=linked && esbuild editor-entry.js --bundle --minify --format=esm --outfile=public/editor.js --loader:.ttf=file && esbuild node_modules/monaco-editor/esm/vs/editor/editor.worker.js --bundle --minify --format=esm --outfile=public/editor.worker.js",
     "prestart": "npm run build",
     "start": "node server.js",
     "test": "node --test"

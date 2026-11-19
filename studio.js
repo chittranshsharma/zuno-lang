@@ -109,7 +109,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   monaco.languages.registerCompletionItemProvider('lingua', { provideCompletionItems(model, position) {
     const word = model.getWordUntilPosition(position);
     const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
-    const names = new Set(['len','range','upper','lower','abs','round','join','vibe','lock','cook','yap','yeet','fr','cap']);
+    const names = new Set(['len','range','upper','lower','abs','round','join','push','pop','slice','reverse','sort','sum','min','max','split','trim','contains','replace','text','number','floor','ceil','sqrt','assert','vibe','lock','cook','yap','yeet','fr','cap']);
     for (const match of model.getValue().matchAll(/\b(?:let|const|vibe|lock|fn|func|cook)\s+(\w+)|\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) {
       if (match[1]) names.add(match[1]);
       if (match[2]) match[2].split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>names.add(n));

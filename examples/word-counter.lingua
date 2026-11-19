@@ -1,0 +1,5 @@
+lock words = split(trim("code creates possibilities"), " ");
+yap("Words: " + text(len(words)));
+for word in words {
+  yap(upper(word));
+}

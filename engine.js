@@ -130,6 +130,11 @@
         expect(';');
         return { type: 'print', token, value };
       }
+      if (!['let', 'const'].includes(token.text) && tokens[index]?.text === '(') {
+        index--;
+        const value = expression(); expect(';');
+        return { type:'expression', token, value };
+      }
       const name = ['let', 'const'].includes(token.text) ? take() : token;
       if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a variable name');
       expect('=');
@@ -230,6 +235,7 @@
         } else {
           const value = evaluate(node.value, scope);
           const name = node.token.text;
+          if (node.type === 'expression') continue;
           if (node.type === 'print') {
             if (output.length >= 1000) fail(node.token, 'Output limit reached');
             output.push(String(value));
@@ -247,7 +253,28 @@
         }
       }
     }
+    const requireArray = value => { if (!Array.isArray(value)) throw new Error('Expected an array'); return value; };
+    const requireText = value => { if (typeof value !== 'string') throw new Error('Expected text'); return value; };
+    const requireNumber = value => { if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Expected a finite number'); return value; };
     const builtins = {
+      push: (items, value) => { requireArray(items); if(items.length>=10000)throw new Error('Array exceeds 10000 items'); if(typeof value==='object' && value!==null)throw new Error('push accepts primitive values'); items.push(value); return items.length; },
+      pop: items => { requireArray(items); if(!items.length)throw new Error('Cannot pop an empty array'); return items.pop(); },
+      slice: (value, start, end) => { if(!Array.isArray(value)&&typeof value!=='string')throw new Error('slice needs array or text'); if(!Number.isInteger(start)||(end!==undefined&&!Number.isInteger(end)))throw new Error('slice indexes must be integers'); return value.slice(start,end); },
+      reverse: items => requireArray(items).slice().reverse(),
+      sort: items => { requireArray(items); if(!items.every(x=>typeof x==='number'))throw new Error('sort needs numbers'); return items.slice().sort((a,b)=>a-b); },
+      sum: items => { const total=requireArray(items).reduce((a,b)=>a+requireNumber(b),0); return requireNumber(total); },
+      min: items => { requireArray(items); if(!items.length)throw new Error('min needs values'); return Math.min(...items.map(requireNumber)); },
+      max: items => { requireArray(items); if(!items.length)throw new Error('max needs values'); return Math.max(...items.map(requireNumber)); },
+      split: (text, separator) => { const items=requireText(text).split(requireText(separator)); if(items.length>10000)throw new Error('Array exceeds 10000 items'); return items; },
+      trim: text => requireText(text).trim(),
+      contains: (text, part) => requireText(text).includes(requireText(part)),
+      replace: (text, from, to) => { const parts=requireText(text).split(requireText(from)); requireText(to); if(parts.reduce((n,p)=>n+p.length,0)+Math.max(0,parts.length-1)*to.length>100000)throw new Error('Text exceeds 100000 characters'); const result=parts.join(to); if(result.length>100000)throw new Error('Text exceeds 100000 characters'); return result; },
+      text: value => { if(typeof value==='object')throw new Error('text needs a primitive value'); return String(value); },
+      number: value => { if(typeof value!=='string'&&typeof value!=='number')throw new Error('number needs text or a number'); return requireNumber(Number(value)); },
+      floor: value => Math.floor(requireNumber(value)),
+      ceil: value => Math.ceil(requireNumber(value)),
+      sqrt: value => { requireNumber(value); if(value<0)throw new Error('sqrt needs a nonnegative number'); return Math.sqrt(value); },
+      assert: (condition, message = 'Assertion failed') => { if(!condition)throw new Error(requireText(message)); return true; },
       len: value => { if (!Array.isArray(value) && typeof value !== 'string') throw new Error('len needs an array or text'); return value.length; },
       range: (start, end) => { if (end === undefined) { end = start; start = 0; } if (!Number.isInteger(start) || !Number.isInteger(end) || end - start > 10000 || end < start) throw new Error('range needs ordered integers, up to 10000 items'); return Array.from({ length: end - start }, (_, i) => start + i); },
       upper: value => { if (typeof value !== 'string') throw new Error('upper needs text'); return value.toUpperCase(); },
