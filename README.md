@@ -1,87 +1,81 @@
-# Lingua 🚀
+# Zuno
 
-### A tiny programming language you can write, run, and save in your browser.
+A programming language with its own interpreter, a browser studio, and a command-line runner.
 
-Lingua began as a simple question for our Web Programming project: **what if we built a programming language and its playground ourselves?** The result is a small language with a browser editor, instant output, examples, documentation, file import/export, and a folder-style explorer backed by MongoDB.
+Zuno has a playful dialect — vibe, lock, cook, yap, and yeet — alongside conventional keywords. It supports functions, closures, recursion, arrays, dictionaries, classes, named modules, and a small namespaced standard library.
 
-The aim is to make the full journey easy to follow: write a program, run it, understand an error, save it, and open it again later.
+## Run the studio
+
+Install Node.js and MongoDB, then run:
+
+~~~sh
+npm install
+npm start
+~~~
+
+Open http://localhost:3000. Configure MONGODB_URI for your database; the default is mongodb://127.0.0.1:27017/zuno. Use HTTPS and NODE_ENV=production when hosting. Hosting is managed separately.
 
 ## Try a program
 
-```text
-let name = "World";
-print("Hello, " + name);
-print((2 + 3) ** 2);
-```
+~~~text
+import math as m;
+vibe profile = {"name": "Avi", "score": 81};
+yap(profile.name);
+yap(m.sqrt(profile.score));
+~~~
 
-Output:
+See [the language reference](LANGUAGE.md), [web guide](docs.html), and examples/ for complete programs. Run node cli.js examples/counter.zuno or node cli.js --check examples/counter.zuno.
 
-```text
-Hello, World
-25
-```
+The CLI supports file imports such as import "./helper.zuno" as helper; on their own line. Browser programs use inline modules and built-in namespaces. There is no package registry, native compilation, inheritance, or async runtime yet.
 
-Lingua currently uses two statements: `let` stores a value and `print` displays one. Write one statement per line and finish it with `;`. It supports numbers, double-quoted strings, variables, `+`, `-`, `*`, `/`, `**`, `%`, and brackets. The [Docs](docs.html) page walks through the syntax with examples you can paste into the playground.
+## Studio
 
-## What is inside?
+Monaco provides highlighting, completion, diagnostics, tabs, and edit history. Ctrl+Enter runs code; Ctrl+Shift+P opens commands; Ctrl+Alt+B opens AI. Panels resize with drag handles and keyboard controls. Files can be imported/exported as .zuno.
 
-| Part | What it does |
-| --- | --- |
-| Playground | Run Lingua code, try four examples, and see output or a line-specific error. |
-| Explorer | Save, open, update, and delete programs; group them using folder paths such as `College/Maths`. |
-| File tools | Export code to a `.lingua` file and import `.lingua` or `.txt` files later. |
-| Editor details | Show line and character counts, the selected file, and unsaved code changes. |
-| Feedback | Validate a form and save submissions to a local JSON file. |
-| Docs and About | Explain the language and the project in beginner-friendly pages. |
+Accounts isolate saved files with salted password hashes and HttpOnly sessions. Saved files support optional autosave. Email verification and account recovery are not implemented. Existing database records are retained; unsaved drafts and editor tabs are local to the browser.
 
-The Playground, Docs, About, and Feedback pages are linked together. You can run code with the **Run** button or **Ctrl + Enter**.
+## AI assistant
 
-## Run locally
+Groq uses openai/gpt-oss-120b by default, with medium reasoning and hidden reasoning output. GROQ_MODEL can override the model. Create a key at https://console.groq.com/keys and paste it into the assistant panel. Keys stay in page memory and pass through the server for each request; Zuno does not store them.
 
-You need Node.js, npm, and a running MongoDB server.
+Chat streams Markdown, supports follow-ups and selected-code context, and can be stopped. Suggested code is reviewed in a diff, accepted explicitly, and undoable. Newer edits block stale suggestions. The assistant receives the supported syntax and standard-library context; it cannot execute code or edit files independently. Live provider replies require a valid user key.
 
-```bash
-npm install
-npm start
-```
+## Checks
 
-Open **http://localhost:3000**. The default database address is `mongodb://127.0.0.1:27017/lingua`. To use a different MongoDB server, set the `MONGODB_URI` environment variable before starting the app.
+npm run build checks CSS and builds the browser bundles. npm test covers interpreter behavior, limits, published examples, and the AI request layer. The bounded runtime limits source size, steps, output, call depth, collection growth, and parser nesting.
 
-The runner works even when MongoDB is offline. Saving and loading programs needs MongoDB. Open the site through the Node server so the feedback and program APIs work.
+## Source and credits
 
-## How it works
+The project is maintained in its existing Git repository. [UI credits](UI-CREDITS.md) list third-party components and licenses.
 
-```text
-Browser pages
-  ├── playground.js → reads and runs Lingua code in the browser
-  ├── programs.js   → shows saved files and calls the program API
-  ├── files.js      → imports and exports local code files
-  └── feedback.js   → validates and sends feedback
-                         ↓
-                    Express server
-                     ├── MongoDB → saved programs
-                     └── JSON file → feedback
-```
+## Interactive apps and the dialect
 
-The runner reads code line by line. It stores variables in a JavaScript object, calculates expressions, and puts printed values in the output panel. If a line cannot be understood, it shows the line number and a short error. It does not use `eval`.
+Use bet/nah for branches, grind for while loops, each for iteration, and and/or/not for logic. Conditions can omit parentheses. Existing aliases and conventional keywords still work.
 
-Express provides `GET /api/programs`, `POST /api/programs`, `PUT /api/programs/:id`, and `DELETE /api/programs/:id` for program CRUD. Program records have a title, code, and folder. `POST /api/feedback` checks and saves form data in `data/feedback.json`; `GET /api/feedback` returns only the submission count, keeping names, emails, and messages out of the response.
+The sandboxed browser App preview supports a ui module with labels, inputs, buttons and named Zuno callbacks. Try Clicker app, Converter app, or Quiz app and press Run. Run again resets state; Hide unloads the app. This enables small interactive tools, not arbitrary full-stack applications. Network access, persistence, custom HTML/CSS and native APIs are not supported. The CLI does not expose ui.
 
-## A quick demo flow
+## Tabs and workspace recovery
 
-1. Pick **Simple Maths** in the example menu and press **Run**.
-2. Change a number and run it again. Try an unknown variable to see a line-specific error.
-3. Create a folder path in the Explorer, give the program a title, and save it.
-4. Click the saved file, edit the code, and watch the unsaved indicator change. Update the file.
-5. Export the code, clear the editor, and import the `.lingua` file.
-6. Open Feedback and submit the form.
+The tab-bar + creates a new file. Each tab has a close button and an unsaved-change dot. Dirty tabs offer Save, Don’t save, and Cancel before closing; use Reopen closed file or Ctrl+Shift+T to restore one of the last ten closed files from this session. Ctrl+Alt+N creates a file; command search includes New, Close, and Reopen.
 
-## Current scope
+Up to 40 open files and their contents restore from local browser storage after refresh. Guest and account workspaces have separate recovery records. Sign-out restores the guest workspace and removes account models from memory. Local recovery is browser-local, not cloud synchronization or encrypted storage; on shared computers, clear site data to remove local drafts. Browser storage failure is reported so you can save/export instead. Closing the last tab leaves an empty workspace with a New file button.
 
-Lingua is deliberately small. Conditions, loops, reassignment, booleans, and block scope are supported. Functions are not implemented. See [LANGUAGE.md](LANGUAGE.md) for the language rules. Imports and exports have a 5,000-character code limit, matching saved programs. Saved programs belong to one shared database for the course demo; there are no accounts or private workspaces.
+Examples and imports open as separate tabs. Saving a draft attaches that tab to its server record without duplicating it. Deleting a saved record leaves the open copy as a local draft. Cursor state and undo history survive tab switching; undo history is not persisted across refresh.
 
-Built as a Web Programming course project using **HTML, CSS, JavaScript, Node.js, Express, and MongoDB**.
+## Install Zuno locally
 
-## Development
+Node.js 20 or newer is required. From this repository run npm run install:cli. This installs a standalone runtime without Express, MongoDB, or the website dependencies.
 
-Run `npm test` for the engine tests. The next product version is being built on `codex/lingua-next`; cloud accounts, live collaboration, and production hosting are not implemented yet.
+~~~sh
+zuno --version
+zuno init my-zuno-app
+cd my-zuno-app
+zuno run main.zuno
+zuno check main.zuno
+~~~
+
+zuno main.zuno is also supported. init refuses to overwrite an existing directory and creates a starter plus a VS Code/Cursor build task (Ctrl+Shift+B). The browser ui module is not available in console runs.
+
+For editor integration, run npm run package:extension. Install dist/zuno-tools.vsix with code --install-extension dist/zuno-tools.vsix or cursor --install-extension dist/zuno-tools.vsix. Open a .zuno file and use Zuno: Run current file or Zuno: Check current file from the command palette. The extension bundles the interpreter, provides syntax highlighting and brackets, and uses Node.js from PATH. Set zuno.nodePath if necessary. These local editor tools are not a full language server.
+
+The example selector is now inside the Examples button. The tab strip stays horizontal and scrolls when necessary. Save before close can write a local .zuno file or save to the signed-in account; failed/cancelled saves keep the tab open. Browser file-picker support varies; unsupported browsers download the file.

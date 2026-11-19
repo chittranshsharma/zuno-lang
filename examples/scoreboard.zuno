@@ -1,0 +1,7 @@
+vibe scores = [82, 94, 71, 88];
+push(scores, 95);
+lock average = sum(scores) / len(scores);
+yap("Average: " + text(round(average)));
+yap("Highest: " + text(max(scores)));
+yap("Sorted: " + join(sort(scores), ", "));
+assert(len(scores) == 5);

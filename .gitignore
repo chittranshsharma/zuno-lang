@@ -1,2 +1,12 @@
 node_modules/
 .env
+.playwright-cli/
+output/
+public/landing.*
+
+public/editor*
+public/*.ttf
+
+dist/
+*.vsix
+editor-extension/runtime/

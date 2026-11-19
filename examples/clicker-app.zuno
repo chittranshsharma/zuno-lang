@@ -1,0 +1,18 @@
+import ui as app;
+vibe clicks = 0;
+app.title("Click check");
+app.label("score", "Clicks: 0");
+cook click() {
+  clicks = clicks + 1;
+  bet clicks >= 10 {
+    app.set("score", "Double digits. You cooked: " + text(clicks));
+  } nah {
+    app.set("score", "Clicks: " + text(clicks));
+  }
+}
+cook reset() {
+  clicks = 0;
+  app.set("score", "Clicks: 0");
+}
+app.button("+1", click);
+app.button("Reset", reset);

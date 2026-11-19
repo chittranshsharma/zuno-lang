@@ -1,0 +1,79 @@
+{
+  "name": "zuno-tools",
+  "displayName": "Zuno Language Tools",
+  "description": "Zuno highlighting and local run/check commands for VS Code and Cursor.",
+  "version": "0.3.0",
+  "publisher": "zuno-local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
+  "activationEvents": [
+    "onLanguage:zuno"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "zuno",
+        "aliases": [
+          "Zuno"
+        ],
+        "extensions": [
+          ".zuno"
+        ],
+        "configuration": "language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "zuno",
+        "scopeName": "source.zuno",
+        "path": "zuno.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "zuno.run",
+        "title": "Zuno: Run current file"
+      },
+      {
+        "command": "zuno.check",
+        "title": "Zuno: Check current file"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "zuno.run",
+          "when": "resourceLangId == zuno",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Zuno",
+      "properties": {
+        "zuno.nodePath": {
+          "type": "string",
+          "default": "node",
+          "description": "Path to the Node.js executable used for Zuno tasks."
+        }
+      }
+    }
+  },
+  "files": [
+    "extension.js",
+    "language-configuration.json",
+    "zuno.tmLanguage.json",
+    "README.md",
+    "runtime/**"
+  ]
+}

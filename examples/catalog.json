@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Start with an idea",
+    "code": "vibe name = \"world\";\nyap(\"Hello, \" + name);"
+  },
+  {
+    "name": "Variables and constants",
+    "code": "vibe score = 10;\nscore = score + 5;\nlock target = 20;\nyap(score >= target);"
+  },
+  {
+    "name": "Choose your voice",
+    "code": "lock ready = fr;\nif (ready && !cap) {\n  yap(\"Let us cook\");\n}"
+  },
+  {
+    "name": "Expressions and maths",
+    "code": "yap((2 + 3) ** 2);\nyap(sqrt(81));\nyap(round(8.6));\nyap(floor(8.6));\nyap(ceil(8.1));\nyap(abs(-12));"
+  },
+  {
+    "name": "Conditions and repetition",
+    "code": "vibe total = 0;\nfor n in range(1, 6) {\n  total = total + n;\n}\nif (total == 15) {\n  yap(\"Correct\");\n} else {\n  yap(\"Try again\");\n}"
+  },
+  {
+    "name": "Functions, closures, recursion",
+    "code": "cook multiplier(factor) {\n  cook apply(value) {\n    yeet value * factor;\n  }\n  yeet apply;\n}\nlock triple = multiplier(3);\nyap(triple(14));"
+  },
+  {
+    "name": "Arrays that do useful work",
+    "code": "vibe scores = [82, 94, 71, 88];\npush(scores, 95);\nlock average = sum(scores) / len(scores);\nyap(\"Average: \" + text(round(average)));\nyap(\"Highest: \" + text(max(scores)));\nyap(\"Sorted: \" + join(sort(scores), \", \"));\nassert(len(scores) == 5);"
+  },
+  {
+    "name": "Text processing",
+    "code": "lock words = split(trim(\"code creates possibilities\"), \" \");\nyap(\"Words: \" + text(len(words)));\nfor word in words {\n  yap(upper(word));\n}"
+  },
+  {
+    "name": "Conversions and assertions",
+    "code": "lock price = number(\"19.5\");\nlock quantity = 3;\nlock total = price * quantity;\nassert(total > 0, \"Total must be positive\");\nyap(\"Total: \" + text(total));"
+  },
+  {
+    "name": "Modules, dictionaries and classes",
+    "code": "import math as m;\nimport dict as d;\nmodule scoring {\n  cook double(value) { yeet value * 2; }\n}\nimport scoring as scores;\nclass Counter {\n  cook init(start) { this.count = start; }\n  cook next() {\n    this.count = this.count + 1;\n    yeet this.count;\n  }\n}\nvibe counter = Counter(4);\nvibe profile = {\"name\": \"Avi\", \"score\": scores.double(21)};\nprofile.score = profile.score + counter.next();\nyap(profile.name);\nyap(profile.score);\nyap(join(d.keys(profile), \", \"));\nyap(m.sqrt(81));\n"
+  }
+]

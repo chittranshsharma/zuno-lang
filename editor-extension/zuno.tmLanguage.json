@@ -1,0 +1,28 @@
+{
+  "scopeName": "source.zuno",
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.zuno",
+      "match": "//.*$"
+    },
+    {
+      "name": "string.quoted.double.zuno",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.zuno",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "keyword.control.zuno",
+      "match": "\\b(vibe|lock|cook|yap|yeet|fr|cap|bet|nah|grind|each|and|or|not|let|const|fn|func|return|print|say|if|else|while|for|in|true|false|module|import|as|class|this)\\b"
+    },
+    {
+      "name": "constant.numeric.zuno",
+      "match": "\\b[0-9]+(?:\\.[0-9]+)?\\b"
+    }
+  ]
+}

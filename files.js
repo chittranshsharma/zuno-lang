@@ -7,7 +7,7 @@ document.querySelector('#export-code').addEventListener('click', () => {
   const file = new Blob([code.value], { type: 'text/plain' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(file);
-  link.download = 'program.lingua';
+  link.download = document.querySelector('#editor-filename').textContent.replace(/[^a-zA-Z0-9_. -]/g,'_') || 'program.zuno';
   link.click();
   URL.revokeObjectURL(link.href);
   fileStatus.textContent = 'File downloaded.';
@@ -17,8 +17,8 @@ document.querySelector('#import-code').addEventListener('click', () => fileInput
 fileInput.addEventListener('change', async () => {
   const file = fileInput.files[0];
   if (!file) return;
-  if (!/\.(lingua|txt)$/i.test(file.name) || file.size > 20000) {
-    fileStatus.textContent = 'Choose a .lingua or .txt file under 20 KB.';
+  if (!/\.(zuno|txt)$/i.test(file.name) || file.size > 20000) {
+    fileStatus.textContent = 'Choose a .zuno or .txt file under 20 KB.';
     fileInput.value = '';
     return;
   }
@@ -28,7 +28,8 @@ fileInput.addEventListener('change', async () => {
     fileInput.value = '';
     return;
   }
-  code.value = importedCode;
+  if(globalThis.ZunoWorkspace)globalThis.ZunoWorkspace.open({name:file.name.replace(/\.txt$/i,'.zuno'),code:importedCode,savedCode:null,title:''});
+  else code.value = importedCode;
   code.dispatchEvent(new Event('input'));
   output.textContent = 'File loaded. Press Run to see the output.';
   fileStatus.textContent = file.name + ' imported.';

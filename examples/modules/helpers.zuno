@@ -1,0 +1,3 @@
+cook totalWithBonus(scores, bonus) {
+  yeet sum(scores) + bonus;
+}

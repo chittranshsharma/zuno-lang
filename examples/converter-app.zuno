@@ -1,0 +1,10 @@
+import ui as app;
+app.title("Temperature check");
+app.input("degrees", "Celsius");
+app.label("result", "Enter a number, then convert.");
+cook convert() {
+  lock value = number(app.value("degrees"));
+  lock fahrenheit = value * 9 / 5 + 32;
+  app.set("result", text(round(fahrenheit)) + " F");
+}
+app.button("Convert", convert);
