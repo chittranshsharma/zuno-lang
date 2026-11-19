@@ -1,0 +1,13 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const version = require('./package.json').version;
+const target = path.join(__dirname,'dist','zuno');
+fs.mkdirSync(target,{recursive:true});
+for(const file of ['cli.js','engine.js','LANGUAGE.md'])fs.copyFileSync(path.join(__dirname,file),path.join(target,file));
+fs.writeFileSync(path.join(target,'package.json'),JSON.stringify({name:'zuno-runtime',version,description:'Zuno language interpreter and CLI',bin:{zuno:'cli.js'},engines:{node:'>=20'},files:['cli.js','engine.js','LANGUAGE.md'],private:true},null,2));
+fs.chmodSync(path.join(target,'cli.js'),0o755);
+const runtime=path.join(__dirname,'editor-extension','runtime');
+fs.mkdirSync(runtime,{recursive:true});
+for(const file of ['cli.js','engine.js'])fs.copyFileSync(path.join(__dirname,file),path.join(runtime,file));
+fs.writeFileSync(path.join(runtime,'package.json'),JSON.stringify({name:'zuno-runtime',version}));
+console.log('Packaged standalone Zuno runtime and editor runtime.');

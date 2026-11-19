@@ -6,3 +6,7 @@ public/landing.*
 
 public/editor*
 public/*.ttf
+
+dist/
+*.vsix
+editor-extension/runtime/

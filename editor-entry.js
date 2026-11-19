@@ -77,7 +77,7 @@ const answerArea = document.querySelector('#assistant-answer');
 const aiTools = document.createElement('div');
 aiTools.className = 'assistant-prompts';
 for (const [label, action] of [
-  ['Ask selection', () => { selectionContext = editor.getModel().getValueInRange(editor.getSelection()); show(true); document.querySelector('#assistant-progress').textContent = selectionContext ? 'Selected code attached' : 'Select some code first'; }],
+  ['Ask selection', () => { selectionContext = editor.getModel()?.getValueInRange(editor.getSelection()) || ''; show(true); document.querySelector('#assistant-progress').textContent = selectionContext ? 'Selected code attached' : 'Select some code first'; }],
   ['Suggest edit', () => { editMode = true; selectionContext = ''; show(true); document.querySelector('#assistant-question').value = 'Improve this program'; }],
   ['Stop', () => activeRequest?.abort()],
   ['New chat', () => { if (activeRequest) return; history.length=0; answerArea.replaceChildren(); selectionContext=''; editMode=false; }]
@@ -116,7 +116,7 @@ document.querySelector('#assistant-form').onsubmit = async e => {
   const progress=document.querySelector('#assistant-progress');
   if(!userApiKey){progress.textContent='Add your Groq key first.';keyInput.focus();return;}
   const question=document.querySelector('#assistant-question').value;
-  const model=editor.getModel();const original=model.getValue();
+  const model=editor.getModel();if(!model){progress.textContent='Open a file first.';return;}const original=model.getValue();
   const code=selectionContext||original;const editing=editMode;
   if(code.length>5000){progress.textContent='Select a smaller block or keep code under 5000 characters.';return;}
   const controller=new AbortController();activeRequest=controller;

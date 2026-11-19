@@ -56,8 +56,26 @@ The sandboxed browser App preview supports a ui module with labels, inputs, butt
 
 ## Tabs and workspace recovery
 
-The tab-bar + creates a new file. Each tab has a close button and an unsaved-change dot. Dirty tabs ask before closing; use Reopen closed file or Ctrl+Shift+T to restore one of the last ten closed files from this session. Ctrl+Alt+N creates a file; command search includes New, Close, and Reopen.
+The tab-bar + creates a new file. Each tab has a close button and an unsaved-change dot. Dirty tabs offer Save, Don’t save, and Cancel before closing; use Reopen closed file or Ctrl+Shift+T to restore one of the last ten closed files from this session. Ctrl+Alt+N creates a file; command search includes New, Close, and Reopen.
 
-Up to 40 open files and their contents restore from local browser storage after refresh. Guest and account workspaces have separate recovery records. Sign-out restores the guest workspace and removes account models from memory. Local recovery is browser-local, not cloud synchronization or encrypted storage; on shared computers, clear site data to remove local drafts. Browser storage failure is reported so you can save/export instead. Closing the last tab opens an empty file.
+Up to 40 open files and their contents restore from local browser storage after refresh. Guest and account workspaces have separate recovery records. Sign-out restores the guest workspace and removes account models from memory. Local recovery is browser-local, not cloud synchronization or encrypted storage; on shared computers, clear site data to remove local drafts. Browser storage failure is reported so you can save/export instead. Closing the last tab leaves an empty workspace with a New file button.
 
 Examples and imports open as separate tabs. Saving a draft attaches that tab to its server record without duplicating it. Deleting a saved record leaves the open copy as a local draft. Cursor state and undo history survive tab switching; undo history is not persisted across refresh.
+
+## Install Zuno locally
+
+Node.js 20 or newer is required. From this repository run npm run install:cli. This installs a standalone runtime without Express, MongoDB, or the website dependencies.
+
+~~~sh
+zuno --version
+zuno init my-zuno-app
+cd my-zuno-app
+zuno run main.zuno
+zuno check main.zuno
+~~~
+
+zuno main.zuno is also supported. init refuses to overwrite an existing directory and creates a starter plus a VS Code/Cursor build task (Ctrl+Shift+B). The browser ui module is not available in console runs.
+
+For editor integration, run npm run package:extension. Install dist/zuno-tools.vsix with code --install-extension dist/zuno-tools.vsix or cursor --install-extension dist/zuno-tools.vsix. Open a .zuno file and use Zuno: Run current file or Zuno: Check current file from the command palette. The extension bundles the interpreter, provides syntax highlighting and brackets, and uses Node.js from PATH. Set zuno.nodePath if necessary. These local editor tools are not a full language server.
+
+The example selector is now inside the Examples button. The tab strip stays horizontal and scrolls when necessary. Save before close can write a local .zuno file or save to the signed-in account; failed/cancelled saves keep the tab open. Browser file-picker support varies; unsupported browsers download the file.

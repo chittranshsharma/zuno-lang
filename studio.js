@@ -12,6 +12,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   let ready=false;let pending=null;
   frame.onload=()=>{ready=true;if(pending!==null){frame.contentWindow.postMessage({type:'zuno-preview',code:pending},'*');pending=null;}};
   previewButton.onclick=()=>{
+    if(!editor.getModel())return;
     previewCard.hidden=false;const program=editor.getValue();
     if(ready)frame.contentWindow.postMessage({type:'zuno-preview',code:program},'*');else pending=program;
     document.querySelector('#run-status').textContent='App preview updated';
@@ -23,6 +24,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   document.querySelector('.editor-main').append(previewCard);
   document.querySelector('.editor-actions').append(previewButton);
   source.addEventListener('input',()=>{if(!previewCard.hidden)previewStatus.textContent='Source changed · press Preview app to apply';});
+  document.addEventListener('zuno-workspace-empty',()=>{previewCard.hidden=true;frame.src='/app-preview.html';ready=false;});
   const sourceCard = workspace.firstElementChild;
   const terminal = workspace.lastElementChild;
   sourceCard.classList.add('source-pane');
@@ -32,11 +34,15 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   const nav=document.querySelector('.links');
   nav.querySelector('[aria-current]').textContent='Explorer';
   const projects=document.createElement('button');projects.textContent='Projects';projects.onclick=()=>{const account=document.querySelector('.account-panel');account.open=true;account.scrollIntoView({block:'nearest',behavior:'smooth'});};nav.insertBefore(projects,nav.children[1]);
-  const templates=document.createElement('button');templates.textContent='Templates';templates.onclick=()=>{document.querySelector('#example').focus();document.querySelector('#example').showPicker?.();};nav.insertBefore(templates,nav.children[2]);
-  const toolbar=document.createElement('div');toolbar.className='source-toolbar';
-  sourceCard.querySelector('.terminal-titlebar').after(toolbar);
   const example=document.querySelector('#example');
-  toolbar.append(example);
+  const exampleDialog=document.createElement('dialog');exampleDialog.className='examples-dialog';
+  const exampleTitle=document.createElement('h2');exampleTitle.textContent='Start from an example';
+  const exampleList=document.createElement('div');exampleList.className='example-grid';
+  for(const option of example.options){const button=document.createElement('button');button.textContent=option.textContent;button.onclick=()=>{example.value=option.value;example.dispatchEvent(new Event('change'));exampleDialog.close();};exampleList.append(button);}
+  const closeExamples=document.createElement('button');closeExamples.textContent='Close';closeExamples.onclick=()=>exampleDialog.close();
+  exampleDialog.append(exampleTitle,exampleList,closeExamples);document.body.append(exampleDialog);
+  example.hidden=true;example.style.display='none';
+  const templates=document.createElement('button');templates.textContent='Examples';templates.onclick=()=>exampleDialog.showModal();nav.insertBefore(templates,nav.children[2]);
   const cursor=document.createElement('span');cursor.id='cursor-position';cursor.textContent='Ln 1, Col 1';
   document.querySelector('#code-count').before(cursor);
   editor.onDidChangeCursorPosition(event=>cursor.textContent='Ln '+event.position.lineNumber+', Col '+event.position.column);
@@ -66,6 +72,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
     clearTimeout(timer);
     timer = setTimeout(() => {
       const model = editor.getModel();
+      if(!model){problems.textContent='Open a file to get started';return;}
       let markers = [];
       try { globalThis.Zuno.parse(model.getValue()); }
       catch (error) {

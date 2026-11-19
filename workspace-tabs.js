@@ -30,11 +30,20 @@ export function setupTabs(monaco, editor, source, container) {
     field('#delete-program').disabled = !entry.savedId;
     document.dispatchEvent(new CustomEvent('studio-file-selected',{detail:{savedCode:entry.savedCode ?? null}}));
   }
+  const empty=document.createElement('div');empty.className='workspace-empty-state';
+  const create=document.createElement('button');create.textContent='+ New file';create.onclick=()=>newFile();empty.append(create);container.after(empty);
+  function showEmpty(){
+    active=undefined;syncing=true;editor.setModel(null);source.value='';source.dispatchEvent(new Event('input'));syncing=false;
+    field('#saved-programs').value='';field('#program-title').value='';
+    field('#update-program').disabled=true;field('#delete-program').disabled=true;
+    document.body.classList.add('workspace-empty');document.dispatchEvent(new Event('zuno-workspace-empty'));draw();persist();
+  }
   function activate(id) {
     const entry = entries.get(id);
     if (!entry) return;
     if (entries.has(active)) entries.get(active).view = editor.saveViewState();
     active = id;
+    document.body.classList.remove('workspace-empty');
     syncing = true;
     editor.setModel(entry.model);
     syncFields(entry);
@@ -56,18 +65,64 @@ export function setupTabs(monaco, editor, source, container) {
     do { name = 'untitled-' + (++sequence) + '.zuno'; } while ([...entries.values()].some(entry=>entry.name===name));
     open({ name, code:'', savedCode:null, title:'' });
   }
-  function close(id) {
-    const entry = entries.get(id);
-    if (!entry) return;
-    if (dirty(entry) && !confirm('Close ' + entry.name + ' and discard unsaved changes? Choose Cancel to keep editing, save, or export it.')) return;
-    closed.push(snapshot(entry)); if (closed.length > 10) closed.shift();
-    const ids=[...entries.keys()]; const index=ids.indexOf(id);
-    entries.delete(id);
-    if (id === active) {
-      if (entries.size) activate(ids[index+1] || ids[index-1]);
-      else newFile();
-    }
-    entry.model.dispose(); draw(); persist();
+  async function saveBeforeClose(entry){
+    return new Promise(resolve=>{
+      const dialog=document.createElement('dialog');dialog.className='close-file-dialog';
+      const heading=document.createElement('h2');heading.textContent='Save changes to '+entry.name+'?';
+      const description=document.createElement('p');description.textContent='Save your work before closing this file.';
+      const nameLabel=document.createElement('label');nameLabel.textContent='File name';
+      const name=document.createElement('input');name.value=entry.title||entry.name.replace(/\.zuno$/i,'');name.maxLength=80;nameLabel.append(name);
+      const destination=document.createElement('select');destination.setAttribute('aria-label','Save destination');
+      if(scope && scope!=='guest')destination.add(new Option('Save to my account','cloud'));
+      destination.add(new Option('Download .zuno file','download'));
+      const error=document.createElement('p');error.setAttribute('role','status');
+      const actions=document.createElement('div');actions.className='close-file-actions';
+      const save=document.createElement('button');save.textContent='Save';
+      const discard=document.createElement('button');discard.textContent="Don’t save";
+      const cancel=document.createElement('button');cancel.textContent='Cancel';
+      let settled=false;
+      const finish=value=>{if(settled)return;settled=true;dialog.close();dialog.remove();resolve(value);};
+      discard.onclick=()=>finish(true);cancel.onclick=()=>finish(false);
+      dialog.oncancel=event=>{event.preventDefault();finish(false);};
+      save.onclick=async()=>{
+        const title=name.value.trim();if(!title){error.textContent='Enter a file name.';return;}
+        const content=entry.model.getValue();
+        save.disabled=true;discard.disabled=true;
+        try{
+          if(destination.value==='cloud'){
+            const response=await fetch('/api/programs'+(entry.savedId?'/'+entry.savedId:''),{method:entry.savedId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,code:content,folder:entry.folder||'General'})});
+            const record=await response.json();if(!response.ok)throw new Error(record.error||'Could not save.');
+            if(entries.get(entry.id)!==entry||entry.model.isDisposed())return finish(false);
+            markSaved(entry.id,record);globalThis.loadPrograms?.();
+          }else{
+            if(window.showSaveFilePicker){
+              const handle=await window.showSaveFilePicker({suggestedName:title+'.zuno',types:[{description:'Zuno source',accept:{'text/plain':['.zuno']}}]});
+              const writable=await handle.createWritable();await writable.write(content);await writable.close();
+            }else{
+              const url=URL.createObjectURL(new Blob([content],{type:'text/plain'}));const link=document.createElement('a');link.href=url;link.download=title.replace(/[^a-zA-Z0-9_. -]/g,'_')+'.zuno';link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
+            }
+          }
+          if(entries.get(entry.id)!==entry||entry.model.isDisposed())return finish(false);
+          if(entry.model.getValue()!==content)throw new Error('File changed while saving. Review the new changes before closing.');
+          finish(true);
+        }catch(reason){error.textContent=reason.name==='AbortError'?'Save cancelled. Your file is still open.':reason.message;}
+        finally{save.disabled=false;discard.disabled=false;}
+      };
+      actions.append(save,discard,cancel);dialog.append(heading,description,nameLabel,destination,error,actions);document.body.append(dialog);dialog.showModal();cancel.focus();
+    });
+  }
+  let closePending=false;
+  async function close(id) {
+    const entry=entries.get(id);if(!entry||closePending)return;
+    closePending=true;
+    try{
+      if(dirty(entry)&&!await saveBeforeClose(entry))return;
+      if(entries.get(id)!==entry)return;
+      closed.push(snapshot(entry));if(closed.length>10)closed.shift();
+      const ids=[...entries.keys()];const index=ids.indexOf(id);entries.delete(id);
+      if(id===active){if(entries.size)activate(ids[index+1]||ids[index-1]);else showEmpty();}
+      entry.model.dispose();draw();persist();
+    }finally{closePending=false;}
   }
   function reopen() { const entry=closed.pop(); if (entry) open(entry); }
   function draw() {
@@ -120,6 +175,7 @@ export function setupTabs(monaco, editor, source, container) {
     }
     syncing=false;
     if(entries.size)activate(entries.has(data.active)?data.active:entries.keys().next().value);
+    else if(data?.version===1 && Array.isArray(data.files))showEmpty();
     else {
       let draft='yap("Ready to cook");';
       if(scope==='guest'){try{const legacy=localStorage.getItem('zuno.workspace.draft');if(legacy!==null&&legacy.length<=100000)draft=legacy;}catch{}}
