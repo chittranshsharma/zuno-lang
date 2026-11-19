@@ -59,3 +59,22 @@ test('collections, text utilities and standalone calls', () => {
 test('every published guide example runs', () => {
   for (const example of require('./examples/catalog.json')) assert.doesNotThrow(()=>execute(example.code),example.name);
 });
+
+test('modules, classes, dictionaries and library namespaces integrate', () => {
+  const fs=require('node:fs');
+  assert.deepEqual(execute(fs.readFileSync('examples/counter.zuno','utf8')),['Avi','47','name, score','9']);
+  assert.deepEqual(execute('vibe d = {"__proto__": 7, "constructor": 8}; yap(d["__proto__"]); yap(d.constructor); vibe a = [1]; a[0] = 9; yap(a[0]);'),['7','8','9']);
+  assert.throws(()=>execute('module a {} module a {}'),/already exists/);
+  assert.throws(()=>execute('import missing as m;'),/Unknown module/);
+  assert.throws(()=>execute('class A { cook init(x) {} } vibe a = A();'),/arguments/);
+  assert.throws(()=>execute('vibe d = {}; yap(d.x);'),/Unknown dictionary/);
+  assert.throws(()=>execute('vibe a = [1]; a[4] = 3;'),/Invalid indexed/);
+  assert.deepEqual(execute('class C { cook init(n) { this.n = n; } cook get() { yeet this.n; } } vibe a=C(1); vibe b=C(2); lock get=a.get; yap(get()); yap(b.get());'),['1','2']);
+});
+
+test('module names and class bodies remain isolated from host objects',()=>{
+  assert.throws(()=>execute('import constructor as host;'),/Unknown module/);
+  assert.throws(()=>execute('class Bad { vibe x = 1; }'),/methods only/);
+  assert.throws(()=>execute('class C { cook init() {} } vibe c = C(); yap(c.constructor);'),/Unknown member/);
+  assert.throws(()=>execute('module m {} import m as a; a = 2;'),/constant/);
+});

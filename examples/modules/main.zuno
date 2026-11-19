@@ -1,0 +1,5 @@
+import "./helpers.zuno" as helpers;
+import testing as t;
+lock result = helpers.totalWithBonus([10, 20, 30], 5);
+t.assert(result == 65);
+yap(result);

@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const app = express();
 try { process.loadEnvFile(); } catch {}
 const Program = mongoose.model('Program', new mongoose.Schema({ owner: { type: mongoose.Schema.Types.ObjectId, index: true }, title: { type: String, required: true }, code: { type: String, required: true }, folder: { type: String, default: 'General' } }, { timestamps: true }));
-const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lingua';
+const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/zuno';
 app.use(express.json());
 app.get('/design.css', (request, response) => response.sendFile(path.join(__dirname, 'design.css')));
 app.get('/premium.css', (request, response) => response.sendFile(path.join(__dirname, 'premium.css')));
@@ -55,4 +55,4 @@ app.delete('/api/programs/:id', async (request, response) => {
 });
 mongoose.connect(mongoUrl).then(() => console.log('MongoDB connected')).catch(() => console.log('MongoDB is not available'));
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log('Lingua is running at http://localhost:' + port));
+app.listen(port, () => console.log('Zuno is running at http://localhost:' + port));

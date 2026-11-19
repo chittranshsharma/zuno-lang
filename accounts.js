@@ -13,7 +13,7 @@ router.use(async (req,res,next)=>{
   const origin=req.get('origin');
   if(req.method!=='GET' && origin && origin!==req.protocol+'://'+req.get('host'))return res.status(403).json({error:'Origin not allowed.'});
   try {
-    const token=(req.headers.cookie||'').split(';').map(v=>v.trim()).find(v=>v.startsWith('lingua_session='))?.slice(15);
+    const token=(req.headers.cookie||'').split(';').map(v=>v.trim()).find(v=>v.startsWith('zuno_session='))?.slice(13);
     if(token){const session=await Session.findOne({token:digest(token),expires:{$gt:new Date()}});if(session)req.user=await User.findById(session.user);}
     next();
   }catch{res.status(503).json({error:'Account database unavailable.'});}
@@ -35,14 +35,14 @@ for(const action of ['register','login'])router.post('/auth/'+action,async(req,r
     }
     const token=crypto.randomBytes(32).toString('hex');
     await Session.create({token:digest(token),user:user._id,expires:new Date(Date.now()+7*86400000)});
-    res.cookie('lingua_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});
+    res.cookie('zuno_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});
     res.json({user:{email:user.email}});
   }catch(error){res.status(error.code===11000?409:503).json({error:error.code===11000?'This email is already registered.':'Account service unavailable.'});}
 });
 router.post('/auth/logout',async(req,res)=>{
-  const token=(req.headers.cookie||'').split(';').map(v=>v.trim()).find(v=>v.startsWith('lingua_session='))?.slice(15);
+  const token=(req.headers.cookie||'').split(';').map(v=>v.trim()).find(v=>v.startsWith('zuno_session='))?.slice(13);
   try { if(token)await Session.deleteOne({token:digest(token)}); } catch { return res.status(503).json({error:'Could not sign out. Please retry.'}); }
-  res.clearCookie('lingua_session',{path:'/'});res.json({message:'Signed out'});
+  res.clearCookie('zuno_session',{path:'/'});res.json({message:'Signed out'});
 });
 router.use('/programs',(req,res,next)=>req.user?next():res.status(401).json({error:'Sign in to open your private projects.'}));
 module.exports=router;

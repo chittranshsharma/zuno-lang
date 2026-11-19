@@ -47,5 +47,7 @@ test('assistant forwards streaming chunks and bounded conversation history', asy
   assert.match(response.headers.get('content-type'),/text\/event-stream/);
   assert.match(await response.text(),/\[DONE\]/);
   assert.equal(received.stream,true);
+  assert.equal(received.model,process.env.GROQ_MODEL||'openai/gpt-oss-120b');
+  if(!process.env.GROQ_MODEL)assert.equal(received.reasoning_effort,'medium');
   assert.equal(received.messages[1].content,'Earlier question');
 });

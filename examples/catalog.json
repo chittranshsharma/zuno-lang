@@ -34,5 +34,9 @@
   {
     "name": "Conversions and assertions",
     "code": "lock price = number(\"19.5\");\nlock quantity = 3;\nlock total = price * quantity;\nassert(total > 0, \"Total must be positive\");\nyap(\"Total: \" + text(total));"
+  },
+  {
+    "name": "Modules, dictionaries and classes",
+    "code": "import math as m;\nimport dict as d;\nmodule scoring {\n  cook double(value) { yeet value * 2; }\n}\nimport scoring as scores;\nclass Counter {\n  cook init(start) { this.count = start; }\n  cook next() {\n    this.count = this.count + 1;\n    yeet this.count;\n  }\n}\nvibe counter = Counter(4);\nvibe profile = {\"name\": \"Avi\", \"score\": scores.double(21)};\nprofile.score = profile.score + counter.next();\nyap(profile.name);\nyap(profile.score);\nyap(join(d.keys(profile), \", \"));\nyap(m.sqrt(81));\n"
   }
 ]

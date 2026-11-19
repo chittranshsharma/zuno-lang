@@ -1,4 +1,4 @@
-# Lingua language guide
+# Zuno language guide
 
 ## Start with an idea
 
@@ -77,7 +77,7 @@ yap(triple(14));
 
 ## Arrays that do useful work
 
-Indexing starts at zero. Out-of-bounds reads are errors. push and pop mutate arrays; sort, reverse, and slice return copies. sort accepts numeric arrays. push currently accepts primitive values and caps arrays at 10,000 items. Nested array literals are supported, but indexed assignment is not yet supported.
+Indexing starts at zero. Out-of-bounds reads are errors. push and pop mutate arrays; sort, reverse, and slice return copies. sort accepts numeric arrays. push currently accepts primitive values and caps arrays at 10,000 items. Nested arrays and indexed assignment are supported.
 
 ~~~text
 vibe scores = [82, 94, 71, 88];
@@ -115,7 +115,7 @@ yap("Total: " + text(total));
 
 ## Run outside the browser
 
-Install project dependencies, then run node cli.js examples/scoreboard.lingua. Use node cli.js --check examples/scoreboard.lingua to parse without executing. The CLI uses the same engine as the playground.
+Install project dependencies, then run node cli.js examples/scoreboard.zuno. Use node cli.js --check examples/scoreboard.zuno to parse without executing. The CLI uses the same engine as the playground.
 
 ## Your workspace
 
@@ -127,7 +127,7 @@ Ctrl+Alt+B opens the Groq assistant. Paste your own key, then choose Use key. As
 
 ## Know the boundaries
 
-This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No modules, dictionaries, classes, package manager, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.
+This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No package manager, inheritance, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.
 
 ## Helper reference
 
@@ -136,3 +136,36 @@ Collections: len(value), range(end), range(start, end), push(array, primitive), 
 Text: upper(text), lower(text), trim(text), split(text, separator), join(array, separator), contains(text, part), replace(text, from, to)
 
 Numbers and checks: abs(number), round(number), floor(number), ceil(number), sqrt(number), number(value), text(primitive), assert(condition, message)
+## Dictionaries, classes, and modules
+
+Dictionaries: vibe profile = {"name": "Avi", "score": 42}; profile.score = 43; yap(profile["name"]);
+Keys must be text. Missing keys are errors. dict.keys, dict.values, dict.has, dict.remove operate on dictionaries.
+
+Classes contain cook/fn/func methods. init initializes fields through this.field assignment. Instantiate by calling the class name. Methods bind their instance. No inheritance or static members.
+
+Declare module name { declarations } then import name as alias;. A module exports every local declaration and executes once at declaration. Modules must be declared before import. Import bindings are constant.
+Standard modules: math (abs, round, floor, ceil, sqrt, sum, min, max); strings (upper, lower, trim, split, join, contains, replace, text, number); arrays (len, range, push, pop, slice, reverse, sort); dict (keys, values, has, remove); testing (assert).
+CLI file imports: import "./helper.zuno" as helper; on its own line. Paths stay beneath the entry file directory. Files execute once in dependency order; cycles and more than 100 module files are rejected. Browser file imports are not supported; use inline modules.
+
+~~~text
+import math as m;
+import dict as d;
+module scoring {
+  cook double(value) { yeet value * 2; }
+}
+import scoring as scores;
+class Counter {
+  cook init(start) { this.count = start; }
+  cook next() {
+    this.count = this.count + 1;
+    yeet this.count;
+  }
+}
+vibe counter = Counter(4);
+vibe profile = {"name": "Avi", "score": scores.double(21)};
+profile.score = profile.score + counter.next();
+yap(profile.name);
+yap(profile.score);
+yap(join(d.keys(profile), ", "));
+yap(m.sqrt(81));
+~~~

@@ -4,20 +4,20 @@ import DOMPurify from 'dompurify';
 import * as monaco from 'monaco-editor';
 globalThis.MonacoEnvironment = { getWorker: () => new Worker('/assets/editor.worker.js', { type: 'module' }) };
 const source = document.querySelector('#code');
-monaco.languages.register({ id: 'lingua' });
-monaco.languages.setMonarchTokensProvider('lingua', { tokenizer: { root: [
-  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|true|false|fr|cap)\b/, 'keyword'],
+monaco.languages.register({ id: 'zuno' });
+monaco.languages.setMonarchTokensProvider('zuno', { tokenizer: { root: [
+  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|class|module|import|as|this|true|false|fr|cap)\b/, 'keyword'],
   [/\b(print|say|yap)\b/, 'type'], [/"(?:\\.|[^"\\])*"/, 'string'], [/\d+(?:\.\d+)?/, 'number'], [/[a-zA-Z_]\w*/, 'identifier']
 ] } });
-monaco.languages.setLanguageConfiguration('lingua', { brackets: [['{','}'],['[',']'],['(',')']], autoClosingPairs: [{open:'{',close:'}'},{open:'[',close:']'},{open:'(',close:')'},{open:'"',close:'"'}] });
-monaco.languages.registerCompletionItemProvider('lingua', { provideCompletionItems(model, position) {
+monaco.languages.setLanguageConfiguration('zuno', { brackets: [['{','}'],['[',']'],['(',')']], autoClosingPairs: [{open:'{',close:'}'},{open:'[',close:']'},{open:'(',close:')'},{open:'"',close:'"'}] });
+monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
   const word = model.getWordUntilPosition(position);
   const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
-  const snippets = { let:'let ${1:name} = ${2:0};', print:'print(${1:value});', fn:'fn ${1:name}(${2:argument}) {\n  return ${3:argument};\n}', if:'if (${1:condition}) {\n  $0\n}', while:'while (${1:condition}) {\n  $0\n}' };
+  const snippets = {"cook":"cook ${1:name}(${2:arg}) {\n  yeet ${3:arg};\n}","class":"class ${1:Name} {\n  cook init(${2:value}) {\n    this.value = value;\n  }\n}","import":"import ${1:math} as ${2:m};","dictionary":"vibe ${1:item} = {\"name\": ${2:\"Zuno\"}};", let:'let ${1:name} = ${2:0};', print:'print(${1:value});', fn:'fn ${1:name}(${2:argument}) {\n  return ${3:argument};\n}', if:'if (${1:condition}) {\n  $0\n}', while:'while (${1:condition}) {\n  $0\n}' };
   return { suggestions:Object.entries(snippets).map(([label,insertText]) => ({ label,insertText,range,kind:monaco.languages.CompletionItemKind.Snippet,insertTextRules:monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet })) };
 } });
-monaco.editor.defineTheme('lingua-premium', { base:'vs-dark',inherit:true,rules:[{token:'keyword',foreground:'C792EA'},{token:'string',foreground:'BDD3AC'},{token:'number',foreground:'DDBB91'}], colors:{'editor.background':'#0C0B10','editor.foreground':'#E5E5E5','editorLineNumber.foreground':'#707075','editor.lineHighlightBackground':'#16121F','editorCursor.foreground':'#FFFFFF','editor.selectionBackground':'#FFFFFF25','editorWidget.background':'#1B1B1E','editorWidget.border':'#39393D'} });
-const editor = monaco.editor.create(document.querySelector('#monaco-editor'), { value:source.value,language:'lingua',theme:'lingua-premium',automaticLayout:true,fontFamily:'JetBrains Mono, monospace',fontSize:14,lineHeight:25,minimap:{enabled:false},padding:{top:20},scrollBeyondLastLine:false,tabSize:2,ariaLabel:'Lingua code editor' });
+monaco.editor.defineTheme('zuno-premium', { base:'vs-dark',inherit:true,rules:[{token:'keyword',foreground:'C792EA'},{token:'string',foreground:'BDD3AC'},{token:'number',foreground:'DDBB91'}], colors:{'editor.background':'#0C0B10','editor.foreground':'#E5E5E5','editorLineNumber.foreground':'#707075','editor.lineHighlightBackground':'#16121F','editorCursor.foreground':'#FFFFFF','editor.selectionBackground':'#FFFFFF25','editorWidget.background':'#1B1B1E','editorWidget.border':'#39393D'} });
+const editor = monaco.editor.create(document.querySelector('#monaco-editor'), { value:source.value,language:'zuno',theme:'zuno-premium',automaticLayout:true,fontFamily:'JetBrains Mono, monospace',fontSize:14,lineHeight:25,minimap:{enabled:false},padding:{top:20},scrollBeyondLastLine:false,tabSize:2,ariaLabel:'Zuno code editor' });
 document.querySelector('.terminal-editor').hidden = true;
 document.querySelector('.terminal-editor').style.display = 'none';
 let syncing = false;
@@ -87,8 +87,8 @@ function previewEdit(original, proposed, model) {
   const reject=document.createElement('button');reject.textContent='Reject';
   const status=document.createElement('p');
   dialog.append(heading,container,status,accept,reject);document.body.append(dialog);dialog.showModal();
-  const before=monaco.editor.createModel(original,'lingua');const after=monaco.editor.createModel(proposed,'lingua');
-  const diff=monaco.editor.createDiffEditor(container,{theme:'lingua-premium',automaticLayout:true,readOnly:true,renderSideBySide:innerWidth>700});
+  const before=monaco.editor.createModel(original,'zuno');const after=monaco.editor.createModel(proposed,'zuno');
+  const diff=monaco.editor.createDiffEditor(container,{theme:'zuno-premium',automaticLayout:true,readOnly:true,renderSideBySide:innerWidth>700});
   diff.setModel({original:before,modified:after});
   accept.onclick=()=>{
     if(model.isDisposed()||model.getValue()!==original){status.textContent='The file changed since this suggestion. Ask for a fresh edit.';return;}
@@ -134,7 +134,7 @@ document.querySelector('#assistant-form').onsubmit = async e => {
     if(history.length>10)history.splice(0,history.length-10);
     keyStatus.textContent='Connected to Groq';progress.textContent='Reply ready';
     if(editing){
-      const match=reply.match(/```(?:lingua|zuno|veya)?\s*\n([\s\S]*?)```/);
+      const match=reply.match(/```(?:zuno|veya)?\s*\n([\s\S]*?)```/);
       if(match && match[1].length<=5000)previewEdit(original,match[1].trim(),model);
       else progress.textContent='No complete replacement program returned. Ask again with a specific change.';
     }

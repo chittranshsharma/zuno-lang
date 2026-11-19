@@ -25,7 +25,7 @@ updateEditorState();
 
 async function readResult(response) {
   if (!response.headers.get('content-type')?.includes('application/json')) {
-    throw new Error('Open Lingua through npm start to use saved programs.');
+    throw new Error('Open Zuno through npm start to use saved programs.');
   }
   const result = await response.json();
   if (!response.ok) throw new Error(result.error);
@@ -43,7 +43,7 @@ document.querySelector('#new-program').addEventListener('click', () => {
   saveDetails.open = true;
   programList.value = '';
   titleInput.value = '';
-  document.querySelector('#editor-filename').textContent = 'untitled-' + (++untitledNumber) + '.lingua';
+  document.querySelector('#editor-filename').textContent = 'untitled-' + (++untitledNumber) + '.zuno';
   code.value = '';
   code.dispatchEvent(new Event('input'));
   savedCode = null;
@@ -68,7 +68,7 @@ function selectProgram(id) {
   updateButton.disabled = !selected;
   deleteButton.disabled = !selected;
   if (!selected) return;
-  document.querySelector('#editor-filename').textContent = selected.title + '.lingua';
+  document.querySelector('#editor-filename').textContent = selected.title + '.zuno';
   saveDetails.open = true;
   titleInput.value = selected.title;
   folderInput.value = selected.folder || 'General';
@@ -88,7 +88,7 @@ function drawFolders(parent, folder, path = '') {
       button.className = 'tree-file';
       button.innerHTML = treeIcons.file;
       const label = document.createElement('span');
-      label.textContent = item.program.title + '.lingua';
+      label.textContent = item.program.title + '.zuno';
       button.append(label);
       if (item.program._id === programList.value) button.setAttribute('aria-current', 'true');
       button.addEventListener('click', () => {

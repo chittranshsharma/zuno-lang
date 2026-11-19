@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lingua Playground</title>
+  <title>Zuno Playground</title>
   <link rel="stylesheet" href="playground.css">
   <link rel="stylesheet" href="workspace.css">
   <link rel="stylesheet" href="interactions.css">
@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/assets/editor.css"><link rel="stylesheet" href="/design.css"></head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/">Lingua</a>
+    <a class="brand" href="/">Zuno</a>
     <nav class="links" aria-label="Main navigation">
       <a href="playground.html" aria-current="page">Playground</a>
       <a href="docs.html">Docs</a>
@@ -22,9 +22,9 @@
   <main class="page">
     <section class="hero">
       <div>
-        <p class="eyebrow">Lingua playground</p>
+        <p class="eyebrow">Zuno playground</p>
         <h1>A little language. Room for big ideas.</h1>
-        <p class="lede">Explore, build, and run your next idea in Lingua.</p>
+        <p class="lede">Explore, build, and run your next idea in Zuno.</p>
       </div>
     </section>
     <div class="editor-layout">
@@ -55,26 +55,26 @@
       <div class="editor-main">
         <div class="workspace">
           <section class="card">
-            <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Source Code</h2><p id="editor-filename">untitled.lingua</p></div><span class="terminal-session">editor</span></header>
+            <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Source Code</h2><p id="editor-filename">untitled.zuno</p></div><span class="terminal-session">editor</span></header>
             <label class="field-label" for="example">Example</label>
             <select id="example" class="select">
               <option value="hello">Hello World</option>
               <option value="math">Simple Maths</option>
               <option value="power">Power and Brackets</option>
               <option value="control">Loops and Conditions</option>
-              <option value="functions">Functions and Arrays</option><option value="modern">Modern dialect</option><option value="scoreboard">Scoreboard</option><option value="words">Word counter</option>
+              <option value="functions">Functions and Arrays</option><option value="modern">Modern dialect</option><option value="scoreboard">Scoreboard</option><option value="words">Word counter</option><option value="counter">Classes and modules</option>
             </select>
             <label class="field-label" for="code">Code</label>
-            <div id="monaco-editor" aria-label="Lingua code editor"></div><div class="terminal-editor"><pre id="code-highlight" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">let name = "World";
+            <div id="monaco-editor" aria-label="Zuno code editor"></div><div class="terminal-editor"><pre id="code-highlight" aria-hidden="true"></pre><textarea id="code" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">let name = "World";
 print(name);</textarea></div>
             <p id="code-count" class="help" aria-live="polite"></p>
             <p id="editor-state" class="help" role="status" aria-live="polite">Unsaved changes</p>
             <div class="editor-actions"><button id="run" class="btn-run" type="button">Run program</button><span>Ctrl + Enter</span><button id="toggle-assistant" type="button" aria-expanded="false" aria-controls="assistant-panel">Ask AI <kbd>Ctrl+Alt+B</kbd></button><span id="run-status" role="status">Ready</span></div>
           </section>
           <section class="card">
-            <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Terminal</h2><p>Lingua runtime</p></div><span class="terminal-session">output</span></header>
+            <header class="card-head terminal-titlebar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><div><h2>Terminal</h2><p>Zuno runtime</p></div><span class="terminal-session">output</span></header>
             <pre id="output" class="sr-only" aria-live="polite">Ready to run.</pre>
-            <div class="terminal-content"><div class="terminal-command" aria-hidden="true"><span>❯</span> lingua run <span class="terminal-command-file">workspace</span></div><pre id="terminal-screen" aria-hidden="true"></pre><span class="terminal-caret" aria-hidden="true"></span><span id="terminal-animation-status" class="terminal-animation-status">Ready</span></div>
+            <div class="terminal-content"><div class="terminal-command" aria-hidden="true"><span>❯</span> zuno run <span class="terminal-command-file">workspace</span></div><pre id="terminal-screen" aria-hidden="true"></pre><span class="terminal-caret" aria-hidden="true"></span><span id="terminal-animation-status" class="terminal-animation-status">Ready</span></div>
             <div class="program-actions editor-actions"><button id="clear-output" type="button">Clear output</button></div>
             <p class="help">Functions, arrays, loops, constants, and the modern dialect.</p>
           </section>
@@ -86,20 +86,20 @@ print(name);</textarea></div>
             <button id="export-code" type="button">Export file</button>
             <button id="import-code" type="button">Import file</button>
           </div>
-          <input id="import-file" type="file" accept=".lingua,.txt,text/plain" hidden>
+          <input id="import-file" type="file" accept=".zuno,.txt,text/plain" hidden>
           <p id="file-status" role="status" aria-live="polite"></p>
         </section>
       </div>
     </div>
   </main>
-  <footer class="footer"><span>Lingua workspace</span><a href="docs.html">Language guide</a></footer>
+  <footer class="footer"><span>Zuno workspace</span><a href="docs.html">Language guide</a></footer>
   <script src="engine.js"></script>
   <script src="playground.js?v=5"></script>
   <script src="files.js?v=2"></script>
   <script src="programs.js?v=3"></script>
   <script src="workspace.js"></script>
   <script src="interactions.js"></script>
-<aside id="assistant-panel" hidden aria-label="Code assistant"><header><div><span class="assistant-eyebrow">Lingua / AI</span><h2>A second perspective.</h2></div><button id="close-assistant" aria-label="Close assistant">Close</button></header><p>Powered by Groq. Submitting sends your current code and question to Groq. Suggestions never change files automatically.</p><div class="assistant-prompts"><button type="button" data-question="Explain this program step by step">Explain code</button><button type="button" data-question="Find potential bugs in this program">Find a bug</button><button type="button" data-question="Suggest a simpler approach using supported Lingua syntax">Simplify</button></div>
-<section class="groq-setup" aria-label="Your Groq connection"><div class="key-heading"><strong>Your Groq key</strong><span id="groq-key-status" role="status">Not added</span></div><p><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Get a free API key from Groq ↗</a></p><label for="groq-key">Paste your API key</label><input id="groq-key" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_..." maxlength="256"><div class="key-actions"><button id="connect-groq" type="button">Use key</button><button id="disconnect-groq" type="button" disabled>Disconnect</button></div><p>Kept only in this page’s memory. Refresh or disconnect to clear it. When you ask, your key passes through the Lingua server to Groq; it is never saved by Lingua. No .env setup needed.</p></section>
+<aside id="assistant-panel" hidden aria-label="Code assistant"><header><div><span class="assistant-eyebrow">Zuno / AI</span><h2>A second perspective.</h2></div><button id="close-assistant" aria-label="Close assistant">Close</button></header><p>GPT-OSS 120B · Powered by Groq. Submitting sends your current code and question to Groq. Suggestions never change files automatically.</p><div class="assistant-prompts"><button type="button" data-question="Explain this program step by step">Explain code</button><button type="button" data-question="Find potential bugs in this program">Find a bug</button><button type="button" data-question="Suggest a simpler approach using supported Zuno syntax">Simplify</button></div>
+<section class="groq-setup" aria-label="Your Groq connection"><div class="key-heading"><strong>Your Groq key</strong><span id="groq-key-status" role="status">Not added</span></div><p><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Get a free API key from Groq ↗</a></p><label for="groq-key">Paste your API key</label><input id="groq-key" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_..." maxlength="256"><div class="key-actions"><button id="connect-groq" type="button">Use key</button><button id="disconnect-groq" type="button" disabled>Disconnect</button></div><p>Kept only in this page’s memory. Refresh or disconnect to clear it. When you ask, your key passes through the Zuno server to Groq; it is never saved by Zuno. No .env setup needed.</p></section>
 <span id="assistant-progress" class="assistant-progress">Ready when you are</span><div id="assistant-answer" role="status" aria-live="polite">Ask for an explanation or help finding a bug.</div><form id="assistant-form"><label for="assistant-question">Your question</label><textarea id="assistant-question" maxlength="2000" required placeholder="Explain this program step by step"></textarea><button id="ask-assistant" type="submit">Ask about my code</button></form></aside><script type="module" src="/assets/editor.js"></script></body>
 </html>

@@ -61,7 +61,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
     const id = identity();
     if (active === id) return;
     if (!models.size) models.set(id, { model: editor.getModel() });
-    else if (!models.has(id)) models.set(id, { model: monaco.editor.createModel(source.value, 'lingua') });
+    else if (!models.has(id)) models.set(id, { model: monaco.editor.createModel(source.value, 'zuno') });
     const entry = models.get(id);
     Object.assign(entry, { name: filename.textContent, savedId: document.querySelector('#saved-programs').value, title: document.querySelector('#program-title').value, folder: document.querySelector('#program-folder').value, savedCode: document.querySelector('#saved-programs').value ? source.value : null });
     active = id;
@@ -87,12 +87,12 @@ export function setupStudio(monaco, editor, source, openAssistant) {
     timer = setTimeout(() => {
       const model = editor.getModel();
       let markers = [];
-      try { globalThis.Lingua.parse(model.getValue()); }
+      try { globalThis.Zuno.parse(model.getValue()); }
       catch (error) {
         const location = error.message.match(/Line (\d+), column (\d+): (.*)/);
         if (location) markers = [{ startLineNumber: +location[1], endLineNumber: +location[1], startColumn: +location[2], endColumn: +location[2] + 1, message: location[3], severity: monaco.MarkerSeverity.Error }];
       }
-      monaco.editor.setModelMarkers(model, 'lingua', markers);
+      monaco.editor.setModelMarkers(model, 'zuno', markers);
       problems.replaceChildren();
       for (const marker of markers) {
         const button = document.createElement('button');
@@ -106,11 +106,11 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   editor.onDidChangeModelContent(diagnostics);
   editor.onDidChangeModel(diagnostics);
   diagnostics();
-  monaco.languages.registerCompletionItemProvider('lingua', { provideCompletionItems(model, position) {
+  monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
     const word = model.getWordUntilPosition(position);
     const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
     const names = new Set(['len','range','upper','lower','abs','round','join','push','pop','slice','reverse','sort','sum','min','max','split','trim','contains','replace','text','number','floor','ceil','sqrt','assert','vibe','lock','cook','yap','yeet','fr','cap']);
-    for (const match of model.getValue().matchAll(/\b(?:let|const|vibe|lock|fn|func|cook)\s+(\w+)|\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) {
+    for (const match of model.getValue().matchAll(/\b(?:let|const|vibe|lock|fn|func|cook|class)\s+(\w+)|\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) {
       if (match[1]) names.add(match[1]);
       if (match[2]) match[2].split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>names.add(n));
     }

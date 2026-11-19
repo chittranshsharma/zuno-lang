@@ -1,4 +1,4 @@
-const draftKey = 'lingua.workspace.draft';
+const draftKey = 'zuno.workspace.draft';
 const runStatus = document.querySelector('#run-status');
 try {
   const draft = localStorage.getItem(draftKey);

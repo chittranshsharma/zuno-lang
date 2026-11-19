@@ -1,0 +1,20 @@
+import math as m;
+import dict as d;
+module scoring {
+  cook double(value) { yeet value * 2; }
+}
+import scoring as scores;
+class Counter {
+  cook init(start) { this.count = start; }
+  cook next() {
+    this.count = this.count + 1;
+    yeet this.count;
+  }
+}
+vibe counter = Counter(4);
+vibe profile = {"name": "Avi", "score": scores.double(21)};
+profile.score = profile.score + counter.next();
+yap(profile.name);
+yap(profile.score);
+yap(join(d.keys(profile), ", "));
+yap(m.sqrt(81));

@@ -12,7 +12,7 @@
         const count = (end < 0 ? source.length : end) - offset;
         offset += count; column += count; continue;
       }
-      const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],{}();=+*/%<>!\-])/);
+      const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],.{}:();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
       if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false' })[text] || text, line, column });
@@ -31,7 +31,7 @@
       if (peek() !== text) fail(tokens[index], 'Expected ' + text);
       return take();
     };
-    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'func', 'const', 'say', 'for', 'in', 'return']);
+    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'func', 'const', 'say', 'for', 'in', 'return', 'class', 'module', 'import', 'as']);
     function argumentsUntil(end) {
       const values = [];
       if (peek() !== end) {
@@ -45,7 +45,16 @@
       if (++depth > 200) fail(tokens[index], 'Expression is too deeply nested');
       const token = take();
       let node;
-      if (token.text === '[') {
+      if (token.text === '{') {
+        const entries = [];
+        while (peek() !== '}') {
+          const key = take();
+          if (!key.text.startsWith('"')) fail(key, 'Dictionary keys must be quoted text');
+          expect(':'); entries.push([JSON.parse(key.text), expression()]);
+          if (peek() !== ',') break; take();
+        }
+        expect('}'); node = { type:'dictionary', token, entries };
+      } else if (token.text === '[') {
         node = { type: 'array', token, items: argumentsUntil(']') };
       } else if (token.text === '(') {
         node = expression();
@@ -62,9 +71,10 @@
       } else if (/^[A-Za-z_]\w*$/.test(token.text) && !reserved.has(token.text)) {
         node = { type: 'variable', token };
       } else fail(token, 'Expected an expression');
-      while (peek() === '(' || peek() === '[') {
+      while (peek() === '(' || peek() === '[' || peek() === '.') {
         const suffix = take();
-        if (suffix.text === '(') node = { type: 'call', token: suffix, callee: node, args: argumentsUntil(')') };
+        if (suffix.text === '.') { const key=take(); if(!/^[A-Za-z_]\w*$/.test(key.text))fail(key,'Expected member name'); node={type:'index',token:suffix,array:node,position:{type:'literal',token:key,value:key.text}}; }
+        else if (suffix.text === '(') node = { type: 'call', token: suffix, callee: node, args: argumentsUntil(')') };
         else { const position = expression(); expect(']'); node = { type: 'index', token: suffix, array: node, position }; }
       }
       while (Object.hasOwn(precedence, peek()) && precedence[peek()] >= min) {
@@ -86,6 +96,17 @@
     }
     function statement() {
       const token = take();
+      if (['module','class'].includes(token.text)) {
+        const name=take(); if(!/^[A-Za-z_]\w*$/.test(name.text)||reserved.has(name.text))fail(name,'Expected a name');
+        const body=block();
+        if(token.text==='class'&&body.some(n=>n.type!=='function'))fail(name,'Class bodies contain methods only');
+        return {type:token.text,token:name,body};
+      }
+      if (token.text === 'import') {
+        const name=take();if(!/^[A-Za-z_]\w*$/.test(name.text))fail(name,'Expected module name');
+        expect('as');const alias=take();if(!/^[A-Za-z_]\w*$/.test(alias.text)||reserved.has(alias.text))fail(alias,'Expected alias');expect(';');
+        return {type:'import',token:alias,name:name.text};
+      }
       if (['fn', 'func'].includes(token.text)) {
         const name = take();
         if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a function name');
@@ -130,10 +151,13 @@
         expect(';');
         return { type: 'print', token, value };
       }
-      if (!['let', 'const'].includes(token.text) && tokens[index]?.text === '(') {
-        index--;
-        const value = expression(); expect(';');
-        return { type:'expression', token, value };
+      if (!['let', 'const'].includes(token.text)) {
+        index--;const target=expression();
+        if(peek()!== '='){expect(';');return {type:'expression',token,value:target};}
+        take();const value=expression();expect(';');
+        if(target.type==='variable')return {type:'assign',token:target.token,value};
+        if(target.type!=='index')fail(token,'Invalid assignment target');
+        return {type:'set',token,target,value};
       }
       const name = ['let', 'const'].includes(token.text) ? take() : token;
       if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a variable name');
@@ -145,7 +169,9 @@
     const program = [];
     while (peek()) program.push(statement());
     if (parseOnly) return program;
+    const modules = new Map();
     const constants = new WeakMap();
+    const dict = entries => ({ kind:'dictionary', values:new Map(entries) });
     const output = [];
     let steps = 0;
     let calls = 0;
@@ -154,15 +180,33 @@
     function evaluate(node, scope) {
       tick(node.token);
       const op = node.token.text;
+      if (node.type === 'dictionary') return dict(node.entries.map(([key,value])=>[key,evaluate(value,scope)]));
       if (node.type === 'array') return node.items.map(item => evaluate(item, scope));
       if (node.type === 'index') {
         const array = evaluate(node.array, scope);
         const position = evaluate(node.position, scope);
+        if (array?.kind==='dictionary') {
+          if(typeof position!=='string'||!array.values.has(position))fail(node.token,'Unknown dictionary key: '+position);
+          return array.values.get(position);
+        }
+        if (array?.kind==='instance') {
+          if(array.fields.has(position))return array.fields.get(position);
+          const method=array.definition.methods.get(position);
+          if(!method)fail(node.token,'Unknown member: '+position);
+          return {...method,scope:{values:new Map([['this',array]]),parent:method.scope}};
+        }
         if ((!Array.isArray(array) && typeof array !== 'string') || !Number.isInteger(position) || position < 0 || position >= array.length) fail(node.token, 'Array index is outside its bounds');
         return array[position];
       }
       if (node.type === 'call') {
         const fn = evaluate(node.callee, scope);
+        if (fn?.kind === 'class') {
+          const instance={kind:'instance',fields:new Map(),definition:fn};
+          const init=fn.methods.get('init');
+          if(init)evaluate({type:'call',token:node.token,callee:{type:'literal',token:node.token,value:{...init,scope:{values:new Map([['this',instance]]),parent:init.scope}}},args:node.args},scope);
+          else if(node.args.length)fail(node.token,'Class has no initializer');
+          return instance;
+        }
         if (fn && fn.kind === 'builtin') {
           const args = node.args.map(arg => evaluate(arg, scope));
           try { return fn.call(...args); } catch (error) { fail(node.token, error.message); }
@@ -215,7 +259,27 @@
     function run(statements, scope) {
       for (const node of statements) {
         tick(node.token);
-        if (node.type === 'function') {
+        if (node.type === 'module') {
+          if(modules.has(node.token.text))fail(node.token,'Module already exists');
+          const local={values:new Map(),parent:scope};run(node.body,local);
+          modules.set(node.token.text,dict(local.values));
+        } else if (node.type === 'import') {
+          if(scope.values.has(node.token.text))fail(node.token,'Alias already declared');
+          if(!modules.has(node.name))fail(node.token,'Unknown module: '+node.name);
+          scope.values.set(node.token.text,modules.get(node.name));
+          if(!constants.has(scope))constants.set(scope,new Set());constants.get(scope).add(node.token.text);
+        } else if (node.type === 'class') {
+          if(scope.values.has(node.token.text))fail(node.token,'Name already declared');
+          const methods=new Map();
+          for(const method of node.body){if(methods.has(method.token.text))fail(method.token,'Duplicate method');methods.set(method.token.text,{kind:'function',params:method.params,body:method.body,scope});}
+          scope.values.set(node.token.text,{kind:'class',methods});
+        } else if (node.type === 'set') {
+          const object=evaluate(node.target.array,scope);const key=evaluate(node.target.position,scope);const value=evaluate(node.value,scope);
+          if(object?.kind==='dictionary'){if(typeof key!=='string')fail(node.token,'Dictionary key must be text');if(object.values.size>=10000&&!object.values.has(key))fail(node.token,'Dictionary limit reached');object.values.set(key,value);}
+          else if(object?.kind==='instance'){if(typeof key!=='string')fail(node.token,'Field must be text');if(object.fields.size>=10000&&!object.fields.has(key))fail(node.token,'Field limit reached');object.fields.set(key,value);}
+          else if(Array.isArray(object)&&Number.isInteger(key)&&key>=0&&key<object.length)object[key]=value;
+          else fail(node.token,'Invalid indexed assignment');
+        } else if (node.type === 'function') {
           if (scope.values.has(node.token.text)) fail(node.token, 'Variable already declared: ' + node.token.text);
           scope.values.set(node.token.text, { kind: 'function', params: node.params, body: node.body, scope });
         } else if (node.type === 'return') {
@@ -257,6 +321,10 @@
     const requireText = value => { if (typeof value !== 'string') throw new Error('Expected text'); return value; };
     const requireNumber = value => { if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Expected a finite number'); return value; };
     const builtins = {
+      keys: value => { if(value?.kind!=='dictionary')throw new Error('keys needs dictionary');return [...value.values.keys()]; },
+      values: value => { if(value?.kind!=='dictionary')throw new Error('values needs dictionary');return [...value.values.values()]; },
+      has: (value,key) => { if(value?.kind!=='dictionary'||typeof key!=='string')throw new Error('has needs dictionary and text');return value.values.has(key); },
+      remove: (value,key) => { if(value?.kind!=='dictionary'||typeof key!=='string')throw new Error('remove needs dictionary and text');return value.values.delete(key); },
       push: (items, value) => { requireArray(items); if(items.length>=10000)throw new Error('Array exceeds 10000 items'); if(typeof value==='object' && value!==null)throw new Error('push accepts primitive values'); items.push(value); return items.length; },
       pop: items => { requireArray(items); if(!items.length)throw new Error('Cannot pop an empty array'); return items.pop(); },
       slice: (value, start, end) => { if(!Array.isArray(value)&&typeof value!=='string')throw new Error('slice needs array or text'); if(!Number.isInteger(start)||(end!==undefined&&!Number.isInteger(end)))throw new Error('slice indexes must be integers'); return value.slice(start,end); },
@@ -284,9 +352,12 @@
       join: (values, separator = ',') => { if (!Array.isArray(values) || typeof separator !== 'string') throw new Error('join needs an array and text'); const result = values.join(separator); if (result.length > 100000) throw new Error('Text exceeds 100000 characters'); return result; }
     };
     const builtinScope = { values: new Map(Object.entries(builtins).map(([name, call]) => [name, { kind: 'builtin', call }])), parent: null };
+    for(const [name,names] of Object.entries({math:['abs','round','floor','ceil','sqrt','sum','min','max'],strings:['upper','lower','trim','split','join','contains','replace','text','number'],arrays:['len','range','push','pop','slice','reverse','sort'],dict:['keys','values','has','remove'],testing:['assert']})) {
+      modules.set(name,dict(names.map(key=>[key,builtinScope.values.get(key)])));
+    }
     run(program, { values: new Map(), parent: builtinScope });
     return output;
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { execute, parse: source => execute(source, 0, true) };
-  else root.Lingua = { execute, parse: source => execute(source, 0, true) };
+  else root.Zuno = { execute, parse: source => execute(source, 0, true) };
 })(globalThis);
