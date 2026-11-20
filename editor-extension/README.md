@@ -1,6 +1,6 @@
 # Zuno Language Tools
 
-Version 0.5.0 includes the Zuno Language Server. Build the extension from the repository with npm install and npm run package:extension, then use Extensions → … → Install from VSIX in VS Code or Cursor to install dist/zuno-tools.vsix. The published 0.4.0 extension predates the language server.
+Version 0.5.0 includes the Zuno Language Server. Download [zuno-tools.vsix](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-tools.vsix), then use Extensions → … → Install from VSIX in VS Code or Cursor. To update from the terminal, use code --install-extension ./zuno-tools.vsix --force (or cursor instead of code), then reload the editor. Building from source is optional: npm install and npm run package:extension create dist/zuno-tools.vsix.
 
 ## Language features
 

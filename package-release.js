@@ -22,6 +22,10 @@ fs.copyFileSync(path.join(root, 'INSTALL.md'), path.join(starter, 'INSTALL.md'))
 execFileSync('tar', ['-czf', path.join(destination, 'zuno-starter-' + version + '.tgz'), '-C', starter, 'starter', 'examples', 'INSTALL.md']);
 fs.copyFileSync(path.join(root, 'INSTALL.md'), path.join(destination, 'INSTALL.md'));
 const assets = ['zuno-runtime-' + version + '.tgz', 'zuno-tools-' + version + '.vsix', 'zuno-starter-' + version + '.tgz', 'INSTALL.md'];
+for (const [versioned, stable] of [[assets[0], 'zuno-runtime.tgz'], [assets[1], 'zuno-tools.vsix'], [assets[2], 'zuno-starter.tgz']]) {
+  fs.copyFileSync(path.join(destination, versioned), path.join(destination, stable));
+  assets.push(stable);
+}
 const checksums = assets.map(name => crypto.createHash('sha256').update(fs.readFileSync(path.join(destination, name))).digest('hex') + '  ' + name);
 fs.writeFileSync(path.join(destination, 'SHA256SUMS.txt'), checksums.join('\n') + '\n');
 console.log('Release ' + version + ' ready in dist/.');

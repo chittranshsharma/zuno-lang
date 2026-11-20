@@ -1,31 +1,44 @@
-# Zuno 0.4.0 — First public preview
+# Zuno 0.5.0 — Language server release
 
-Zuno's first downloadable release brings the language to your terminal, VS Code, and Cursor. Node.js 20 or newer is required. These packages are portable across Windows, macOS, and Linux; they are not native executables.
+Zuno now ships a language server inside its VS Code/Cursor extension. Install the VSIX and reload the editor; no API key, database, or separate server installation is needed.
 
-## Downloads
+## Editor features
 
-- `zuno-runtime-0.4.0.tgz`: standalone interpreter and CLI, with no website/database dependencies.
-- `zuno-tools-0.4.0.vsix`: editor highlighting, current-file and project Run/Check commands, bundled runtime, and clickable errors.
-- `zuno-starter-0.4.0.tgz`: starter project and language examples.
-- `INSTALL.md`: installation, project layout, updates, and removal.
-- `SHA256SUMS.txt`: hashes of the assets above.
+- Ctrl+Space: complete variables, parameters, functions, dialect snippets, imported exports, standard-library members, and known class/dictionary members.
+- F12 or Ctrl+click: go to declarations and imported files.
+- F2: rename resolved symbols across project files, including unsaved buffers. Rename checks for collisions and capture while keeping shadowed variables, comments, and unrelated strings separate.
+- Live diagnostics: syntax, unknown symbols/modules/members, duplicate declarations, constant assignments, invalid returns, and file-import errors, without executing programs.
 
-## Quick start
+The server watches project files, resolves imports inside the project root, and uses the interpreter's parser. Positions use UTF-16 so editor ranges remain correct around Unicode. Multiple open files share one project validation pass.
+
+## Downloads and installation
+
+Install Node.js 20+ for the CLI and editor Run/Check commands. The packages work on Windows, macOS, and Linux.
+
+| Download | Use |
+| --- | --- |
+| zuno-runtime.tgz | Standalone terminal interpreter and CLI |
+| zuno-tools.vsix | VS Code/Cursor extension, language server, and bundled runtime |
+| zuno-starter.tgz | Starter project and examples |
+| INSTALL.md | Installation, project layout, updates, and removal |
+| SHA256SUMS.txt | SHA-256 hashes for all packages and the install guide |
+
+Versioned copies of the three packages are included too. The website's stable download links follow GitHub's latest release.
 
 ```sh
-npm install --global ./zuno-runtime-0.4.0.tgz
+npm install --global https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-runtime.tgz
 zuno init my-first-app
 cd my-first-app
 zuno run
 zuno check
 ```
 
-The generated `zuno.json` selects the project entry. Run/check discover it from child folders too. Local file imports load once, stay inside the project, and report syntax/runtime errors against original file positions. The language includes functions, closures, arrays, dictionaries, classes, modules, and built-in libraries.
+Download zuno-tools.vsix, then use Extensions → … → Install from VSIX in VS Code or Cursor. Or use code --install-extension ./zuno-tools.vsix --force (replace code with cursor for Cursor). Reload the editor after updating.
 
-For VS Code/Cursor, use Extensions → … → Install from VSIX. Install Node.js and open a `.zuno` file or project folder. The extension can run without installing the global CLI.
+## Validation and boundaries
 
-## Current boundaries
+The release is checked with interpreter/CLI tests, symbol-analysis tests, real LSP messages, fresh runtime installs, and packaged-server checks. Extension-host tests cover completion, definition, rename, and diagnostic updates in actual VS Code and Cursor. CI checks Windows, macOS, Linux, and the Node.js 20 minimum.
 
-This is an early release. The interpreter bounds source size, evaluation steps, output, file count, and recursion. `zuno check` validates syntax in the entry and imports; it does not perform full static type checking. The local extension is not a language server. The browser-only `ui` module does not run in the CLI. Zuno has no package registry, networking API, or async runtime. Account-backed projects and AI need the local server; the public Pages site provides downloads and documentation.
+This is static symbol analysis, not a full type checker. Computed properties and arbitrary function-return types are not fully inferred. Rename requires valid syntax/imports and stays within the bounded project index (100 source files and 200 scanned directories). The browser-only ui module remains unavailable in console runs. Account-backed projects and AI require the local server; GitHub Pages provides downloads and documentation.
 
-See [the install guide](https://github.com/chittranshsharma/zuno-lang/blob/main/INSTALL.md) and [language reference](https://github.com/chittranshsharma/zuno-lang/blob/main/LANGUAGE.md). Report bugs with the command, version, and a small `.zuno` example.
+See the [install guide](https://github.com/chittranshsharma/zuno-lang/blob/v0.5.0/INSTALL.md), [editor guide](https://github.com/chittranshsharma/zuno-lang/blob/v0.5.0/editor-extension/README.md), and [next-phase plan](https://github.com/chittranshsharma/zuno-lang/blob/main/NEXT-PHASE.md).

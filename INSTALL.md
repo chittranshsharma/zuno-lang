@@ -1,27 +1,13 @@
-# Install Zuno 0.4.0
+# Install Zuno 0.5.0
 
-Zuno's first public release needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
-
-## Language server: 0.5 source build
-
-The current source contains the 0.5.0 language server; the published 0.4.0 archives below remain the earlier release. To get completion, F12 definition, F2 rename, and live diagnostics in VS Code/Cursor:
-
-```sh
-git clone https://github.com/chittranshsharma/zuno-lang.git
-cd zuno-lang
-npm install
-npm run package:extension
-code --install-extension dist/zuno-tools.vsix --force
-```
-
-Use `cursor` instead of `code` for Cursor. Reload the editor and open a .zuno file. The language server starts automatically and needs no API key, database, or separate installation. Run/Check still use Node.js 20+ on PATH. Read the [editor guide](editor-extension/README.md) for supported symbols and analysis limits.
+Zuno 0.5.0 needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
 
 ## Install the runtime
 
-Download `zuno-runtime-0.4.0.tgz` from [the release](https://github.com/chittranshsharma/zuno-lang/releases/tag/v0.4.0). In the folder containing the download:
+Download [zuno-runtime.tgz](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-runtime.tgz) from the latest release. In the folder containing the download:
 
 ```sh
-npm install --global ./zuno-runtime-0.4.0.tgz
+npm install --global ./zuno-runtime.tgz
 zuno --version
 zuno init my-first-app
 cd my-first-app
@@ -32,20 +18,24 @@ zuno check
 You can also install the release directly:
 
 ```sh
-npm install --global https://github.com/chittranshsharma/zuno-lang/releases/download/v0.4.0/zuno-runtime-0.4.0.tgz
+npm install --global https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-runtime.tgz
 ```
 
 Restart your terminal if `zuno` is not found. Your npm global bin directory must be on PATH. If global installation is unavailable, extract the archive and use `node package/cli.js run path/to/project`.
 
 ## Install editor tools
 
-Download `zuno-tools-0.4.0.vsix` from the same release. In VS Code or Cursor, open Extensions, choose the `…` menu, then **Install from VSIX**. Or use:
+Download [zuno-tools.vsix](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-tools.vsix) from the same release. In VS Code or Cursor, open Extensions, choose the `…` menu, then **Install from VSIX**. Or use:
 
 ```sh
-code --install-extension ./zuno-tools-0.4.0.vsix
+code --install-extension ./zuno-tools.vsix --force
 ```
 
 Replace `code` with `cursor` for Cursor. The extension bundles its runtime; install the CLI separately if you want a `zuno` terminal command. Open a `.zuno` file for highlighting and **Zuno: Run current file** / **Zuno: Check current file**. Open a project folder for **Zuno: Run project** / **Zuno: Check project**. Task errors appear in the Problems panel with clickable file positions. Set `zuno.nodePath` if Node.js is not on your editor's PATH.
+
+The bundled language server starts automatically for .zuno files. Use Ctrl+Space for completion, F12 or Ctrl+click for definitions, and F2 for rename. Errors appear live without running your code. It supports unsaved buffers, imports across files, and known members; no API key or separate server install is required. Reload the editor after updating. See the [editor guide](editor-extension/README.md) for analysis limits.
+
+Versioned archives are also available on the release page. Stable filenames above track the latest release. Download SHA256SUMS.txt from the same release to verify files before installing.
 
 ## Local projects
 
@@ -77,7 +67,7 @@ Errors show the original absolute file path, line, column, and source excerpt. R
 
 ## Starter and examples
 
-`zuno-starter-0.4.0.tgz` contains a ready-made project and examples. Extract it with an archive tool, open the `starter` folder, and run `zuno run`. Examples importing the `ui` module need the browser studio.
+`zuno-starter.tgz` contains a ready-made project and examples. Extract it with an archive tool, open the `starter` folder, and run `zuno run`. Examples importing the `ui` module need the browser studio.
 
 ## Update or remove
 
