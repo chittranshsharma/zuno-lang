@@ -32,27 +32,28 @@ The GitHub Pages site is an introduction and install guide. To use the browser s
 
 ## Run Zuno on your computer
 
-Install [Node.js 20 or newer](https://nodejs.org/) and clone this repository. Then, from the repository folder:
+Install [Node.js 20 or newer](https://nodejs.org/), then install the [first public release](https://github.com/chittranshsharma/zuno-lang/releases/tag/v0.4.0):
 
 ```sh
-npm install
-npm run install:cli
+npm install --global https://github.com/chittranshsharma/zuno-lang/releases/download/v0.4.0/zuno-runtime-0.4.0.tgz
 zuno --version
 zuno init my-first-app
 cd my-first-app
-zuno run main.zuno
+zuno run
+zuno check
 ```
 
-You can run any `.zuno` file with `zuno file.zuno` or check its syntax with `zuno check file.zuno`. `zuno init` creates a starter file and a VS Code/Cursor build task. The command-line runtime is packaged without the website or database dependencies. It supports local file imports written as `import "./helper.zuno" as helper;`.
+You can run any `.zuno` file with `zuno file.zuno` or check its syntax with `zuno check file.zuno`. `zuno init` creates a project with `zuno.json`, an entry file, an imported helper, and VS Code/Cursor build tasks. Run/check discover your entry from the project folder or its children. Imports stay within the project root and errors point to the original file and line. The runtime needs no website or database dependencies. [Installation and project guide](INSTALL.md).
 
-Want editor commands and highlighting too? From the repository folder:
+Want editor commands and highlighting too? Download `zuno-tools-0.4.0.vsix` from the release, then:
 
 ```sh
-npm run package:extension
-code --install-extension dist/zuno-tools.vsix
+code --install-extension ./zuno-tools-0.4.0.vsix
 ```
 
-For Cursor, replace `code` with `cursor`. Restart the editor, open a `.zuno` file, then run **Zuno: Run current file** or **Zuno: Check current file** from the command palette. The extension bundles the interpreter, uses Node.js, and does not require MongoDB. It is not a full language server yet.
+For Cursor, replace `code` with `cursor`. You can also use Extensions → … → Install from VSIX. Open a `.zuno` file for **Zuno: Run current file** / **Zuno: Check current file**, or open a project folder for **Zuno: Run project** / **Zuno: Check project**. Errors link to source positions in the Problems panel. The extension bundles the interpreter, uses Node.js, and does not require MongoDB. It is not a full language server yet.
+
+The release includes a starter/examples archive, install guide, and SHA-256 checksums. To build everything from source, run `npm install` then `npm run package:release`. To install the CLI from a checkout, run `npm run install:cli`.
 
 ## Run the browser studio locally
 

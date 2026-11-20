@@ -145,7 +145,9 @@ Classes contain cook/fn/func methods. init initializes fields through this.field
 
 Declare module name { declarations } then import name as alias;. A module exports every local declaration and executes once at declaration. Modules must be declared before import. Import bindings are constant.
 Standard modules: math (abs, round, floor, ceil, sqrt, sum, min, max); strings (upper, lower, trim, split, join, contains, replace, text, number); arrays (len, range, push, pop, slice, reverse, sort); dict (keys, values, has, remove); testing (assert).
-CLI file imports: import "./helper.zuno" as helper; on its own line. Paths stay beneath the entry file directory. Files execute once in dependency order; cycles and more than 100 module files are rejected. Browser file imports are not supported; use inline modules.
+CLI file imports: import "./helper.zuno" as helper; on its own line. Paths are relative to the importing file and stay beneath the closest project root containing zuno.json (or the entry file directory for standalone files). Files execute once in dependency order; cycles and more than 100 files including the entry are rejected. Errors show original file positions. Browser file imports are not supported; use inline modules.
+
+Create a project with `zuno init my-app`, enter it, and run `zuno run` or `zuno check`. The `entry` field in `zuno.json` selects the entry file; the generated project uses `src/main.zuno`. Explicit files/folders also work. Check parses the entry and all its imports without executing; unused files and static types are not checked. See [installation and projects](INSTALL.md).
 
 ~~~text
 import math as m;

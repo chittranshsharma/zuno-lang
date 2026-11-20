@@ -2,7 +2,7 @@
   "name": "zuno-tools",
   "displayName": "Zuno Language Tools",
   "description": "Zuno highlighting and local run/check commands for VS Code and Cursor.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "zuno-local",
   "engines": {
     "vscode": "^1.85.0"
@@ -20,6 +20,12 @@
     "onLanguage:zuno"
   ],
   "contributes": {
+    "problemMatchers": [{
+      "name": "zuno",
+      "owner": "zuno",
+      "fileLocation": "absolute",
+      "pattern": { "regexp": "^(.+):(\\d+):(\\d+): (.*)$", "file": 1, "line": 2, "column": 3, "message": 4 }
+    }],
     "languages": [
       {
         "id": "zuno",
@@ -47,6 +53,14 @@
       {
         "command": "zuno.check",
         "title": "Zuno: Check current file"
+      },
+      {
+        "command": "zuno.runProject",
+        "title": "Zuno: Run project"
+      },
+      {
+        "command": "zuno.checkProject",
+        "title": "Zuno: Check project"
       }
     ],
     "menus": {

@@ -1,6 +1,6 @@
 {
   "name": "zuno",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "build": "node check-styles.js && esbuild landing.jsx --bundle --minify --jsx=automatic --outfile=public/landing.js --legal-comments=linked && esbuild editor-entry.js --bundle --minify --format=esm --outfile=public/editor.js --loader:.ttf=file && esbuild node_modules/monaco-editor/esm/vs/editor/editor.worker.js --bundle --minify --format=esm --outfile=public/editor.worker.js",
@@ -9,7 +9,9 @@
     "test": "node --test",
     "package:runtime": "node package-runtime.js",
     "install:cli": "node install-runtime.js",
-    "package:extension": "node package-runtime.js && cd editor-extension && npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository --skip-license --out ../dist/zuno-tools.vsix"
+    "package:extension": "node package-runtime.js && cd editor-extension && npx --yes @vscode/vsce@3.7.1 package --no-dependencies --allow-missing-repository --skip-license --out ../dist/zuno-tools.vsix",
+    "package:release": "node package-release.js",
+    "verify:release": "node verify-release.js"
   },
   "dependencies": {
     "dompurify": "^3.4.17",
