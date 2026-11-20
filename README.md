@@ -51,9 +51,23 @@ Want editor commands and highlighting too? Download `zuno-tools-0.4.0.vsix` from
 code --install-extension ./zuno-tools-0.4.0.vsix
 ```
 
-For Cursor, replace `code` with `cursor`. You can also use Extensions → … → Install from VSIX. Open a `.zuno` file for **Zuno: Run current file** / **Zuno: Check current file**, or open a project folder for **Zuno: Run project** / **Zuno: Check project**. Errors link to source positions in the Problems panel. The extension bundles the interpreter, uses Node.js, and does not require MongoDB. It is not a full language server yet.
+For Cursor, replace `code` with `cursor`. You can also use Extensions → … → Install from VSIX. Open a `.zuno` file for **Zuno: Run current file** / **Zuno: Check current file**, or open a project folder for **Zuno: Run project** / **Zuno: Check project**. Errors link to source positions in the Problems panel. The extension bundles the interpreter, uses Node.js, and does not require MongoDB.
 
 The release includes a starter/examples archive, install guide, and SHA-256 checksums. To build everything from source, run `npm install` then `npm run package:release`. To install the CLI from a checkout, run `npm run install:cli`.
+
+## Language server in 0.5.0
+
+The current source adds a bundled language server for VS Code and Cursor. It provides completion with **Ctrl+Space**, go to definition with **F12**, symbol rename with **F2**, and live errors as you type. It understands lexical scopes, parameters, closures, imports across files, and known class members. Rename respects shadowing and checks for name collisions; diagnostics use unsaved buffers without executing your code.
+
+The public 0.4.0 download does not include this update. Build the latest editor tools from a checkout:
+
+```sh
+npm install
+npm run package:extension
+code --install-extension dist/zuno-tools.vsix --force
+```
+
+Replace `code` with `cursor` for Cursor, then reload the editor. See [editor features and analysis limits](editor-extension/README.md). Dynamic dictionary keys, computed properties, and arbitrary function-return types are not fully inferred. Project indexing is bounded, and rename requires valid syntax and imports.
 
 ## Run the browser studio locally
 

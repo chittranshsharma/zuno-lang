@@ -5,7 +5,7 @@
     let line = 1;
     let column = 1;
     let offset = 0;
-    const fail = (token, message) => { throw new Error(`Line ${token.line}, column ${token.column}: ${message}`); };
+    const fail = (token, message) => { const error = new Error(`Line ${token.line}, column ${token.column}: ${message}`); error.token = token; throw error; };
     while (offset < source.length) {
       if (source.slice(offset, offset + 2) === '//') {
         const end = source.indexOf('\n', offset);
@@ -15,14 +15,15 @@
       const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],.{}:();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
-      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false', bet:'if', nah:'else', grind:'while', each:'for', and:'&&', or:'||', not:'!' })[text] || text, line, column });
-      for (const character of text) {
+      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false', bet:'if', nah:'else', grind:'while', each:'for', and:'&&', or:'||', not:'!' })[text] || text, raw: text, start: offset, end: offset + text.length, line, column });
+      for (let i = 0; i < text.length; i++) {
+        const character = text[i];
         if (character === '\n') { line++; column = 1; }
         else column++;
       }
       offset += text.length;
     }
-    tokens.push({ text: '', line, column });
+    tokens.push({ text: '', raw: '', start: offset, end: offset, line, column });
     let index = 0;
     let depth = 0;
     const peek = () => tokens[Math.min(index,tokens.length-1)].text;
@@ -47,13 +48,18 @@
       let node;
       if (token.text === '{') {
         const entries = [];
+        const entryTokens = [];
         while (peek() !== '}') {
           const key = take();
           if (!key.text.startsWith('"')) fail(key, 'Dictionary keys must be quoted text');
-          expect(':'); entries.push([JSON.parse(key.text), expression()]);
+          expect(':');
+          let name;
+          try { name = JSON.parse(key.text); } catch { fail(key, 'Invalid string escape'); }
+          entries.push([name, expression()]);
+          entryTokens.push({ ...key, text: name });
           if (peek() !== ',') break; take();
         }
-        expect('}'); node = { type:'dictionary', token, entries };
+        expect('}'); node = { type:'dictionary', token, entries, entryTokens };
       } else if (token.text === '[') {
         node = { type: 'array', token, items: argumentsUntil(']') };
       } else if (token.text === '(') {
@@ -86,11 +92,13 @@
       return node;
     }
     function block() {
-      expect('{');
+      const opening = expect('{');
       if (++depth > 200) fail(tokens[index], 'Blocks are too deeply nested');
       const statements = [];
       while (peek() && peek() !== '}') statements.push(statement());
-      expect('}');
+      const closing = expect('}');
+      statements.start = opening.start;
+      statements.end = closing.end;
       depth--;
       return statements;
     }
@@ -105,24 +113,26 @@
       if (token.text === 'import') {
         const name=take();if(!/^[A-Za-z_]\w*$/.test(name.text))fail(name,'Expected module name');
         expect('as');const alias=take();if(!/^[A-Za-z_]\w*$/.test(alias.text)||reserved.has(alias.text))fail(alias,'Expected alias');expect(';');
-        return {type:'import',token:alias,name:name.text};
+        return {type:'import',token:alias,name:name.text,moduleToken:name};
       }
       if (['fn', 'func'].includes(token.text)) {
         const name = take();
         if (!/^[A-Za-z_]\w*$/.test(name.text) || reserved.has(name.text)) fail(name, 'Expected a function name');
         expect('(');
         const params = [];
+        const paramTokens = [];
         if (peek() !== ')') {
           do {
             const param = take();
             if (!/^[A-Za-z_]\w*$/.test(param.text) || reserved.has(param.text) || params.includes(param.text)) fail(param, 'Invalid or duplicate parameter');
             params.push(param.text);
+            paramTokens.push(param);
             if (peek() !== ',') break;
             take();
           } while (true);
         }
         expect(')');
-        return { type: 'function', token: name, params, body: block() };
+        return { type: 'function', token: name, params, paramTokens, body: block() };
       }
       if (token.text === 'for') {
         const name = take();
@@ -168,7 +178,8 @@
       return { type: ['let', 'const'].includes(token.text) ? 'declare' : 'assign', constant: token.text === 'const', token: name, value };
     }
     const program = [];
-    while (peek()) program.push(statement());
+    try { while (peek()) program.push(statement()); }
+    catch (error) { error.program = program; throw error; }
     if (parseOnly) return program;
     const modules = new Map();
     const constants = new WeakMap();

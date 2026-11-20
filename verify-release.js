@@ -38,3 +38,4 @@ for (const line of fs.readFileSync(path.join(root, 'dist', 'SHA256SUMS.txt'), 'u
 }
 console.log('Fresh runtime install, project discovery, starter, imports, portable tasks, and checksums passed.');
 console.log('Verification files: ' + directory);
+execFileSync(process.execPath, [path.join(root, 'lsp-smoke.js'), path.join(root, 'editor-extension', 'dist', 'server.js')], { stdio: 'inherit' });

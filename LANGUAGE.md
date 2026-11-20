@@ -127,6 +127,8 @@ Ctrl+Alt+B opens the Groq assistant. Paste your own key, then choose Use key. As
 
 ## Know the boundaries
 
+The 0.5.0 editor extension provides static language services: Ctrl+Space completion, F12 definition, F2 rename, and live syntax/symbol/import diagnostics. It analyzes unsaved files and never executes programs. File imports and known class members resolve across the local project. Dynamic keys and arbitrary return types are not fully inferred. See [the editor guide](editor-extension/README.md) for build instructions, analysis limits, and rename behavior. The published 0.4.0 extension predates these features.
+
 This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No package manager, inheritance, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.
 
 ## Helper reference

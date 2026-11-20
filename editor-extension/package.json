@@ -1,8 +1,8 @@
 {
   "name": "zuno-tools",
   "displayName": "Zuno Language Tools",
-  "description": "Zuno highlighting and local run/check commands for VS Code and Cursor.",
-  "version": "0.4.0",
+  "description": "Zuno language server with completion, definition, rename, diagnostics, and local run/check commands.",
+  "version": "0.5.0",
   "publisher": "zuno-local",
   "engines": {
     "vscode": "^1.85.0"
@@ -10,7 +10,7 @@
   "categories": [
     "Programming Languages"
   ],
-  "main": "extension.js",
+  "main": "dist/extension.js",
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false
@@ -84,7 +84,7 @@
     }
   },
   "files": [
-    "extension.js",
+    "dist/**",
     "language-configuration.json",
     "zuno.tmLanguage.json",
     "README.md",

@@ -2,6 +2,20 @@
 
 Zuno's first public release needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
 
+## Language server: 0.5 source build
+
+The current source contains the 0.5.0 language server; the published 0.4.0 archives below remain the earlier release. To get completion, F12 definition, F2 rename, and live diagnostics in VS Code/Cursor:
+
+```sh
+git clone https://github.com/chittranshsharma/zuno-lang.git
+cd zuno-lang
+npm install
+npm run package:extension
+code --install-extension dist/zuno-tools.vsix --force
+```
+
+Use `cursor` instead of `code` for Cursor. Reload the editor and open a .zuno file. The language server starts automatically and needs no API key, database, or separate installation. Run/Check still use Node.js 20+ on PATH. Read the [editor guide](editor-extension/README.md) for supported symbols and analysis limits.
+
 ## Install the runtime
 
 Download `zuno-runtime-0.4.0.tgz` from [the release](https://github.com/chittranshsharma/zuno-lang/releases/tag/v0.4.0). In the folder containing the download:

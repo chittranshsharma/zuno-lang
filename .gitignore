@@ -10,3 +10,4 @@ public/*.ttf
 dist/
 *.vsix
 editor-extension/runtime/
+editor-extension/dist/

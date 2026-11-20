@@ -1,6 +1,8 @@
 const vscode = require('vscode');
 const path = require('node:path');
-function activate(context) {
+const { LanguageClient, TransportKind } = require('vscode-languageclient/node');
+let client;
+async function activate(context) {
   for(const command of ['run','check','runProject','checkProject'])context.subscriptions.push(vscode.commands.registerCommand('zuno.'+command,async()=>{
     const action=command.startsWith('run')?'run':'check';
     const project=command.endsWith('Project');
@@ -18,5 +20,15 @@ function activate(context) {
     task.problemMatchers=['$zuno'];
     await vscode.tasks.executeTask(task);
   }));
+  const server = { module: path.join(context.extensionPath, 'dist', 'server.js'), transport: TransportKind.ipc };
+  const sourceWatcher = vscode.workspace.createFileSystemWatcher('**/*.zuno');
+  const projectWatcher = vscode.workspace.createFileSystemWatcher('**/zuno.json');
+  context.subscriptions.push(sourceWatcher, projectWatcher);
+  client = new LanguageClient('zuno', 'Zuno Language Server', server, {
+    documentSelector: [{ scheme: 'file', language: 'zuno' }, { scheme: 'untitled', language: 'zuno' }],
+    synchronize: { fileEvents: [sourceWatcher, projectWatcher] }
+  });
+  await client.start();
 }
-module.exports = { activate };
+function deactivate() { return client?.stop(); }
+module.exports = { activate, deactivate };
