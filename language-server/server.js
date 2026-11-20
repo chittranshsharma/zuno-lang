@@ -25,12 +25,17 @@ function analyze(uri) {
 function validate() {
   const diagnostics = new Map();
   const roots = new Set();
+  const covered = new Set();
   for (const document of documents.all()) {
+    if (covered.has(document.uri)) continue;
     try {
       const analysis = analyze(document.uri);
       if (roots.has(analysis.root || document.uri)) continue;
       roots.add(analysis.root || document.uri);
-      for (const file of analysis.files.values()) diagnostics.set(file.uri, { uri: file.uri, version: documents.get(file.uri)?.version, diagnostics: file.diagnostics });
+      for (const file of analysis.files.values()) {
+        covered.add(file.uri);
+        diagnostics.set(file.uri, { uri: file.uri, version: documents.get(file.uri)?.version, diagnostics: file.diagnostics });
+      }
     } catch (error) {
       diagnostics.set(document.uri, { uri: document.uri, version: document.version, diagnostics: [{ severity: 1, source: 'zuno', message: error.message, range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } } }] });
     }
