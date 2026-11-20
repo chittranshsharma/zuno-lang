@@ -23,7 +23,7 @@ function resolveProject(input, cwd = process.cwd()) {
   const directory = fs.statSync(target).isDirectory() ? target : path.dirname(target);
   const project = findProject(directory);
   const root = fs.realpathSync(project || directory);
-  let entry = target;
+  let entry = fs.statSync(target).isDirectory() ? target : fs.realpathSync(target);
   if (fs.statSync(target).isDirectory()) {
     let config = { entry: 'main.zuno' };
     if (project) {
@@ -33,7 +33,7 @@ function resolveProject(input, cwd = process.cwd()) {
         throw new Error('zuno.json needs an entry ending in .zuno.');
       }
     }
-    entry = path.resolve(project || directory, config.entry);
+    entry = path.resolve(root, config.entry);
   }
   if (!inside(root, entry)) throw new Error('Entry must stay in the project directory.');
   return { root, entry };

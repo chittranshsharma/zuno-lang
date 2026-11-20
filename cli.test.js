@@ -75,3 +75,19 @@ test('file imports are isolated, checked without execution, and loaded once', t 
   fs.writeFileSync(path.join(root,'main.zuno'),'import "../missing.zuno" as h;');
   assert.match(call('run').stderr,/main.zuno:1: File not found/);
 });
+
+test('entry and folder paths work through a directory alias without weakening import boundaries', t => {
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'zuno-alias-'));
+  t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+  const real=path.join(root,'real');
+  const alias=path.join(root,'alias');
+  fs.mkdirSync(real);
+  fs.writeFileSync(path.join(real,'main.zuno'),'yap(42);');
+  fs.symlinkSync(real,alias,process.platform==='win32'?'junction':'dir');
+  const call=(file)=>spawnSync(process.execPath,[path.resolve('cli.js'),'run',file],{encoding:'utf8'});
+  assert.equal(call(path.join(alias,'main.zuno')).stdout.trim(),'42');
+  assert.equal(call(alias).stdout.trim(),'42');
+  fs.writeFileSync(path.join(root,'outside.zuno'),'yap("outside");');
+  fs.writeFileSync(path.join(real,'main.zuno'),'import "../outside.zuno" as outside;');
+  assert.match(call(alias).stderr,/Imports must stay/);
+});
