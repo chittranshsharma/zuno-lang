@@ -36,12 +36,15 @@ test('editor commands use bundled runtime, project folder, saved documents, and 
   assert.equal(tasks[1].execution.args[1], 'check');
   assert.equal(tasks[1].execution.args[2], folder.uri.fsPath);
   assert.equal(tasks[1].problemMatchers[0], '$zuno');
+  await commands.get('zuno.testProject')();
+  assert.equal(tasks[2].execution.args[1], 'test');
+  assert.equal(tasks[2].execution.args[2], folder.uri.fsPath);
   saveAll = false;
   await commands.get('zuno.runProject')();
-  assert.equal(tasks.length, 2);
+  assert.equal(tasks.length, 3);
   document.save = async () => false;
   await commands.get('zuno.run')();
-  assert.equal(tasks.length, 2);
+  assert.equal(tasks.length, 3);
   const manifest = JSON.parse(fs.readFileSync('editor-extension/package.json', 'utf8'));
   const matcher = new RegExp(manifest.contributes.problemMatchers[0].pattern.regexp);
   const error = matcher.exec(document.uri.fsPath + ':4:2: Unknown variable');

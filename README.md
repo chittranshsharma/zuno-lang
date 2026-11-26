@@ -41,6 +41,8 @@ zuno init my-first-app
 cd my-first-app
 zuno run
 zuno check
+zuno test
+zuno format --check
 ```
 
 You can run any `.zuno` file with `zuno file.zuno` or check its syntax with `zuno check file.zuno`. `zuno init` creates a project with `zuno.json`, an entry file, an imported helper, and VS Code/Cursor build tasks. Run/check discover your entry from the project folder or its children. Imports stay within the project root and errors point to the original file and line. The runtime needs no website or database dependencies. [Installation and project guide](INSTALL.md).
@@ -55,9 +57,15 @@ For Cursor, replace `code` with `cursor`. You can also use Extensions → … �
 
 The release includes a starter/examples archive, install guide, and SHA-256 checksums. To build everything from source, run `npm install` then `npm run package:release`. To install the CLI from a checkout, run `npm run install:cli`.
 
-## Language server in 0.5.0
+## Developer tools in 0.6.0
 
-The 0.5.0 release includes a bundled language server for VS Code and Cursor. It provides completion with **Ctrl+Space**, go to definition with **F12**, symbol rename with **F2**, and live errors as you type. It understands lexical scopes, parameters, closures, imports across files, and known class members. Rename respects shadowing and checks for name collisions; diagnostics use unsaved buffers without executing your code.
+The bundled language server for VS Code and Cursor provides **hover**, **signature help**, completion with **Ctrl+Space**, go to definition with **F12**, symbol rename with **F2**, and live errors as you type. It understands lexical scopes, parameters, closures, imports across files, and known class members. Rename respects shadowing and checks for name collisions; diagnostics use unsaved buffers without executing your code.
+
+Use **Format Document** or `zuno format` to format source without changing its tokens, strings, comments or chosen dialect. `zuno format --check` checks formatting without writing. `zuno test` runs `*.test.zuno` files with fresh state per file, bounded execution, source locations and a failing exit code when a test fails. New projects include a passing test. The extension adds **Zuno: Test project**.
+
+The browser studio now runs, checks and tests imports between open tabs in its **Project tools** panel. Double-click a tab to set its relative project path. Try **Test example** to open a small two-file test project. Tests run in a worker with a Stop button. The sandboxed UI preview remains a separate workflow.
+
+For multi-file AI help, open **Project context**, select files, and enable **Use selected files**. You can attach the latest test result, ask about relationships, or use **Suggest edit**. Review every changed file before applying. Changes to any selected file invalidate the proposal; **Undo project edit** restores the batch only when its files have not changed again. Nothing is applied automatically. Selected context is limited to 8 files / 20,000 characters, with 5,000 characters per file.
 
 Download [zuno-tools.vsix](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-tools.vsix), then install or update it:
 
@@ -92,7 +100,7 @@ The browser `ui` module can build counters, calculators, quizzes, and similar sm
 - [Language reference](LANGUAGE.md) and [working examples](examples/)
 - [Browser documentation](docs.html) and [about page](about.html)
 - [Editor extension](editor-extension/) and [UI component credits](UI-CREDITS.md)
-- [Next phase: the 0.6 developer workflow](NEXT-PHASE.md)
+- [Next development batch](NEXT-PHASE.md)
 - `npm test` runs interpreter, CLI, and assistant API tests; `npm run build` builds the studio assets and checks CSS.
 
 If something breaks or a feature feels missing, open an issue with a short `.zuno` example and the result you expected.

@@ -41,65 +41,24 @@ function resolveProject(input, cwd = process.cwd()) {
 
 function compileProject(input, cwd) {
   const { root, entry } = resolveProject(input, cwd);
-  const files = new Map();
-  const visiting = [];
-  const modules = [];
-  const sourceLines = [];
-  const locations = [];
-  const originals = new Map();
+  const { compileSources } = require('./source-compiler');
   const label = filename => path.relative(root, filename) || path.basename(filename);
-
-  function load(filename, importedAt) {
+  const canonical = filename => {
     let resolved;
     try { resolved = fs.realpathSync(filename); }
-    catch { throw new Error((importedAt ? label(importedAt.file) + ':' + importedAt.line + ': ' : '') + 'File not found: ' + label(filename)); }
+    catch { throw new Error('File not found: ' + label(filename)); }
     if (!inside(root, resolved)) throw new Error('Imports must stay in the project directory: ' + label(filename));
-    if (visiting.includes(resolved)) throw new Error('Circular module import: ' + [...visiting, resolved].map(label).join(' -> '));
-    if (files.has(resolved)) return files.get(resolved);
-    if (files.size >= 100) throw new Error('Too many module files (maximum 100 including the entry).');
     if (!resolved.endsWith('.zuno')) throw new Error('Module files must end in .zuno: ' + label(resolved));
-    if (fs.statSync(resolved).size > 400000) throw new Error('Source file is too large: ' + label(resolved));
-    const text = fs.readFileSync(resolved, 'utf8').replace(/^\uFEFF/, '');
-    originals.set(resolved, text.split(/\r?\n/));
-    const record = { name: '__file' + files.size, file: resolved, lines: [] };
-    files.set(resolved, record);
-    visiting.push(resolved);
-    for (const [index, line] of originals.get(resolved).entries()) {
-      const match = line.match(/^([ \t]*)import[ \t]+"([^"\r\n]+)"[ \t]+as[ \t]+([A-Za-z_]\w*)[ \t]*;[ \t]*(?:\/\/.*)?$/);
-      if (match) {
-        const dependency = load(path.resolve(path.dirname(resolved), match[2]), { file: resolved, line: index + 1 });
-        record.lines.push(match[1] + 'import ' + dependency.name + ' as ' + match[3] + ';');
-      } else if (/^[ \t]*import[ \t]+"/.test(line)) {
-        throw new Error(label(resolved) + ':' + (index + 1) + ': Put each file import on its own line: import "./file.zuno" as name;');
-      } else record.lines.push(line);
-    }
-    visiting.pop();
-    modules.push(record);
-    return record;
-  }
-
-  const main = load(entry);
-  for (const record of modules) {
-    if (record !== main) { sourceLines.push('module ' + record.name + ' {'); locations.push(null); }
-    record.lines.forEach((line, index) => {
-      sourceLines.push(line);
-      locations.push({ file: record.file, line: index + 1 });
-    });
-    if (record !== main) { sourceLines.push('}'); locations.push({ file: record.file, line: record.lines.length }); }
-  }
-  const source = sourceLines.join('\n');
-  if (source.length > 100000) throw new Error('Combined project exceeds 100000 characters.');
-  return { source, locations, originals, root, entry: main.file, files: files.size };
+    return resolved;
+  };
+  const project = compileSources(canonical(entry), filename => {
+    if (fs.statSync(filename).size > 400000) throw new Error('Source file is too large: ' + label(filename));
+    return fs.readFileSync(filename, 'utf8');
+  }, (from, target) => canonical(path.resolve(path.dirname(from), target)), label);
+  return { ...project, root };
 }
 
-function formatError(error, project) {
-  const match = error.message.match(/^Line (\d+), column (\d+): ([\s\S]*)$/);
-  const location = match && project?.locations[Number(match[1]) - 1];
-  if (!location) return error.message;
-  const column = Number(match[2]);
-  const line = project.originals.get(location.file)[location.line - 1] || '';
-  return location.file + ':' + location.line + ':' + column + ': ' + match[3] + '\n  ' + line + '\n  ' + ' '.repeat(Math.max(0, column - 1)) + '^';
-}
+const { formatError } = require('./source-compiler');
 
 function runProject(input, check = false, cwd) {
   const project = compileProject(input, cwd);

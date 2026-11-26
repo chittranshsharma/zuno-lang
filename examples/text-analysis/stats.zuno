@@ -1,0 +1,10 @@
+cook wordCount(sentence) {
+  vibe words = split(trim(sentence), " ");
+  vibe count = 0;
+  each word in words {
+    bet len(word) > 0 {
+      count = count + 1;
+    }
+  }
+  yeet count;
+}

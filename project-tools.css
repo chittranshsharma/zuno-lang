@@ -1,0 +1,25 @@
+.project-context { margin:18px 0; padding:16px; border:1px solid #37263f; border-radius:10px; background:#100d16; }
+.project-context summary { cursor:pointer; color:#ead9f8; font-weight:500; }
+.project-context p { color:#b6a8c4; font-size:13px; line-height:1.6; }
+.project-context label { display:flex; align-items:center; gap:10px; min-height:44px; font-size:13px; }
+.project-context input[type=checkbox] { flex:none; width:16px; height:16px; accent-color:#b373e5; }
+.context-files { max-height:220px; overflow:auto; margin:12px 0; border-block:1px solid #302139; }
+.context-files span { overflow-wrap:anywhere; }
+.project-review { width:min(1100px,94vw); max-height:94vh; overflow:auto; background:#100d16; color:#f1eaf7; border:1px solid #634078; border-radius:14px; padding:24px; font-family:var(--ui); }
+.project-review::backdrop { background:#000b; }
+.project-review h2 { font-size:22px; font-weight:500; margin:0 0 8px; }
+.project-review p { color:#b6a8c4; }
+.review-files { display:flex; gap:8px; overflow:auto; padding:12px 0; }
+.project-review button,.project-tools button { min-height:40px; padding:9px 14px; border:1px solid #463051; border-radius:7px; background:#1b1323; color:#ead9f8; font:inherit; cursor:pointer; }
+.review-files button { flex:none; }
+.review-files button[aria-pressed=true] { background:#3a2350; border-color:#ab72d3; }
+.review-actions { display:flex; justify-content:flex-end; gap:12px; }
+.review-actions button:last-child { background:#743da0; color:#fff; }
+.project-review button:disabled { opacity:.45; cursor:not-allowed; }
+.review-diff { height:50vh; border:1px solid #37263f; }
+.project-tools { margin-top:14px; padding:14px; border:1px solid #302139; border-radius:10px; background:#100d16; }
+.project-tool-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.project-tools pre { max-height:300px; overflow:auto; white-space:pre-wrap; color:#d6c7e5; font:12px/1.7 var(--mono); }
+.project-tools h3 { font-size:14px; margin:0 0 12px; font-weight:500; }
+.project-tools p { color:#b6a8c4; font-size:13px; }
+@media(max-width:600px) { .project-review { padding:14px; } .review-actions { flex-wrap:wrap; } }

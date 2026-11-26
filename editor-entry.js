@@ -2,6 +2,9 @@ import { setupStudio } from './studio.js';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import * as monaco from 'monaco-editor';
+import { setupProjectAssistant } from './project-assistant';
+import { setupProjectTools } from './project-tools';
+import { format } from './formatter';
 globalThis.MonacoEnvironment = { getWorker: () => new Worker('/assets/editor.worker.js', { type: 'module' }) };
 const source = document.querySelector('#code');
 monaco.languages.register({ id: 'zuno' });
@@ -10,6 +13,10 @@ monaco.languages.setMonarchTokensProvider('zuno', { tokenizer: { root: [
   [/\b(print|say|yap)\b/, 'type'], [/"(?:\\.|[^"\\])*"/, 'string'], [/\d+(?:\.\d+)?/, 'number'], [/[a-zA-Z_]\w*/, 'identifier']
 ] } });
 monaco.languages.setLanguageConfiguration('zuno', { brackets: [['{','}'],['[',']'],['(',')']], autoClosingPairs: [{open:'{',close:'}'},{open:'[',close:']'},{open:'(',close:')'},{open:'"',close:'"'}] });
+monaco.languages.registerDocumentFormattingEditProvider('zuno', { provideDocumentFormattingEdits(model, options) {
+  try { return [{ range:model.getFullModelRange(), text:format(model.getValue(), options) }]; }
+  catch (error) { document.querySelector('#run-status').textContent = 'Cannot format: ' + error.message;return []; }
+} });
 monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
   const word = model.getWordUntilPosition(position);
   const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
@@ -80,7 +87,7 @@ for (const [label, action] of [
   ['Ask selection', () => { selectionContext = editor.getModel()?.getValueInRange(editor.getSelection()) || ''; show(true); document.querySelector('#assistant-progress').textContent = selectionContext ? 'Selected code attached' : 'Select some code first'; }],
   ['Suggest edit', () => { editMode = true; selectionContext = ''; show(true); document.querySelector('#assistant-question').value = 'Improve this program'; }],
   ['Stop', () => activeRequest?.abort()],
-  ['New chat', () => { if (activeRequest) return; history.length=0; answerArea.replaceChildren(); selectionContext=''; editMode=false; }]
+  ['New chat', () => { if (activeRequest) return; history.length=0; answerArea.replaceChildren(); selectionContext=''; editMode=false;projectAssistant.reset(); }]
 ]) { const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=action;aiTools.append(button); }
 document.querySelector('#assistant-form').before(aiTools);
 editor.addAction({ id:'ask-selection',label:'Ask AI about selection',contextMenuGroupId:'navigation',run:()=>aiTools.firstElementChild.click() });
@@ -116,9 +123,12 @@ document.querySelector('#assistant-form').onsubmit = async e => {
   const progress=document.querySelector('#assistant-progress');
   if(!userApiKey){progress.textContent='Add your Groq key first.';keyInput.focus();return;}
   const question=document.querySelector('#assistant-question').value;
+  let projectContext;
+  try { projectContext = projectAssistant.context(); }
+  catch (error) { progress.textContent = error.message;return; }
   const model=editor.getModel();if(!model){progress.textContent='Open a file first.';return;}const original=model.getValue();
   const code=selectionContext||original;const editing=editMode;
-  if(code.length>5000){progress.textContent='Select a smaller block or keep code under 5000 characters.';return;}
+  if(!projectContext && code.length>5000){progress.textContent='Select a smaller block or keep code under 5000 characters.';return;}
   const controller=new AbortController();activeRequest=controller;
   const timeout=setTimeout(()=>controller.abort(),65000);
   const submittedKey=userApiKey;
@@ -126,7 +136,7 @@ document.querySelector('#assistant-form').onsubmit = async e => {
   button.disabled=true;progress.textContent='Generating…';
   let reply='';let completed=false;
   try{
-    const response=await fetch('/api/assistant',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+submittedKey},body:JSON.stringify({code,question,history:history.slice(-10),stream:true,edit:editing}),signal:controller.signal});
+    const response=await fetch('/api/assistant',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+submittedKey},body:JSON.stringify({...projectContext ? {files:projectContext.files,testResult:projectContext.testResult} : {code},question,history:projectContext ? [] : history.slice(-10),stream:true,edit:editing}),signal:controller.signal});
     if(!response.ok){const data=await response.json();throw new Error(data.error);}
     const reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
     while(true){
@@ -138,6 +148,7 @@ document.querySelector('#assistant-form').onsubmit = async e => {
         const data=line.slice(5).trim();if(data==='[DONE]'){completed=true;continue;}
         if(!data)continue;
         const event=JSON.parse(data);reply+=event.choices?.[0]?.delta?.content||'';
+        if(reply.length>60000)throw new Error('Response exceeded the size limit. Ask for a smaller change.');
       }
       content.innerHTML=DOMPurify.sanitize(marked.parse(reply));
     }
@@ -145,12 +156,16 @@ document.querySelector('#assistant-form').onsubmit = async e => {
     history.push({role:'user',content:question},{role:'assistant',content:reply.slice(0,12000)});
     if(history.length>10)history.splice(0,history.length-10);
     keyStatus.textContent='Connected to Groq';progress.textContent='Reply ready';
-    if(editing){
+    if(editing && projectContext) {
+      const count = projectAssistant.review(projectContext.snapshot, reply);
+      content.textContent = 'Proposed changes to ' + count + ' files. Review each diff before applying.';
+    }
+    else if(editing){
       const match=reply.match(/```(?:zuno|veya)?\s*\n([\s\S]*?)```/);
       if(match && match[1].length<=5000)previewEdit(original,match[1].trim(),model);
       else progress.textContent='No complete replacement program returned. Ask again with a specific change.';
     }
-  }catch(error){progress.textContent=controller.signal.aborted?'Generation stopped':error.message;if(!reply)content.textContent=progress.textContent;}
+  }catch(error){progress.textContent=controller.signal.aborted?'Generation stopped':error.message;controller.abort();if(!reply)content.textContent=progress.textContent;}
   finally{clearTimeout(timeout);button.disabled=false;activeRequest=undefined;selectionContext='';editMode=false;}
 };
 document.querySelectorAll('[data-question]').forEach(button => button.onclick = () => {
@@ -159,3 +174,5 @@ document.querySelectorAll('[data-question]').forEach(button => button.onclick = 
 });
 
 setupStudio(monaco, editor, source, () => show(panel.hidden));
+const projectAssistant = setupProjectAssistant(monaco, editor);
+setupProjectTools(editor);

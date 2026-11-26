@@ -1,6 +1,6 @@
-# Install Zuno 0.5.0
+# Install Zuno 0.6.0
 
-Zuno 0.5.0 needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
+Zuno 0.6.0 needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
 
 ## Install the runtime
 
@@ -13,6 +13,8 @@ zuno init my-first-app
 cd my-first-app
 zuno run
 zuno check
+zuno test
+zuno format --check
 ```
 
 You can also install the release directly:
@@ -47,6 +49,7 @@ my-first-app/
   src/
     main.zuno
     greeting.zuno
+    greeting.test.zuno
   .vscode/
     tasks.json
   README.md
@@ -64,6 +67,21 @@ The `zuno.json` file selects the entry:
 `zuno run` and `zuno check` discover the closest project file from your current folder. You can also pass a folder or a `.zuno` file explicitly. Without `zuno.json`, a folder uses `main.zuno`. File imports must occupy their own line. They are relative to the importing file, may use `../` within the project root, and execute once per run. Cycles, paths outside the root, and symlinks escaping the root are rejected. Check validates the entry and all imported files; it does not execute them or inspect unused files.
 
 Errors show the original absolute file path, line, column, and source excerpt. Runs remain bounded to 100,000 steps, 100 files, and 100,000 combined source characters. The `ui` module needs the browser studio and is unavailable in terminal runs.
+
+## Format and test a project
+
+`zuno format` formats every `.zuno` file in the nearest project. Pass a file to format just that file. `zuno format --check` makes no edits and exits with code 1 when formatting is needed. Formatting preserves tokens, dialect, strings, comments and CRLF/LF line endings. Invalid syntax prevents writes; all selected files are validated before any are changed.
+
+`zuno test` discovers `*.test.zuno` files in deterministic path order, including subfolders. Each test file gets fresh state and the usual execution limits. A failure or infinite loop does not stop the remaining tests. Imports use the project root and failures point to the original file/line. Exit code is 0 when every file passes, 1 on failures or no tests. A passing file means execution finished; write `assert` calls to verify behavior.
+
+```zuno
+import "./greeting.zuno" as greeting;
+assert(greeting.greet("Zuno") == "Welcome, Zuno", "greets by name");
+```
+
+Folder discovery excludes dot folders, node_modules, dist, output, vendor, public, symlink directories and nested projects. It is limited to 100 matching files and 200 directories. Pass a nested project explicitly to test it separately. No filesystem or networking APIs are exposed to test programs.
+
+In VS Code/Cursor, hover a symbol for its signature and declaration. Typing `(` or `,` opens signature help; Ctrl+Shift+Space requests it manually. Use Format Document for the shared formatter (one undo restores the source), and **Zuno: Test project** for project tests. Terminal tasks require Node.js 20+; the language server uses the editor's bundled runtime.
 
 ## Starter and examples
 

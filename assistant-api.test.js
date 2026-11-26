@@ -3,6 +3,30 @@ const assert = require('node:assert/strict');
 const express = require('express');
 const { createAssistantRouter } = require('./assistant-api');
 
+test('project assistant forwards only validated selected context and rejects invalid project data', async t => {
+  const app = express();app.use(express.json());
+  let received;
+  app.use('/api/assistant', createAssistantRouter(async (url, options) => {
+    received = JSON.parse(options.body);
+    return { ok:true, json:async () => ({ choices:[{ message:{ content:'{"edits":[]}' } }] }) };
+  }));
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise(resolve => server.once('listening', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const files = [{ id:'main', path:'main.test.zuno', code:'assert(fr, "works");', ignored:'do not forward' }];
+  const ask = body => fetch(`http://127.0.0.1:${server.address().port}/api/assistant`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer test-only' }, body:JSON.stringify({ files, question:'Fix tests', edit:true, ...body }) });
+  assert.equal((await ask({ testResult:'1 passed' })).status, 200);
+  const context = JSON.parse(received.messages.at(-1).content);
+  assert.equal(context.code, undefined);
+  assert.equal(context.files[0].ignored, undefined);
+  assert.equal(context.testResult, '1 passed');
+  assert.match(context.instruction, /only selected/);
+  assert.equal((await ask({ files:[...files, files[0]] })).status, 400);
+  assert.equal((await ask({ files:[{ ...files[0], path:'../private.zuno' }] })).status, 400);
+  assert.equal((await ask({ testResult:'x'.repeat(6001) })).status, 400);
+  assert.equal((await ask({ history:[null] })).status, 400);
+});
+
 test('assistant keeps visitor keys isolated and rejects missing or invalid credentials', async t => {
   const received = [];
   const app = express();

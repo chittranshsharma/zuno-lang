@@ -9,7 +9,7 @@ export function setupTabs(monaco, editor, source, container) {
   const field = id => document.querySelector(id);
   const status = message => { field('#run-status').textContent = message; };
   const dirty = entry => entry.model.getValue() !== (entry.savedCode ?? '');
-  const snapshot = entry => ({ id:entry.id, name:entry.name, code:entry.model.getValue(), savedId:entry.savedId, savedCode:entry.savedCode, title:entry.title, folder:entry.folder });
+  const snapshot = entry => ({ id:entry.id, name:entry.name, projectPath:entry.projectPath, code:entry.model.getValue(), savedId:entry.savedId, savedCode:entry.savedCode, title:entry.title, folder:entry.folder });
   function persist() {
     clearTimeout(saveTimer);
     if (!scope) return;
@@ -132,6 +132,7 @@ export function setupTabs(monaco, editor, source, container) {
       const select=document.createElement('button');select.className='file-tab-select';select.textContent=entry.name;
       select.setAttribute('aria-pressed',String(entry.id===active));select.title=entry.name+(dirty(entry)?' · Unsaved changes':'');
       select.onclick=()=>activate(entry.id);
+      select.ondblclick=()=>renamePath(entry.id);
       const dot=document.createElement('span');dot.className='file-tab-dirty';dot.textContent=dirty(entry)?'●':'';dot.setAttribute('aria-label',dirty(entry)?'Unsaved changes':'Saved');
       const remove=document.createElement('button');remove.className='file-tab-close';remove.textContent='×';remove.setAttribute('aria-label','Close '+entry.name);remove.onclick=()=>close(entry.id);
       tab.onauxclick=event=>{if(event.button===1){event.preventDefault();close(entry.id);}};
@@ -170,7 +171,7 @@ export function setupTabs(monaco, editor, source, container) {
     if(data?.version===1 && Array.isArray(data.files)) {
       for(const file of data.files.slice(0,40)) {
         if(typeof file.id!=='string'||typeof file.name!=='string'||typeof file.code!=='string'||file.code.length>100000)continue;
-        entries.set(file.id,{id:file.id,name:file.name,model:monaco.editor.createModel(file.code,'zuno'),savedId:typeof file.savedId==='string'?file.savedId:'',savedCode:typeof file.savedCode==='string'?file.savedCode:null,title:typeof file.title==='string'?file.title:'',folder:typeof file.folder==='string'?file.folder:'General'});
+        entries.set(file.id,{id:file.id,name:file.name,projectPath:typeof file.projectPath==='string'?file.projectPath:undefined,model:monaco.editor.createModel(file.code,'zuno'),savedId:typeof file.savedId==='string'?file.savedId:'',savedCode:typeof file.savedCode==='string'?file.savedCode:null,title:typeof file.title==='string'?file.title:'',folder:typeof file.folder==='string'?file.folder:'General'});
       }
     }
     syncing=false;
@@ -193,5 +194,19 @@ export function setupTabs(monaco, editor, source, container) {
   const initial=editor.getModel();
   open({name:field('#editor-filename').textContent,code:source.value,title:'',savedCode:null});
   initial.dispose();
-  return {open,newFile,detachSaved,closeCurrent:()=>close(active),reopen,setScope,markSaved,persist,get activeId(){return active;}};
+  function list() {
+    return [...entries.values()].map(entry => ({ id:entry.id, path:entry.projectPath || entry.name, code:entry.model.getValue(), version:entry.model.getVersionId(), model:entry.model }));
+  }
+  function renamePath(id = active) {
+    const entry = entries.get(id);
+    if (!entry) return;
+    const name = window.prompt('Project path, for example src/main.zuno', entry.projectPath || entry.name);
+    if (name === null) return;
+    if (!/^[\w .-]+(?:\/[\w .-]+)*\.zuno$/.test(name) || name.length > 160 || name.split('/').some(part => part === '.' || part === '..') || list().some(file => file.id !== id && file.path.toLowerCase() === name.toLowerCase())) return status('Choose a unique relative .zuno path.');
+    entry.projectPath = name;
+    entry.name = name;
+    draw();persist();
+    if (active === id) field('#editor-filename').textContent = name;
+  }
+  return {open,newFile,detachSaved,closeCurrent:()=>close(active),reopen,setScope,markSaved,persist,list,renamePath,activate,get activeId(){return active;}};
 }

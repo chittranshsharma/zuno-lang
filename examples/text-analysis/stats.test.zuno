@@ -1,0 +1,4 @@
+import "./stats.zuno" as stats;
+assert(stats.wordCount("one two") == 2, "counts words");
+assert(stats.wordCount("  one   two  ") == 2, "ignores repeated spaces");
+assert(stats.wordCount("") == 0, "empty input");

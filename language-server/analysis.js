@@ -369,6 +369,67 @@ class Analysis {
     return null;
   }
 
+  callable(symbol) {
+    if (symbol?.kind === 'class') return { name: symbol.name, params: symbol.members?.symbols.get('init')?.params || [] };
+    if (symbol?.params) return { name: symbol.name, params: symbol.params };
+    return null;
+  }
+
+  describe(symbol) {
+    const call = this.callable(symbol);
+    const label = call ? call.name + '(' + call.params.join(', ') + ')' : symbol.kind + ' ' + symbol.name;
+    const location = symbol.file ? '\n\nDeclared in ' + path.relative(this.root || path.dirname(symbol.file.filename), symbol.file.filename).replaceAll('\\', '/') + ':' + (symbol.file.document.positionAt(symbol.token.start).line + 1) : '\n\nZuno standard library.';
+    return '```zuno\n' + label + '\n```\n\n' + (symbol.constant ? 'Constant ' : '') + symbol.kind + '.' + location;
+  }
+
+  hover(uri, position) {
+    const item = this.occurrence(uri, position);
+    if (item?.symbol) return { contents: { kind: 'markdown', value: this.describe(item.symbol) }, range: this.range(item.file, item.token) };
+    if (item) return { contents: { kind: 'plaintext', value: 'Unresolved symbol. No static declaration is available.' }, range: this.range(item.file, item.token) };
+    return null;
+  }
+
+  signatureHelp(uri, position) {
+    const file = [...this.files.values()].find(item => item.uri === uri);
+    if (!file) return null;
+    const offset = file.document.offsetAt(position);
+    const token = file.tokens.find(item => item.start < offset && offset < item.end);
+    if (token?.string) return null;
+    const line = file.text.slice(file.text.lastIndexOf('\n', offset - 1) + 1, offset);
+    if (/\/\//.test(line.replace(/"(?:\\.|[^"\\])*"/g, ''))) return null;
+    const stack = [];
+    const pairs = { ')': '(', ']': '[', '}': '{' };
+    for (const [index, token] of file.tokens.entries()) {
+      if (token.start >= offset) break;
+      if (['(', '[', '{'].includes(token.raw)) stack.push({ raw: token.raw, index, argument: 0 });
+      else if (pairs[token.raw]) { if (stack.at(-1)?.raw === pairs[token.raw]) stack.pop(); }
+      else if (token.raw === ',' && stack.length) stack.at(-1).argument++;
+    }
+    for (const frame of stack.reverse()) {
+      if (frame.raw !== '(') continue;
+      const before = file.tokens[frame.index - 1];
+      if (!before || !/^[A-Za-z_]\w*$/.test(before.raw)) continue;
+      if (['cook', 'fn', 'func'].includes(file.tokens[frame.index - 2]?.raw)) return null;
+      if (['if', 'bet', 'while', 'grind', 'for', 'each', 'not'].includes(before.raw)) continue;
+      let symbol = this.occurrences.find(item => item.file === file && item.token.start === before.start)?.symbol;
+      if (!symbol) {
+        const parts = [before.raw];
+        let index = frame.index - 2;
+        while (file.tokens[index]?.raw === '.' && /^[A-Za-z_]\w*$/.test(file.tokens[index - 1]?.raw || '')) {
+          parts.unshift(file.tokens[index - 1].raw);
+          index -= 2;
+        }
+        symbol = this.value({ type: 'variable', token: { text: parts.shift() } }, this.scopeAt(file, offset));
+        for (const part of parts) symbol = symbol?.members?.symbols.get(part);
+      }
+      if (['yap', 'print', 'say'].includes(before.raw)) symbol = { name: before.raw, kind: 'function', params: ['value'], builtin: true };
+      const call = this.callable(symbol);
+      if (!call) return null;
+      return { signatures: [{ label: call.name + '(' + call.params.join(', ') + ')', parameters: call.params.map(label => ({ label })), documentation: { kind: 'markdown', value: this.describe(symbol) } }], activeSignature: 0, activeParameter: frame.argument };
+    }
+    return null;
+  }
+
   completion(uri, position) {
     const file = [...this.files.values()].find(file => file.uri === uri);
     if (!file) return [];

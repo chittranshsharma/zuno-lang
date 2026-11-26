@@ -1,4 +1,5 @@
 import { setupTabs } from './workspace-tabs.js';
+import { validate } from './formatter';
 export function setupStudio(monaco, editor, source, openAssistant) {
   document.body.classList.add('studio');
   const workspace = document.querySelector('.workspace');
@@ -74,7 +75,7 @@ export function setupStudio(monaco, editor, source, openAssistant) {
       const model = editor.getModel();
       if(!model){problems.textContent='Open a file to get started';return;}
       let markers = [];
-      try { globalThis.Zuno.parse(model.getValue()); }
+      try { validate(model.getValue()); }
       catch (error) {
         const location = error.message.match(/Line (\d+), column (\d+): (.*)/);
         if (location) markers = [{ startLineNumber: +location[1], endLineNumber: +location[1], startColumn: +location[2], endColumn: +location[2] + 1, message: location[3], severity: monaco.MarkerSeverity.Error }];

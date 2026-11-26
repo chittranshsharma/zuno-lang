@@ -127,7 +127,7 @@ Ctrl+Alt+B opens the Groq assistant. Paste your own key, then choose Use key. As
 
 ## Know the boundaries
 
-The 0.5.0 editor extension provides static language services: Ctrl+Space completion, F12 definition, F2 rename, and live syntax/symbol/import diagnostics. It analyzes unsaved files and never executes programs. File imports and known class members resolve across the local project. Dynamic keys and arbitrary return types are not fully inferred. See [the editor guide](editor-extension/README.md) for installation, analysis limits, and rename behavior. The language server is included in the 0.5.0 release.
+The 0.6.0 editor extension provides static language services: Ctrl+Space completion, F12 definition, F2 rename, and live syntax/symbol/import diagnostics. It analyzes unsaved files and never executes programs. File imports and known class members resolve across the local project. Dynamic keys and arbitrary return types are not fully inferred. See [the editor guide](editor-extension/README.md) for installation, analysis limits, and rename behavior. The language server is included in the 0.6.0 release.
 
 This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No package manager, inheritance, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.
 
@@ -147,7 +147,7 @@ Classes contain cook/fn/func methods. init initializes fields through this.field
 
 Declare module name { declarations } then import name as alias;. A module exports every local declaration and executes once at declaration. Modules must be declared before import. Import bindings are constant.
 Standard modules: math (abs, round, floor, ceil, sqrt, sum, min, max); strings (upper, lower, trim, split, join, contains, replace, text, number); arrays (len, range, push, pop, slice, reverse, sort); dict (keys, values, has, remove); testing (assert).
-CLI file imports: import "./helper.zuno" as helper; on its own line. Paths are relative to the importing file and stay beneath the closest project root containing zuno.json (or the entry file directory for standalone files). Files execute once in dependency order; cycles and more than 100 files including the entry are rejected. Errors show original file positions. Browser file imports are not supported; use inline modules.
+CLI file imports: import "./helper.zuno" as helper; on its own line. Paths are relative to the importing file and stay beneath the closest project root containing zuno.json (or the entry file directory for standalone files). Files execute once in dependency order; cycles and more than 100 files including the entry are rejected. Errors show original file positions. Browser Project tools also resolve relative imports between open tabs; set each tab's project path first. The app preview still uses inline modules.
 
 Create a project with `zuno init my-app`, enter it, and run `zuno run` or `zuno check`. The `entry` field in `zuno.json` selects the entry file; the generated project uses `src/main.zuno`. Explicit files/folders also work. Check parses the entry and all its imports without executing; unused files and static types are not checked. See [installation and projects](INSTALL.md).
 

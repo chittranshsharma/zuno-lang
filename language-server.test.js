@@ -29,6 +29,31 @@ function fixture(t, files) {
   return { root, uri, open, edit, analysis, position };
 }
 
+test('hover and signatures resolve imports, constructors, builtins and unsaved nested calls', t => {
+  const f = fixture(t, {
+    'main.zuno': 'import "./helper.zuno" as h;\nimport strings as s;\nclass Box { cook init(value) { this.value = value; } }\nvibe box = Box(1);\nyap(h.add(1, len([1, 2])));',
+    'helper.zuno': 'cook add(left, right) { yeet left + right; }'
+  });
+  let a = f.analysis('main.zuno');
+  assert.match(a.hover(f.uri('main.zuno'), f.position('main.zuno', 'add')).contents.value, /add\(left, right\)/);
+  assert.match(a.hover(f.uri('main.zuno'), f.position('main.zuno', 'Box(1)')).contents.value, /Box\(value\)/);
+  const signature = (source, suffix) => {
+    const document = f.edit('main.zuno', source);
+    a = f.analysis('main.zuno');
+    return a.signatureHelp(document.uri, document.positionAt(suffix ? source.indexOf(suffix) + suffix.length : source.length));
+  };
+  const prefix = 'import "./helper.zuno" as h;\nimport strings as s;\n';
+  assert.equal(signature(prefix + 'h.add(1, ').activeParameter, 1);
+  assert.equal(signature(prefix + 'h.add(1, len([1, 2]), ', 'len(').signatures[0].label, 'len(value)');
+  assert.equal(signature(prefix + 'h.add(len([1, 2]), ').activeParameter, 1);
+  assert.equal(signature(prefix + 's.replace("a,b", "a", ').activeParameter, 2);
+  assert.equal(signature(prefix + 'h.add(unknown('), null);
+  assert.equal(signature(prefix + 'h.add("unfinished'), null);
+  assert.equal(signature(prefix + 'h.add(1, // comment'), null);
+  f.edit('helper.zuno', 'cook add(first, second, third) { yeet first; }');
+  assert.equal(signature(prefix + 'h.add(').signatures[0].label, 'add(first, second, third)');
+});
+
 test('completion and definitions resolve parameters, closures, shadowing and standard modules', t => {
   const f = fixture(t, { 'main.zuno': 'import math as m;\nvibe score = 1;\ncook outer(arg) {\n  vibe score = arg;\n  cook inner() { yeet score; }\n  yeet inner();\n}\nyap(score);\nyap(m.sqrt(9));' });
   const a = f.analysis('main.zuno');

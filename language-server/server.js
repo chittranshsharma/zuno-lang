@@ -1,6 +1,7 @@
 const { createConnection, TextDocuments, ProposedFeatures, TextDocumentSyncKind, ResponseError, ErrorCodes } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { Analysis } = require('./analysis');
+const { format } = require('../formatter');
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
@@ -12,10 +13,13 @@ connection.onInitialize(() => ({
     textDocumentSync: TextDocumentSyncKind.Incremental,
     completionProvider: { triggerCharacters: ['.'] },
     definitionProvider: true,
+    hoverProvider: true,
+    signatureHelpProvider: { triggerCharacters: ['(', ','], retriggerCharacters: [')'] },
+    documentFormattingProvider: true,
     renameProvider: { prepareProvider: true },
     referencesProvider: true
   },
-  serverInfo: { name: 'Zuno Language Server', version: '0.5.0' }
+  serverInfo: { name: 'Zuno Language Server', version: '0.6.0' }
 }));
 
 function analyze(uri) {
@@ -52,6 +56,17 @@ documents.onDidClose(schedule);
 connection.onDidChangeWatchedFiles(schedule);
 connection.onCompletion(params => analyze(params.textDocument.uri).completion(params.textDocument.uri, params.position));
 connection.onDefinition(params => analyze(params.textDocument.uri).definition(params.textDocument.uri, params.position));
+connection.onHover(params => analyze(params.textDocument.uri).hover(params.textDocument.uri, params.position));
+connection.onSignatureHelp(params => analyze(params.textDocument.uri).signatureHelp(params.textDocument.uri, params.position));
+connection.onDocumentFormatting(params => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) return [];
+  try {
+    const source = document.getText();
+    const newText = format(source, params.options);
+    return source === newText ? [] : [{ range: { start: { line: 0, character: 0 }, end: document.positionAt(source.length) }, newText }];
+  } catch (error) { throw new ResponseError(ErrorCodes.InvalidParams, 'Cannot format: ' + error.message); }
+});
 connection.onReferences(params => {
   const analysis = analyze(params.textDocument.uri);
   const occurrence = analysis.occurrence(params.textDocument.uri, params.position);

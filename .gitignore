@@ -5,6 +5,7 @@ output/
 public/landing.*
 
 public/editor*
+public/project.worker.js
 public/*.ttf
 
 dist/

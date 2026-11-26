@@ -3,8 +3,8 @@ const path = require('node:path');
 const { LanguageClient, TransportKind } = require('vscode-languageclient/node');
 let client;
 async function activate(context) {
-  for(const command of ['run','check','runProject','checkProject'])context.subscriptions.push(vscode.commands.registerCommand('zuno.'+command,async()=>{
-    const action=command.startsWith('run')?'run':'check';
+  for(const command of ['run','check','runProject','checkProject','testProject'])context.subscriptions.push(vscode.commands.registerCommand('zuno.'+command,async()=>{
+    const action=command.startsWith('run')?'run':command.startsWith('test')?'test':'check';
     const project=command.endsWith('Project');
     const document=vscode.window.activeTextEditor?.document;
     const folder=document&&vscode.workspace.getWorkspaceFolder(document.uri)||vscode.workspace.workspaceFolders?.[0];

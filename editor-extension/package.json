@@ -2,7 +2,7 @@
   "name": "zuno-tools",
   "displayName": "Zuno Language Tools",
   "description": "Zuno language server with completion, definition, rename, diagnostics, and local run/check commands.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "zuno-local",
   "engines": {
     "vscode": "^1.85.0"
@@ -46,6 +46,10 @@
       }
     ],
     "commands": [
+      {
+        "command": "zuno.testProject",
+        "title": "Zuno: Test project"
+      },
       {
         "command": "zuno.run",
         "title": "Zuno: Run current file"

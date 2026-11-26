@@ -40,6 +40,7 @@ code.addEventListener('keydown', event => {
 });
 
 function runCode() {
+  if (/^\s*import\s+"/m.test(code.value) && globalThis.ZunoRunProject) return globalThis.ZunoRunProject();
   if(globalThis.ZunoWorkspace && !globalThis.ZunoWorkspace.activeId){document.querySelector('#run-status').textContent='Create or open a file first.';return;}
   const started = performance.now();
   if (/\bimport\s+ui\s+as\b/.test(code.value)) {

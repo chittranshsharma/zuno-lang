@@ -1,0 +1,2 @@
+import "./stats.zuno" as stats;
+yap(stats.wordCount("Zuno makes small tools possible"));

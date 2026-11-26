@@ -1,8 +1,13 @@
 # Zuno Language Tools
 
-Version 0.5.0 includes the Zuno Language Server. Download [zuno-tools.vsix](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-tools.vsix), then use Extensions → … → Install from VSIX in VS Code or Cursor. To update from the terminal, use code --install-extension ./zuno-tools.vsix --force (or cursor instead of code), then reload the editor. Building from source is optional: npm install and npm run package:extension create dist/zuno-tools.vsix.
+Version 0.6.0 includes the Zuno Language Server, formatter and test runner. Download [zuno-tools.vsix](https://github.com/chittranshsharma/zuno-lang/releases/latest/download/zuno-tools.vsix), then use Extensions → … → Install from VSIX in VS Code or Cursor. To update from the terminal, use code --install-extension ./zuno-tools.vsix --force (or cursor instead of code), then reload the editor. Building from source is optional: npm install and npm run package:extension create dist/zuno-tools.vsix.
 
 ## Language features
+
+- Hover: signatures, symbol kind and declaration location for resolved symbols, including imported functions and constructors.
+- Signature help: function parameters and the active argument while typing `(` or `,`. Nested calls, arrays and dictionaries keep their argument counts separate. Unknown dynamic calls stay unresolved.
+- Format Document: the same formatter as `zuno format`. Invalid syntax makes no edit; a successful whole-document edit is undoable in one step. Editor tab size and spaces/tabs are respected.
+- Zuno: Test project: save open documents, then discover and run `*.test.zuno` files with isolated state and source-mapped failures.
 
 - Ctrl+Space: variables, parameters, functions, keywords/snippets, imported exports, standard-library members, and known class members.
 - F12 or Ctrl+click: go to a declaration or imported file.

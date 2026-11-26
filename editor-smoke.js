@@ -35,6 +35,16 @@ async function run() {
   assert.ok(completion.items.some(item => item.detail === 'double(value)'));
   const definition = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, new vscode.Position(2, 9));
   assert.equal((definition[0].uri || definition[0].targetUri).fsPath.toLowerCase(), helper.fsPath.toLowerCase());
+  const hover = await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, new vscode.Position(2, 9));
+  assert.match(hover[0].contents.map(item => item.value).join(''), /double\(value\)/);
+  const signature = await vscode.commands.executeCommand('vscode.executeSignatureHelpProvider', uri, new vscode.Position(2, 13), '(');
+  assert.equal(signature.signatures[0].label, 'double(value)');
+  const original = document.getText();
+  await vscode.commands.executeCommand('editor.action.formatDocument');
+  await wait(() => document.getText() !== original);
+  assert.equal(document.getText(), original + '\n');
+  await vscode.commands.executeCommand('undo');
+  await wait(() => document.getText() === original);
   const rename = await vscode.commands.executeCommand('vscode.executeDocumentRenameProvider', uri, new vscode.Position(2, 9), 'twice');
   assert.equal(rename.entries().length, 2);
   assert.equal(await vscode.workspace.applyEdit(rename), true);
@@ -49,7 +59,11 @@ async function run() {
   repaired.replace(uri, new vscode.Range(1, 0, 1, 22), 'vibe amount = 4;');
   assert.equal(await vscode.workspace.applyEdit(repaired), true);
   await wait(() => vscode.languages.getDiagnostics(uri).length === 0);
-  console.log('ZUNO_EDITOR_SMOKE_PASSED: completion, cross-file definition, rename, and live diagnostics.');
+  fs.writeFileSync(path.join(directory, 'main.test.zuno'), 'assert(1 + 1 == 2, "addition");');
+  const result = require('node:child_process').execFileSync(process.execPath, [path.join(extension.extensionPath, 'runtime', 'cli.js'), 'test', directory], { encoding: 'utf8', env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } });
+  assert.match(result, /1 passed, 0 failed/);
+  assert.ok((await vscode.commands.getCommands()).includes('zuno.testProject'));
+  console.log('ZUNO_EDITOR_SMOKE_PASSED: hover, signatures, format and undo, tests, completion, cross-file definition, rename, and live diagnostics.');
   if (process.env.ZUNO_SMOKE_REPORT) fs.writeFileSync(process.env.ZUNO_SMOKE_REPORT, JSON.stringify({ passed: true, version: extension.packageJSON.version }));
 }
 

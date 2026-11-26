@@ -37,6 +37,8 @@ async function verifyServer(server) {
   try {
     const initialized = await request('initialize', { processId: process.pid, rootUri: URI.file(root).toString(), capabilities: { workspace: { workspaceEdit: { documentChanges: true } } } });
     assert.equal(initialized.capabilities.renameProvider.prepareProvider, true);
+    assert.equal(initialized.capabilities.hoverProvider, true);
+    assert.equal(initialized.capabilities.documentFormattingProvider, true);
     await connection.sendNotification('initialized', {});
     await connection.sendNotification('textDocument/didOpen', { textDocument: { uri: main, languageId: 'zuno', version: 1, text: source } });
     await wait(1, items => items.length === 0);
@@ -44,6 +46,12 @@ async function verifyServer(server) {
     const completion = await request('textDocument/completion', { ...at, position: { line: 2, character: 6 } });
     assert.ok(completion.some(item => item.label === 'double'));
     assert.equal((await request('textDocument/definition', at)).uri, helper);
+    assert.match((await request('textDocument/hover', at)).contents.value, /double\(value\)/);
+    const signature = await request('textDocument/signatureHelp', { ...at, position: { line: 2, character: 13 } });
+    assert.equal(signature.signatures[0].label, 'double(value)');
+    const formatted = await request('textDocument/formatting', { textDocument: { uri: main }, options: { tabSize: 2, insertSpaces: true } });
+    assert.equal(formatted.length, 1);
+    assert.match(formatted[0].newText, /grind fr \{\n\}/);
     assert.equal((await request('textDocument/rename', { ...at, newName: 'twice' })).documentChanges.length, 2);
     await assert.rejects(request('textDocument/rename', { ...at, newName: 'fr' }), /keyword/);
     await connection.sendNotification('textDocument/didOpen', { textDocument: { uri: helper, languageId: 'zuno', version: 1, text: 'cook triple(value) { yeet value * 3; }' } });
@@ -62,6 +70,7 @@ async function verifyServer(server) {
     await wait(4, items => items.length === 0);
     await connection.sendNotification('textDocument/didChange', { textDocument: { uri: main, version: 5 }, contentChanges: [{ text: 'vibe broken = ;' }] });
     await wait(5, items => items.some(item => item.message.includes('Expected an expression')));
+    await assert.rejects(request('textDocument/formatting', { textDocument: { uri: main }, options: { tabSize: 2, insertSpaces: true } }), /Cannot format/);
     await connection.sendNotification('textDocument/didChange', { textDocument: { uri: main, version: 6 }, contentChanges: [{ text: source.replace('double', 'triple') }] });
     await wait(6, items => items.length === 0);
     const exit = new Promise(resolve => child.once('exit', resolve));
