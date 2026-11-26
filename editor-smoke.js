@@ -63,6 +63,15 @@ async function run() {
   const result = require('node:child_process').execFileSync(process.execPath, [path.join(extension.extensionPath, 'runtime', 'cli.js'), 'test', directory], { encoding: 'utf8', env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' } });
   assert.match(result, /1 passed, 0 failed/);
   assert.ok((await vscode.commands.getCommands()).includes('zuno.testProject'));
+  const libraryDocument = await vscode.workspace.openTextDocument({ language:'zuno', content:'import arrays as a;\ncook double(x) { yeet x*2; }\nvibe values=a.map([1,2],double);\neach x in values { dip; }' });
+  await vscode.window.showTextDocument(libraryDocument);
+  await wait(async () => {
+    const items = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', libraryDocument.uri, new vscode.Position(2, 14));
+    return items?.items.some(item => item.label === 'map');
+  });
+  const libraryHover = await vscode.commands.executeCommand('vscode.executeHoverProvider', libraryDocument.uri, new vscode.Position(2, 16));
+  assert.match(libraryHover[0].contents.map(item => item.value).join(''), /shallow snapshot/);
+  await wait(() => vscode.languages.getDiagnostics(libraryDocument.uri).length === 0);
   console.log('ZUNO_EDITOR_SMOKE_PASSED: hover, signatures, format and undo, tests, completion, cross-file definition, rename, and live diagnostics.');
   if (process.env.ZUNO_SMOKE_REPORT) fs.writeFileSync(process.env.ZUNO_SMOKE_REPORT, JSON.stringify({ passed: true, version: extension.packageJSON.version }));
 }

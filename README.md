@@ -10,6 +10,8 @@ Zuno is a programming language you can run in a browser, in your terminal, or fr
 
 ## Your first program
 
+New in **0.7**: `dip` / `break`, `skip` / `continue`, stepped ranges, and `map`, `filter`, `reduce`, `find`, `findIndex`, `some`, `every`. Callbacks can use closures and bound methods, share the interpreter's limits, and report errors at their original source line. Try the [inventory report](examples/collections/) or [loop-control example](examples/loop-control.zuno).
+
 ```zuno
 vibe name = "world";
 

@@ -3,7 +3,7 @@ const path = require('node:path');
 const { URI } = require('vscode-uri');
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { parse } = require('../engine');
-const { functions, modules, reserved, snippets } = require('./catalog');
+const { functions, modules, reserved, snippets, descriptions } = require('./catalog');
 const identity = filename => process.platform === 'win32' ? filename.toLowerCase() : filename;
 const canonical = filename => { try { return fs.realpathSync(filename); } catch { return path.resolve(filename); } };
 const inside = (root, filename) => { const relative = path.relative(root, filename); return relative !== '..' && !relative.startsWith('..' + path.sep) && !path.isAbsolute(relative); };
@@ -379,7 +379,7 @@ class Analysis {
     const call = this.callable(symbol);
     const label = call ? call.name + '(' + call.params.join(', ') + ')' : symbol.kind + ' ' + symbol.name;
     const location = symbol.file ? '\n\nDeclared in ' + path.relative(this.root || path.dirname(symbol.file.filename), symbol.file.filename).replaceAll('\\', '/') + ':' + (symbol.file.document.positionAt(symbol.token.start).line + 1) : '\n\nZuno standard library.';
-    return '```zuno\n' + label + '\n```\n\n' + (symbol.constant ? 'Constant ' : '') + symbol.kind + '.' + location;
+    return '```zuno\n' + label + '\n```\n\n' + (symbol.constant ? 'Constant ' : '') + symbol.kind + '.' + location + (symbol.builtin && descriptions[symbol.name] ? '\n\n' + descriptions[symbol.name] : '');
   }
 
   hover(uri, position) {

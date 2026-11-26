@@ -19,7 +19,7 @@ connection.onInitialize(() => ({
     renameProvider: { prepareProvider: true },
     referencesProvider: true
   },
-  serverInfo: { name: 'Zuno Language Server', version: '0.6.0' }
+  serverInfo: { name: 'Zuno Language Server', version: '0.7.0' }
 }));
 
 function analyze(uri) {

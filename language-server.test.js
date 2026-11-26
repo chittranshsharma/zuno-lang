@@ -54,6 +54,16 @@ test('hover and signatures resolve imports, constructors, builtins and unsaved n
   assert.equal(signature(prefix + 'h.add(').signatures[0].label, 'add(first, second, third)');
 });
 
+test('new collection helpers and loop controls have editor support', t => {
+  const f = fixture(t, { 'main.zuno':'import arrays as a;\ncook even(x) { yeet x%2==0; }\nvibe values = a.filter([1,2],even);\neach x in values { bet x==2 { dip; } skip; }' });
+  const analysis = f.analysis('main.zuno');
+  assert.deepEqual(analysis.main.diagnostics, []);
+  assert.match(analysis.hover(f.uri('main.zuno'), f.position('main.zuno', 'filter')).contents.value, /must return fr or cap/);
+  assert.ok(analysis.completion(f.uri('main.zuno'), { line:3, character:0 }).some(item => item.label === 'skip'));
+  f.edit('main.zuno', 'skip;');
+  assert.ok(f.analysis('main.zuno').main.diagnostics.some(item => item.message.includes('inside a loop')));
+});
+
 test('completion and definitions resolve parameters, closures, shadowing and standard modules', t => {
   const f = fixture(t, { 'main.zuno': 'import math as m;\nvibe score = 1;\ncook outer(arg) {\n  vibe score = arg;\n  cook inner() { yeet score; }\n  yeet inner();\n}\nyap(score);\nyap(m.sqrt(9));' });
   const a = f.analysis('main.zuno');

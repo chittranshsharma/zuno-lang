@@ -1,0 +1,7 @@
+import "./report.zuno" as report;
+
+assert(report.totalValue([]) == 0, "empty inventory");
+assert(report.totalValue([{"price": 10, "stock": 3}]) == 30, "price times stock");
+assert(report.totalValue([{"price": 10, "stock": 0}]) == 0, "out of stock");
+assert(every([], report.inStock) == fr, "every on empty input");
+assert(some([], report.inStock) == cap, "some on empty input");

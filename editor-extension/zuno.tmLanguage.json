@@ -18,7 +18,7 @@
     },
     {
       "name": "keyword.control.zuno",
-      "match": "\\b(vibe|lock|cook|yap|yeet|fr|cap|bet|nah|grind|each|and|or|not|let|const|fn|func|return|print|say|if|else|while|for|in|true|false|module|import|as|class|this)\\b"
+      "match": "\\b(vibe|lock|cook|yap|yeet|fr|cap|bet|nah|grind|each|and|or|not|let|const|fn|func|return|print|say|if|else|while|for|in|true|false|module|import|as|class|this|break|continue|dip|skip)\\b"
     },
     {
       "name": "constant.numeric.zuno",

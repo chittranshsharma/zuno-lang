@@ -5,11 +5,12 @@ import * as monaco from 'monaco-editor';
 import { setupProjectAssistant } from './project-assistant';
 import { setupProjectTools } from './project-tools';
 import { format } from './formatter';
+import { functions, descriptions, modules } from './language-server/catalog';
 globalThis.MonacoEnvironment = { getWorker: () => new Worker('/assets/editor.worker.js', { type: 'module' }) };
 const source = document.querySelector('#code');
 monaco.languages.register({ id: 'zuno' });
 monaco.languages.setMonarchTokensProvider('zuno', { tokenizer: { root: [
-  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|bet|nah|grind|each|and|or|not|class|module|import|as|this|true|false|fr|cap)\b/, 'keyword'],
+  [/\b(let|const|vibe|lock|fn|func|cook|yeet|return|for|in|if|else|while|bet|nah|grind|each|and|or|not|class|module|import|as|this|true|false|fr|cap|break|continue|dip|skip)\b/, 'keyword'],
   [/\b(print|say|yap)\b/, 'type'], [/"(?:\\.|[^"\\])*"/, 'string'], [/\d+(?:\.\d+)?/, 'number'], [/[a-zA-Z_]\w*/, 'identifier']
 ] } });
 monaco.languages.setLanguageConfiguration('zuno', { brackets: [['{','}'],['[',']'],['(',')']], autoClosingPairs: [{open:'{',close:'}'},{open:'[',close:']'},{open:'(',close:')'},{open:'"',close:'"'}] });
@@ -29,10 +30,12 @@ monaco.languages.registerCompletionItemProvider('zuno', {
     const prefix=model.getLineContent(position.lineNumber).slice(0,position.column-1);
     const match=prefix.match(/(\w+)\.(\w*)$/);
     if(!match)return {suggestions:[]};
-    const imported=[...model.getValue().matchAll(/import\s+ui\s+as\s+(\w+)/g)].some(item=>item[1]===match[1]);
-    if(!imported)return {suggestions:[]};
+    const imported=[...model.getValue().matchAll(/import\s+(\w+)\s+as\s+(\w+)/g)].find(item=>item[2]===match[1]);
+    const namespace = imported && Object.hasOwn(modules, imported[1]) ? modules[imported[1]] : null;
+    if(!namespace)return {suggestions:[]};
     const range={startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:position.column-match[2].length,endColumn:position.column};
-    return {suggestions:['title','label','input','value','set','button','clear'].map(label=>({label,insertText:label,range,kind:monaco.languages.CompletionItemKind.Function}))};
+    const signatures = Array.isArray(namespace) ? namespace.map(name => [name, functions[name]]) : Object.entries(namespace);
+    return {suggestions:signatures.map(([label, params])=>({label,insertText:label,range,kind:monaco.languages.CompletionItemKind.Function,detail:label+'('+params.join(', ')+')',documentation:descriptions[label]||'Zuno standard library'}))};
   }
 });
 monaco.editor.defineTheme('zuno-premium', { base:'vs-dark',inherit:true,rules:[{token:'keyword',foreground:'C792EA'},{token:'string',foreground:'BDD3AC'},{token:'number',foreground:'DDBB91'}], colors:{'editor.background':'#0C0B10','editor.foreground':'#E5E5E5','editorLineNumber.foreground':'#707075','editor.lineHighlightBackground':'#16121F','editorCursor.foreground':'#FFFFFF','editor.selectionBackground':'#FFFFFF25','editorWidget.background':'#1B1B1E','editorWidget.border':'#39393D'} });

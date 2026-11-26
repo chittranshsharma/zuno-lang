@@ -1,5 +1,6 @@
 import { setupTabs } from './workspace-tabs.js';
 import { validate } from './formatter';
+import { functions, descriptions, reserved } from './language-server/catalog';
 export function setupStudio(monaco, editor, source, openAssistant) {
   document.body.classList.add('studio');
   const workspace = document.querySelector('.workspace');
@@ -97,13 +98,13 @@ export function setupStudio(monaco, editor, source, openAssistant) {
   monaco.languages.registerCompletionItemProvider('zuno', { provideCompletionItems(model, position) {
     const word = model.getWordUntilPosition(position);
     const range = { startLineNumber:position.lineNumber,endLineNumber:position.lineNumber,startColumn:word.startColumn,endColumn:word.endColumn };
-    const names = new Set(['len','range','upper','lower','abs','round','join','push','pop','slice','reverse','sort','sum','min','max','split','trim','contains','replace','text','number','floor','ceil','sqrt','assert','vibe','lock','cook','yap','yeet','fr','cap','bet','nah','grind','each','and','or','not']);
+    const names = new Set([...Object.keys(functions), ...reserved]);
     for (const match of model.getValue().matchAll(/\b(?:let|const|vibe|lock|fn|func|cook|class)\s+(\w+)|\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) {
       if (match[1]) names.add(match[1]);
       if (match[2]) match[2].split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>names.add(n));
     }
     for (const match of model.getValue().matchAll(/\b(?:fn|func|cook)\s+\w+\s*\(([^)]*)\)/g)) match[1].split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>names.add(n));
-    return { suggestions:[...names].map(label=>({label,insertText:label,range,kind:monaco.languages.CompletionItemKind.Variable})) };
+    return { suggestions:[...names].map(label=>({label,insertText:label,range,kind:Object.hasOwn(functions,label)?monaco.languages.CompletionItemKind.Function:monaco.languages.CompletionItemKind.Variable,detail:Object.hasOwn(functions,label)?label+'('+functions[label].join(', ')+')':undefined,documentation:descriptions[label]})) };
   } });
   function separator(target, axis, min, max, initial) {
     const range = document.createElement('input');

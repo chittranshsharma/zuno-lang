@@ -1,0 +1,10 @@
+import "./report.zuno" as report;
+
+vibe items = [
+  {"name": "Notebook", "price": 80, "stock": 3},
+  {"name": "Pen", "price": 20, "stock": 5},
+  {"name": "Bag", "price": 500, "stock": 0}
+];
+yap("Inventory value: " + text(report.totalValue(items)));
+yap("Available products: " + text(len(filter(items, report.inStock))));
+yap("First available index: " + text(findIndex(items, report.inStock)));

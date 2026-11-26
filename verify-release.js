@@ -34,6 +34,8 @@ assert.equal(run(path.join(directory, 'starter'), 'run'), 'Welcome, Zuno');
 assert.equal(run(path.join(directory, 'examples', 'modules'), 'run', 'main.zuno'), '65');
 assert.equal(run(path.join(directory, 'examples', 'text-analysis'), 'run'), '5');
 assert.match(run(path.join(directory, 'examples', 'text-analysis'), 'test'), /1 passed, 0 failed/);
+assert.match(run(path.join(directory, 'examples', 'collections'), 'run'), /Inventory value: 340/);
+assert.match(run(path.join(directory, 'examples', 'collections'), 'test'), /1 passed, 0 failed/);
 const tasks = JSON.parse(fs.readFileSync(path.join(directory, 'starter', '.vscode', 'tasks.json'), 'utf8'));
 assert.equal(tasks.tasks[0].command, 'zuno');
 assert.ok(!JSON.stringify(tasks).includes(root));

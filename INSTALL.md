@@ -1,6 +1,6 @@
-# Install Zuno 0.6.0
+# Install Zuno 0.7.0
 
-Zuno 0.6.0 needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
+Zuno 0.7.0 needs Node.js 20 or newer. It works on Windows, macOS, and Linux; MongoDB is not required for the CLI or editor extension.
 
 ## Install the runtime
 

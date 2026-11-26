@@ -15,7 +15,7 @@
       const match = source.slice(offset).match(/^(\s+|"(?:\\.|[^"\\\r\n])*"|\d+(?:\.\d+)?|[A-Za-z_]\w*|==|!=|<=|>=|&&|\|\||\*\*|[\[\],.{}:();=+*/%<>!\-])/);
       if (!match) fail({ line, column }, 'Unexpected character ' + source[offset]);
       const text = match[0];
-      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false', bet:'if', nah:'else', grind:'while', each:'for', and:'&&', or:'||', not:'!' })[text] || text, raw: text, start: offset, end: offset + text.length, line, column });
+      if (!/^\s/.test(text)) tokens.push({ text: ({ __proto__:null, vibe:'let', lock:'const', cook:'func', yap:'print', yeet:'return', fr:'true', cap:'false', bet:'if', nah:'else', grind:'while', each:'for', and:'&&', or:'||', not:'!', dip:'break', skip:'continue' })[text] || text, raw: text, start: offset, end: offset + text.length, line, column });
       for (let i = 0; i < text.length; i++) {
         const character = text[i];
         if (character === '\n') { line++; column = 1; }
@@ -32,7 +32,7 @@
       if (peek() !== text) fail(tokens[index], 'Expected ' + text);
       return take();
     };
-    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'func', 'const', 'say', 'for', 'in', 'return', 'class', 'module', 'import', 'as']);
+    const reserved = new Set(['let', 'print', 'if', 'else', 'while', 'true', 'false', 'fn', 'func', 'const', 'say', 'for', 'in', 'return', 'class', 'module', 'import', 'as', 'break', 'continue']);
     function argumentsUntil(end) {
       const values = [];
       if (peek() !== end) {
@@ -104,6 +104,7 @@
     }
     function statement() {
       const token = take();
+      if (['break', 'continue'].includes(token.text)) { expect(';');return { type:token.text, token }; }
       if (['module','class'].includes(token.text)) {
         const name=take(); if(!/^[A-Za-z_]\w*$/.test(name.text)||reserved.has(name.text))fail(name,'Expected a name');
         const body=block();
@@ -180,6 +181,14 @@
     const program = [];
     try { while (peek()) program.push(statement()); }
     catch (error) { error.program = program; throw error; }
+    function validateControl(statements, loops = 0) {
+      for (const node of statements) {
+        if (['break', 'continue'].includes(node.type) && !loops) fail(node.token, node.token.raw + ' must be inside a loop in the same function or module');
+        if (node.body) validateControl(node.body, ['function', 'module', 'class'].includes(node.type) ? 0 : ['for', 'while'].includes(node.type) ? loops + 1 : loops);
+        if (node.otherwise) validateControl(node.otherwise, loops);
+      }
+    }
+    validateControl(program);
     if (parseOnly) return program;
     const modules = new Map();
     const constants = new WeakMap();
@@ -188,6 +197,7 @@
     let steps = 0;
     let calls = 0;
     const returnSignal = Symbol('return');
+    const loopSignal = Symbol('loop');
     const tick = token => { if (++steps > limit) fail(token, 'Execution limit reached. Check your loops.'); };
     function evaluate(node, scope) {
       tick(node.token);
@@ -221,7 +231,7 @@
         }
         if (fn && fn.kind === 'builtin') {
           const args = node.args.map(arg => evaluate(arg, scope));
-          try { return fn.call(...args); } catch (error) { fail(node.token, error.message); }
+          try { return fn.call.apply({ token:node.token, scope }, args); } catch (error) { if (error.token) throw error;fail(node.token, error.message); }
         }
         if (!fn || fn.kind !== 'function') fail(node.token, 'Expected a function');
         if (fn.params.length !== node.args.length) fail(node.token, 'Wrong number of arguments');
@@ -271,7 +281,9 @@
     function run(statements, scope) {
       for (const node of statements) {
         tick(node.token);
-        if (node.type === 'module') {
+        if (node.type === 'break' || node.type === 'continue') {
+          throw { type:loopSignal, kind:node.type };
+        } else if (node.type === 'module') {
           if(modules.has(node.token.text))fail(node.token,'Module already exists');
           const local={values:new Map(),parent:scope};run(node.body,local);
           modules.set(node.token.text,dict(local.values));
@@ -302,11 +314,11 @@
         } else if (node.type === 'for') {
           const items = evaluate(node.iterable, scope);
           if (!Array.isArray(items) && typeof items !== 'string') fail(node.token, 'For needs an array or text');
-          for (const item of items) { tick(node.token); run(node.body, { values: new Map([[node.token.text, item]]), parent: scope }); }
+          for (const item of items) { tick(node.token); if (iteration(node.body, { values: new Map([[node.token.text, item]]), parent: scope }) === 'break') break; }
         } else if (node.type === 'while') {
           while (evaluate(node.condition, scope)) {
             tick(node.token);
-            run(node.body, { values: new Map(), parent: scope });
+            if (iteration(node.body, { values: new Map(), parent: scope }) === 'break') break;
           }
         } else {
           const value = evaluate(node.value, scope);
@@ -329,10 +341,49 @@
         }
       }
     }
+    function iteration(body, scope) {
+      try { run(body, scope); }
+      catch (signal) { if (signal?.type === loopSignal) return signal.kind;throw signal; }
+    }
+    function transform(kind, items, callback, initial, context) {
+      const snapshot = requireArray(items).slice();
+      if (!callback || !['function', 'builtin'].includes(callback.kind)) throw new Error(kind + ' needs a function callback');
+      const count = kind === 'reduce' ? 2 : 1;
+      if (callback.kind === 'function' && ![count, count + 1].includes(callback.params.length)) throw new Error(kind + ' callback needs ' + count + ' arguments, plus an optional index');
+      const result = [];
+      let accumulator = initial;
+      for (let index = 0; index < snapshot.length; index++) {
+        const args = kind === 'reduce' ? [accumulator, snapshot[index]] : [snapshot[index]];
+        if (callback.kind === 'function' && callback.params.length === count + 1) args.push(index);
+        const value = evaluate({ type:'call', token:context.token, callee:{ type:'literal', token:context.token, value:callback }, args:args.map(value => ({ type:'literal', token:context.token, value })) }, context.scope);
+        if (kind === 'map') result.push(value);
+        else if (kind === 'reduce') accumulator = value;
+        else {
+          if (typeof value !== 'boolean') throw new Error(kind + ' callback must return a boolean');
+          if (kind === 'filter' && value) result.push(snapshot[index]);
+          if (kind === 'find' && value) return snapshot[index];
+          if (kind === 'findIndex' && value) return index;
+          if (kind === 'some' && value) return true;
+          if (kind === 'every' && !value) return false;
+        }
+      }
+      if (kind === 'reduce') return accumulator;
+      if (kind === 'find' || kind === 'some') return false;
+      if (kind === 'findIndex') return -1;
+      if (kind === 'every') return true;
+      return result;
+    }
     const requireArray = value => { if (!Array.isArray(value)) throw new Error('Expected an array'); return value; };
     const requireText = value => { if (typeof value !== 'string') throw new Error('Expected text'); return value; };
     const requireNumber = value => { if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Expected a finite number'); return value; };
     const builtins = {
+      map: function(items, callback) { return transform('map', items, callback, undefined, this); },
+      filter: function(items, callback) { return transform('filter', items, callback, undefined, this); },
+      reduce: function(items, callback, initial) { if (arguments.length !== 3) throw new Error('reduce needs an array, callback and initial value');return transform('reduce', items, callback, initial, this); },
+      find: function(items, callback) { return transform('find', items, callback, undefined, this); },
+      findIndex: function(items, callback) { return transform('findIndex', items, callback, undefined, this); },
+      some: function(items, callback) { return transform('some', items, callback, undefined, this); },
+      every: function(items, callback) { return transform('every', items, callback, undefined, this); },
       keys: value => { if(value?.kind!=='dictionary')throw new Error('keys needs dictionary');return [...value.values.keys()]; },
       values: value => { if(value?.kind!=='dictionary')throw new Error('values needs dictionary');return [...value.values.values()]; },
       has: (value,key) => { if(value?.kind!=='dictionary'||typeof key!=='string')throw new Error('has needs dictionary and text');return value.values.has(key); },
@@ -356,7 +407,13 @@
       sqrt: value => { requireNumber(value); if(value<0)throw new Error('sqrt needs a nonnegative number'); return Math.sqrt(value); },
       assert: (condition, message = 'Assertion failed') => { if(!condition)throw new Error(requireText(message)); return true; },
       len: value => { if (!Array.isArray(value) && typeof value !== 'string') throw new Error('len needs an array or text'); return value.length; },
-      range: (start, end) => { if (end === undefined) { end = start; start = 0; } if (!Number.isInteger(start) || !Number.isInteger(end) || end - start > 10000 || end < start) throw new Error('range needs ordered integers, up to 10000 items'); return Array.from({ length: end - start }, (_, i) => start + i); },
+      range: (start, end, step = 1) => {
+        if (end === undefined) { end = start;start = 0; }
+        if (![start, end, step].every(Number.isSafeInteger) || step === 0 || (end - start) * step < 0) throw new Error('range needs safe integers and a nonzero step toward the end');
+        const length = Math.ceil((end - start) / step);
+        if (length > 10000) throw new Error('range exceeds 10000 items');
+        return Array.from({ length }, (_, index) => start + index * step);
+      },
       upper: value => { if (typeof value !== 'string') throw new Error('upper needs text'); return value.toUpperCase(); },
       lower: value => { if (typeof value !== 'string') throw new Error('lower needs text'); return value.toLowerCase(); },
       abs: value => { if (typeof value !== 'number') throw new Error('abs needs a number'); return Math.abs(value); },
@@ -364,7 +421,7 @@
       join: (values, separator = ',') => { if (!Array.isArray(values) || typeof separator !== 'string') throw new Error('join needs an array and text'); const result = values.join(separator); if (result.length > 100000) throw new Error('Text exceeds 100000 characters'); return result; }
     };
     const builtinScope = { values: new Map(Object.entries(builtins).map(([name, call]) => [name, { kind: 'builtin', call }])), parent: null };
-    for(const [name,names] of Object.entries({math:['abs','round','floor','ceil','sqrt','sum','min','max'],strings:['upper','lower','trim','split','join','contains','replace','text','number'],arrays:['len','range','push','pop','slice','reverse','sort'],dict:['keys','values','has','remove'],testing:['assert']})) {
+    for(const [name,names] of Object.entries({math:['abs','round','floor','ceil','sqrt','sum','min','max'],strings:['upper','lower','trim','split','join','contains','replace','text','number'],arrays:['len','range','push','pop','slice','reverse','sort','map','filter','reduce','find','findIndex','some','every'],dict:['keys','values','has','remove'],testing:['assert']})) {
       modules.set(name,dict(names.map(key=>[key,builtinScope.values.get(key)])));
     }
     if(host.ui){

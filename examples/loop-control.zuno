@@ -1,0 +1,11 @@
+vibe selected = [];
+each value in range(10, 0, -1) {
+  bet value % 2 == 0 {
+    skip;
+  }
+  bet len(selected) == 3 {
+    dip;
+  }
+  push(selected, value);
+}
+yap(join(selected, ", "));

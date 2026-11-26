@@ -1,0 +1,15 @@
+cook inStock(item) {
+  yeet item.stock > 0;
+}
+
+cook inventoryValue(item) {
+  yeet item.price * item.stock;
+}
+
+cook add(total, value) {
+  yeet total + value;
+}
+
+cook totalValue(items) {
+  yeet reduce(map(filter(items, inStock), inventoryValue), add, 0);
+}

@@ -127,11 +127,42 @@ Ctrl+Alt+B opens the Groq assistant. Paste your own key, then choose Use key. As
 
 ## Know the boundaries
 
-The 0.6.0 editor extension provides static language services: Ctrl+Space completion, F12 definition, F2 rename, and live syntax/symbol/import diagnostics. It analyzes unsaved files and never executes programs. File imports and known class members resolve across the local project. Dynamic keys and arbitrary return types are not fully inferred. See [the editor guide](editor-extension/README.md) for installation, analysis limits, and rename behavior. The language server is included in the 0.6.0 release.
+The 0.7.0 editor extension provides static language services: Ctrl+Space completion, F12 definition, F2 rename, and live syntax/symbol/import diagnostics. It analyzes unsaved files and never executes programs. File imports and known class members resolve across the local project. Dynamic keys and arbitrary return types are not fully inferred. See [the editor guide](editor-extension/README.md) for installation, analysis limits, and rename behavior. The language server is included in the 0.7.0 release.
 
 This is an interpreted language for learning, algorithms, text processing, and small calculations. It is not yet a Python or C++ replacement. No package manager, inheritance, native compilation, networking, filesystem access from programs, or async execution. Source is capped at 100,000 characters; saved/imported programs at 5,000. Runs stop at 100,000 evaluation steps, 1,000 output lines, 200 parser nesting levels, or 100 nested function calls.
 
 ## Helper reference
+
+### Transform and search collections
+
+`map(items, callback)` returns transformed items. `filter(items, predicate)` keeps matching items. `reduce(items, callback, initial)` accumulates from left to right, with an explicit initial value. Callbacks are named functions, closures, bound methods, or suitable builtins such as `upper`. No arrow functions are needed.
+
+~~~text
+cook double(value) { yeet value * 2; }
+cook even(value) { yeet value % 2 == 0; }
+cook add(total, value) { yeet total + value; }
+vibe values = map(range(1, 6), double);
+yap(join(filter(values, even), ", "));
+yap(reduce(values, add, 0));
+~~~
+
+Map and predicates receive `(value)` or `(value, index)`. Reduce receives `(accumulator, value)` or `(accumulator, value, index)`. Predicates must return `fr` or `cap`. All transforms iterate a shallow snapshot: adding/removing/replacing source array entries inside the callback does not change the visited sequence; objects inside that snapshot are still shared. Callbacks share the caller's execution and recursion limits. Errors point to the callback's original source line.
+
+`some(items, predicate)` stops at the first match; `every` stops at the first non-match. Empty arrays return `cap` for some and `fr` for every. `find` returns the first match or `cap`; use `findIndex` to distinguish a false-valued item from no match. `findIndex` returns -1 when absent. Empty map/filter return an empty array; empty reduce returns the supplied initial value. These helpers also exist under `import arrays as a;`.
+
+### Control a loop
+
+`dip;` / `break;` exits the nearest loop. `skip;` / `continue;` skips to its next iteration. These statements must be inside a loop in the same function/module, even if the offending branch would never run. A function cannot break its caller's loop.
+
+~~~text
+each value in range(10, 0, -1) {
+  bet value % 2 == 0 { skip; }
+  bet value < 5 { dip; }
+  yap(value);
+}
+~~~
+
+`range(end)` starts at 0; `range(start, end)` steps by 1; `range(start, end, step)` accepts a positive or negative safe integer step toward the end. The end is excluded. A zero step, fractional/unsafe values, wrong direction, or more than 10,000 results is an error. `range(5, 0, -2)` produces `[5, 3, 1]`.
 
 Collections: len(value), range(end), range(start, end), push(array, primitive), pop(array), slice(value, start, end), reverse(array), sort(numbers), sum(numbers), min(numbers), max(numbers)
 

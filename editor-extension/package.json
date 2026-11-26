@@ -1,8 +1,8 @@
 {
   "name": "zuno-tools",
   "displayName": "Zuno Language Tools",
-  "description": "Zuno language server with completion, definition, rename, diagnostics, and local run/check commands.",
-  "version": "0.6.0",
+  "description": "Zuno language server with hover, signatures, formatting, completion, definition, rename, diagnostics and local project tests.",
+  "version": "0.7.0",
   "publisher": "zuno-local",
   "engines": {
     "vscode": "^1.85.0"
